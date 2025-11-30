@@ -4,7 +4,30 @@ import axios, {
   type AxiosResponse,
   type InternalAxiosRequestConfig,
 } from 'axios'
+import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
+
+interface QueueItem {
+  resolve: (value?: unknown) => void
+  reject: (reason?: unknown) => void
+}
+
+const MAX_RETRIES = 3
+const RETRY_DELAY = 1000
+
+let isRefreshing = false
+let failedQueue: QueueItem[] = []
+
+const processQueue = (error: Error | null, token: string | null = null) => {
+  failedQueue.forEach((p) => {
+    if (error) {
+      p.reject(error)
+    } else {
+      p.resolve(token)
+    }
+  })
+  failedQueue = []
+}
 
 const config = {
   baseURL: import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api/v1',
@@ -42,10 +65,67 @@ api.interceptors.response.use(
     return response
   },
   async (error) => {
+    const originalRequest = error.config
+
     if (import.meta.env.VITE_NODE_ENV === 'development') {
       console.error('API Response Error:', error)
     }
 
+    if (!error.response && originalRequest) {
+      originalRequest.retryCount = originalRequest.retryCount ?? 0
+
+      if (originalRequest.retryCount < MAX_RETRIES) {
+        originalRequest.retryCount++
+
+        console.log(
+          `🔄 Retrying request (${originalRequest.retryCount}/${MAX_RETRIES})...`,
+        )
+
+        await new Promise((resolve) =>
+          setTimeout(resolve, RETRY_DELAY * originalRequest.retryCount),
+        )
+        return api(originalRequest)
+      }
+    }
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject })
+        })
+          .then((token) => {
+            originalRequest.headers.Authorization = `Bearer ${token}`
+            return api(originalRequest)
+          })
+          .catch((err) => Promise.reject(err))
+      }
+
+      const navigate = useNavigate()
+      originalRequest._retry = true
+      isRefreshing = true
+
+      try {
+        const response = await axios.post(`${config.baseURL}/auth/refresh`)
+
+        const { access_token } = response.data
+        if (!access_token) navigate('/auth/login')
+        localStorage.setItem('access_token', access_token)
+
+        originalRequest.headers.Authorization = `Bearer ${access_token}`
+
+        processQueue(null, access_token)
+
+        return api(originalRequest)
+      } catch (refreshError) {
+        processQueue(refreshError as Error, null)
+        localStorage.removeItem('access_token')
+        navigate('/auth/login')
+
+        return Promise.reject(refreshError)
+      } finally {
+        isRefreshing = false
+      }
+    }
     return Promise.reject(handleError(error))
   },
 )
