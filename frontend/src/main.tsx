@@ -6,6 +6,7 @@ import App from './App.tsx'
 import ErrorFallback from './components/common/ErrorFallback.tsx'
 import { ThemeProvider } from './providers/ThemeProvider.tsx'
 
+import 'nprogress/nprogress.css'
 import './index.css'
 
 createRoot(document.getElementById('root')!).render(

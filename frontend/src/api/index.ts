@@ -1,4 +1,5 @@
 import { ApiError } from '@/models/ApiError'
+import { progress } from '@/utils/nprogress.util'
 import axios, {
   AxiosError,
   type AxiosResponse,
@@ -42,6 +43,10 @@ const api = axios.create(config)
 
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
+    if (!config.headers?.['X-Skip-Progress']) {
+      progress.start()
+    }
+
     const token = localStorage.getItem('access_token')
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
@@ -52,6 +57,7 @@ api.interceptors.request.use(
     return config
   },
   (error) => {
+    progress.stop()
     return Promise.reject(error)
   },
 )
@@ -62,6 +68,7 @@ api.interceptors.response.use(
       console.log('API Response:', response)
     }
 
+    progress.stop()
     return response
   },
   async (error) => {
@@ -126,6 +133,8 @@ api.interceptors.response.use(
         isRefreshing = false
       }
     }
+
+    progress.stop()
     return Promise.reject(handleError(error))
   },
 )
