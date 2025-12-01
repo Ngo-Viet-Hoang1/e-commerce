@@ -17,12 +17,13 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@routes/*": ["./src/routes/*"],
-      "@controllers/*": ["./src/controllers/*"],
-      "@models/*": ["./src/models/*"],
-      "@middlewares/*": ["./src/middlewares/*"],
-      "@utils/*": ["./src/utils/*"],
-      "@config/*": ["./src/config/*"]
+      "@v1/*": ["src/api/v1/*"],
+      "@v1/routes/*": ["src/api/v1/routes/*"],
+      "@v1/controllers/*": ["src/api/v1/controllers/*"],
+      "@v1/models/*": ["src/api/v1/models/*"],
+      "@v1/middlewares/*": ["src/api/v1/middlewares/*"],
+      "@v1/utils/*": ["src/api/v1/utils/*"],
+      "@v1/config/*": ["src/api/v1/config/*"]
     },
 
     // Best practices
