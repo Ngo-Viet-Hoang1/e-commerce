@@ -1,0 +1,7 @@
+dist
+node_modules
+build
+coverage
+.vite
+*.config.js
+*.config.ts
