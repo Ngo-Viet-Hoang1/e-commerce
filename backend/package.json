@@ -9,12 +9,19 @@
   },
   "devDependencies": {
     "@types/bun": "latest",
-    "@types/express": "^5.0.5"
+    "@types/dotenv": "^8.2.3",
+    "@types/express": "^5.0.5",
+    "@types/http-errors": "^2.0.5",
+    "@types/morgan": "^1.9.10",
+    "@types/node": "^24.10.1",
+    "morgan": "^1.10.1"
   },
   "peerDependencies": {
     "typescript": "^5"
   },
   "dependencies": {
-    "express": "^5.1.0"
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "http-errors": "^2.0.1"
   }
 }
