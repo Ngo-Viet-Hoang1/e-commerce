@@ -25,6 +25,7 @@
     "@types/morgan": "^1.9.10",
     "@types/node": "^24.10.1",
     "@types/prettier": "^3.0.0",
+    "@types/winston": "^2.4.4",
     "eslint": "^9.39.1",
     "globals": "^16.5.0",
     "jiti": "^2.6.1",
@@ -42,6 +43,8 @@
     "express": "^5.1.0",
     "helmet": "^8.1.0",
     "http-errors": "^2.0.1",
-    "prettier": "^3.7.3"
+    "prettier": "^3.7.3",
+    "winston": "^3.18.3",
+    "winston-daily-rotate-file": "^5.0.0"
   }
 }
