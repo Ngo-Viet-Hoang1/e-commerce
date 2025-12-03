@@ -23,6 +23,7 @@
     "@types/express": "^5.0.5",
     "@types/helmet": "^4.0.0",
     "@types/http-errors": "^2.0.5",
+    "@types/ioredis": "^5.0.0",
     "@types/morgan": "^1.9.10",
     "@types/node": "^24.10.1",
     "@types/prettier": "^3.0.0",
@@ -45,6 +46,7 @@
     "express": "^5.1.0",
     "helmet": "^8.1.0",
     "http-errors": "^2.0.1",
+    "ioredis": "^5.8.2",
     "prettier": "^3.7.3",
     "winston": "^3.18.3",
     "winston-daily-rotate-file": "^5.0.0"

@@ -1,6 +1,8 @@
+import type { Server } from 'http'
+import { disconnectRedis } from '../config/database/redis.js'
 import logger from '../config/logger'
 
-const setupProcessHandlers = (): void => {
+const setupProcessHandlers = (server?: Server): void => {
   process.on(
     'unhandledRejection',
     (reason: unknown, promise: Promise<unknown>) => {
@@ -29,16 +31,41 @@ const setupProcessHandlers = (): void => {
     process.exit(1)
   })
 
-  process.on('SIGTERM', () => {
-    logger.info('SIGTERM received, shutting down gracefully')
-    // Close server, database connections, etc.
-    process.exit(0)
-  })
+  const gracefulShutdown = async (signal: string) => {
+    logger.info(`${signal} received, shutting down gracefully`)
 
-  process.on('SIGINT', () => {
-    logger.info('SIGINT received, shutting down gracefully')
-    process.exit(0)
-  })
+    try {
+      // Close HTTP server first (stop accepting new requests)
+      if (server) {
+        await new Promise<void>((resolve, reject) => {
+          server.close((err) => {
+            if (err) {
+              logger.error('Error closing HTTP server:', err)
+              reject(err)
+            } else {
+              logger.info('✅ HTTP server closed')
+              resolve()
+            }
+          })
+        })
+      }
+
+      // Close Redis connection
+      await disconnectRedis()
+
+      // Add other cleanup tasks here
+      // await database.close()
+
+      logger.info('✅ Graceful shutdown completed')
+      process.exit(0)
+    } catch (error) {
+      logger.error('Error during graceful shutdown:', error)
+      process.exit(1)
+    }
+  }
+
+  process.on('SIGTERM', () => gracefulShutdown('SIGTERM'))
+  process.on('SIGINT', () => gracefulShutdown('SIGINT'))
 }
 
 export default setupProcessHandlers

@@ -1,16 +1,31 @@
+import { connectRedis } from '@v1/config/database/redis'
 import logger from '@v1/config/logger'
 import setupProcessHandlers from '@v1/utils/process-handler.util'
+import type { Server } from 'http'
 import app from './app'
 
 const port = process.env.PORT || 3000
 
-// Setup process error handlers
-setupProcessHandlers()
+async function startServer(): Promise<Server> {
+  try {
+    await connectRedis()
 
-const server = app.listen(port, () => {
-  logger.info(
-    `2 Factor Authentication app listening at http://localhost:${port}`,
-  )
-})
+    const server = app.listen(port, () => {
+      logger.info(`🚀 Server listening at http://localhost:${port}`)
+      logger.info(`📝 Environment: ${process.env.NODE_ENV || 'development'}`)
+      logger.info(`🔗 API Base: http://localhost:${port}/api/v1`)
+    })
 
-export default server
+    // Setup graceful shutdown với server instance
+    setupProcessHandlers(server)
+
+    return server
+  } catch (error) {
+    logger.error('❌ Failed to start server:', error)
+    process.exit(1)
+  }
+}
+
+startServer()
+
+export { startServer }
