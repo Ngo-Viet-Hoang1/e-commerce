@@ -3,6 +3,7 @@ import {
   globalErrorHandler,
   notFoundHandler,
 } from '@v1/middlewares/error-handler.middleware'
+import { limiter } from '@v1/middlewares/rate-limiter.middleware'
 import { requestIdMiddleware } from '@v1/middlewares/request-id.middleware'
 import router from '@v1/routes'
 import compression from 'compression'
@@ -20,6 +21,7 @@ const app = express()
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
+app.use(limiter)
 app.use(requestIdMiddleware)
 
 app.use(corsMiddleware)
