@@ -1,4 +1,3 @@
-import logger from '@v1/config/logger'
 import { corsMiddleware } from '@v1/middlewares/cors.middleware'
 import {
   globalErrorHandler,
@@ -6,7 +5,6 @@ import {
 } from '@v1/middlewares/error-handler.middleware'
 import { requestIdMiddleware } from '@v1/middlewares/request-id.middleware'
 import router from '@v1/routes'
-import setupProcessHandlers from '@v1/utils/process-handler.util'
 import compression from 'compression'
 import dotenv from 'dotenv'
 import express from 'express'
@@ -18,13 +16,9 @@ import { fileURLToPath } from 'url'
 dotenv.config()
 
 const app = express()
-const port = process.env.PORT || 3000
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
-
-// Setup process error handlers
-setupProcessHandlers()
 
 app.use(requestIdMiddleware)
 
@@ -61,6 +55,4 @@ app.use('/api/v1', router)
 app.use(notFoundHandler)
 app.use(globalErrorHandler)
 
-app.listen(port, () => {
-  logger.info(`Example app listening at http://localhost:${port}`)
-})
+export default app
