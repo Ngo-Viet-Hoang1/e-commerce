@@ -1,4 +1,5 @@
 import logger from '@v1/config/logger'
+import { corsMiddleware } from '@v1/middlewares/cors.middleware'
 import {
   globalErrorHandler,
   notFoundHandler,
@@ -26,6 +27,8 @@ const __dirname = path.dirname(__filename)
 setupProcessHandlers()
 
 app.use(requestIdMiddleware)
+
+app.use(corsMiddleware)
 
 // Security middleware
 app.use(helmet())
