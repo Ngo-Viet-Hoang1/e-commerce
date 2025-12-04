@@ -142,6 +142,39 @@ function getErrorMapping(err: Error): {
       category: ErrorCategory.AUTHENTICATION,
       severity: ErrorSeverity.MEDIUM,
     },
+    // Prisma errors
+    PrismaClientKnownRequestError: {
+      statusCode: 400,
+      message: 'Database request error',
+      status: 'fail',
+      code: ErrorCode.DATABASE_ERROR,
+      category: ErrorCategory.DATABASE,
+      severity: ErrorSeverity.HIGH,
+    },
+    PrismaClientUnknownRequestError: {
+      statusCode: 500,
+      message: 'Unknown database error',
+      status: 'error',
+      code: ErrorCode.DATABASE_ERROR,
+      category: ErrorCategory.DATABASE,
+      severity: ErrorSeverity.CRITICAL,
+    },
+    PrismaClientValidationError: {
+      statusCode: 400,
+      message: 'Database validation error',
+      status: 'fail',
+      code: ErrorCode.VALIDATION_ERROR,
+      category: ErrorCategory.VALIDATION,
+      severity: ErrorSeverity.MEDIUM,
+    },
+    PrismaClientInitializationError: {
+      statusCode: 503,
+      message: 'Database connection failed',
+      status: 'error',
+      code: ErrorCode.DATABASE_ERROR,
+      category: ErrorCategory.DATABASE,
+      severity: ErrorSeverity.CRITICAL,
+    },
   }
 
   return (
