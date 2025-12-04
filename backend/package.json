@@ -27,6 +27,7 @@
     "@types/ioredis": "^5.0.0",
     "@types/morgan": "^1.9.10",
     "@types/node": "^24.10.1",
+    "@types/pg": "^8.15.6",
     "@types/prettier": "^3.0.0",
     "@types/rate-limit-redis": "^3.0.0",
     "@types/winston": "^2.4.4",
@@ -34,12 +35,15 @@
     "globals": "^16.5.0",
     "jiti": "^2.6.1",
     "morgan": "^1.10.1",
+    "prisma": "^7.1.0",
     "typescript-eslint": "^8.48.0"
   },
   "peerDependencies": {
     "typescript": "^5"
   },
   "dependencies": {
+    "@prisma/adapter-pg": "^7.1.0",
+    "@prisma/client": "^7.1.0",
     "compression": "^1.8.1",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
@@ -50,6 +54,7 @@
     "helmet": "^8.1.0",
     "http-errors": "^2.0.1",
     "ioredis": "^5.8.2",
+    "pg": "^8.16.3",
     "prettier": "^3.7.3",
     "rate-limit-redis": "^4.3.1",
     "winston": "^3.18.3",
