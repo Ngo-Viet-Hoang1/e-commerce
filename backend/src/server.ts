@@ -1,3 +1,4 @@
+import { connectPrisma } from '@v1/config/database/postgres'
 import { connectRedis } from '@v1/config/database/redis'
 import logger from '@v1/config/logger'
 import setupProcessHandlers from '@v1/utils/process-handler.util'
@@ -8,7 +9,8 @@ const port = process.env.PORT || 3000
 
 async function startServer(): Promise<Server> {
   try {
-    await connectRedis()
+    // Connect to databases
+    await Promise.all([connectRedis(), connectPrisma()])
 
     const server = app.listen(port, () => {
       logger.info(`🚀 Server listening at http://localhost:${port}`)
@@ -16,7 +18,7 @@ async function startServer(): Promise<Server> {
       logger.info(`🔗 API Base: http://localhost:${port}/api/v1`)
     })
 
-    // Setup graceful shutdown với server instance
+    // Setup graceful shutdown with server instance
     setupProcessHandlers(server)
 
     return server

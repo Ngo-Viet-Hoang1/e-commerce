@@ -1,4 +1,5 @@
 import type { Server } from 'http'
+import { disconnectPrisma } from '../config/database/postgres.js'
 import { disconnectRedis } from '../config/database/redis.js'
 import logger from '../config/logger'
 
@@ -50,11 +51,9 @@ const setupProcessHandlers = (server?: Server): void => {
         })
       }
 
-      // Close Redis connection
+      // Close database connections
       await disconnectRedis()
-
-      // Add other cleanup tasks here
-      // await database.close()
+      await disconnectPrisma()
 
       logger.info('✅ Graceful shutdown completed')
       process.exit(0)
