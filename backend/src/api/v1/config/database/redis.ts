@@ -84,13 +84,30 @@ redis.on('end', () => {
 
 export async function connectRedis(): Promise<void> {
   try {
-    if (isConnected) {
+    // Check connection status
+    if (redis.status === 'ready' || isConnected) {
       logger.info('Redis already connected')
       return
     }
 
-    if (isConnecting) {
-      logger.info('Redis connection in progress...')
+    if (redis.status === 'connecting' || isConnecting) {
+      logger.info('Redis connection in progress, waiting...')
+      // Wait for connection to complete
+      await new Promise<void>((resolve, reject) => {
+        const timeout = setTimeout(() => {
+          reject(new Error('Redis connection timeout'))
+        }, 10000)
+
+        redis.once('ready', () => {
+          clearTimeout(timeout)
+          resolve()
+        })
+
+        redis.once('error', (err) => {
+          clearTimeout(timeout)
+          reject(err)
+        })
+      })
       return
     }
 
