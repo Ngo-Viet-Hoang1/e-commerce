@@ -2,10 +2,8 @@
 import type { NextFunction, Request, Response } from 'express'
 import logger from '../config/logger'
 import { ErrorCategory, ErrorCode, ErrorSeverity } from '../enums/index.js'
-import type {
-  ErrorLogPayload,
-  IErrorResponse,
-} from '../interfaces/base-response.interface.js'
+import type { IErrorResponse } from '../interfaces/base-response.interface.js'
+import type { ErrorLogPayload } from '../interfaces/error.interface.js'
 import { AppError, NotFoundException } from '../models/app-error.model'
 
 export const globalErrorHandler = (
