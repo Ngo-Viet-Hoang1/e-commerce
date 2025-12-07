@@ -1,8 +1,8 @@
-import { connectPrisma } from '@v1/config/database/postgres'
-import { connectRedis } from '@v1/config/database/redis'
-import logger from '@v1/config/logger'
-import setupProcessHandlers from '@v1/utils/process-handler.util'
+import { connectPrisma } from '@/api/v1/shared/config/database/postgres'
+import { connectRedis } from '@/api/v1/shared/config/database/redis'
+import logger from '@/api/v1/shared/config/logger'
 import type { Server } from 'http'
+import setupProcessHandlers from './api/v1/shared/utils/process-handler.util'
 import app from './app'
 
 const port = process.env.PORT || 3000

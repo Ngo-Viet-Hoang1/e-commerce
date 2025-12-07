@@ -1,11 +1,11 @@
-import { corsMiddleware } from '@v1/middlewares/cors.middleware'
+import { corsMiddleware } from '@/api/v1/shared/middlewares/cors.middleware'
 import {
   globalErrorHandler,
   notFoundHandler,
-} from '@v1/middlewares/error-handler.middleware'
-import { limiter } from '@v1/middlewares/rate-limiter.middleware'
-import { requestIdMiddleware } from '@v1/middlewares/request-id.middleware'
-import router from '@v1/routes'
+} from '@/api/v1/shared/middlewares/error-handler.middleware'
+import { limiter } from '@/api/v1/shared/middlewares/rate-limiter.middleware'
+import { requestIdMiddleware } from '@/api/v1/shared/middlewares/request-id.middleware'
+import router from '@/api/v1/routes'
 import compression from 'compression'
 import dotenv from 'dotenv'
 import express from 'express'

@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from 'express'
 import createError from 'http-errors'
-import { ErrorCategory, ErrorCode, ErrorSeverity } from '../enums/index.js'
-import { AppError } from '../models/app-error.model.js'
+import { ErrorCategory, ErrorCode, ErrorSeverity } from '../../shared/enums'
+import { AppError } from '../../shared/models/app-error.model'
 
 class ErrorController {
   index = (_req: Request, _res: Response, _next: NextFunction): void => {

@@ -1,6 +1,6 @@
 import express from 'express'
 import createError from 'http-errors'
-import { errorController } from '../controllers/error.controller'
+import { errorController } from '../modules/error/error.controller'
 import {
   ConflictException,
   ForbiddenException,
@@ -9,7 +9,7 @@ import {
   RateLimitException,
   UnauthorizedException,
   ValidationException,
-} from '../models/app-error.model'
+} from '../shared/models/app-error.model'
 
 const router = express.Router()
 

@@ -1,6 +1,6 @@
 import Redis from 'ioredis'
 import { ExternalServiceException } from '../../models/app-error.model.js'
-import logger from '../logger'
+import logger from '../logger.js'
 
 const REDIS_CONFIG = {
   host: process.env.REDIS_HOST || 'localhost',

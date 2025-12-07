@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { NextFunction, Request, Response } from 'express'
-import logger from '../config/logger'
+import logger from '../config/logger.js'
 import { ErrorCategory, ErrorCode, ErrorSeverity } from '../enums/index.js'
 import type { IErrorResponse } from '../interfaces/base-response.interface.js'
 import type { ErrorLogPayload } from '../interfaces/error.interface.js'
