@@ -1,4 +1,4 @@
-import type { JWT_SCOPE } from '../../modules/auth/auth.constant'
+import type { JWT_SCOPE } from '../../modules/auth/auth.enum'
 
 export interface AccessTokenPayload {
   id: number

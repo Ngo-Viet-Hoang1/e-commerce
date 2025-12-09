@@ -3,3 +3,8 @@ export enum JWT_SCOPE {
   MFA = 'mfa',
   REFRESH = 'refresh',
 }
+
+export enum REFRESH_TOKEN_STATUS {
+  ACTIVE = 'active',
+  REVOKED = 'revoked',
+}

@@ -1,0 +1,220 @@
+import crypto from 'crypto'
+import redis from '../../shared/config/database/redis'
+import { DatabaseException } from '../../shared/models/app-error.model'
+import { REFRESH_TOKEN_STATUS } from './auth.enum'
+
+class RefreshTokenStore {
+  private static readonly REFRESH_TOKEN_KEY_PREFIX = 'refreshToken:v1:'
+
+  private static readonly USER_REFRESH_SET_PREFIX = 'user:'
+  private static readonly USER_REFRESH_SET_SUFFIX = ':refreshTokens:v1'
+
+  private static getTokenMetadataKey(hashedToken: string): string {
+    return `${this.REFRESH_TOKEN_KEY_PREFIX}${hashedToken}`
+  }
+
+  private static getUserRefreshSetKey(userId: number): string {
+    return `${this.USER_REFRESH_SET_PREFIX}${userId}${this.USER_REFRESH_SET_SUFFIX}`
+  }
+
+  private static getTokenUserMappingKey(hashedToken: string): string {
+    return `${this.REFRESH_TOKEN_KEY_PREFIX}userId:${hashedToken}`
+  }
+
+  static hashToken(token: string) {
+    const secret = process.env.REFRESH_TOKEN_SECRET || 'fallback-secret'
+    return crypto.createHmac('sha256', secret).update(token).digest('hex')
+  }
+
+  static async store(
+    userId: number,
+    token: string,
+    opts: {
+      ip?: string
+      deviceId?: string
+      ttlSeconds: number
+    },
+  ) {
+    try {
+      const hashedToken = this.hashToken(token)
+
+      const tokenMetadataKey = this.getTokenMetadataKey(hashedToken)
+      const userRefreshSetKey = this.getUserRefreshSetKey(userId)
+      const tokenUserMappingKey = this.getTokenUserMappingKey(hashedToken)
+
+      const { ip = 'unknown', deviceId = 'unknown', ttlSeconds } = opts
+
+      if (!ttlSeconds || ttlSeconds <= 0) {
+        throw new DatabaseException('Invalid TTL for refresh token')
+      }
+
+      const tokenMetadata = {
+        userId,
+        ip,
+        deviceId,
+        status: REFRESH_TOKEN_STATUS.ACTIVE,
+        createdAt: new Date().toISOString(),
+        lastUsedAt: new Date().toISOString(),
+      }
+
+      const existingSetTTL = await redis.ttl(userRefreshSetKey)
+      let newSetTTL: number | null = ttlSeconds
+
+      if (existingSetTTL === -1) {
+        newSetTTL = null
+      } else if (existingSetTTL > ttlSeconds) {
+        newSetTTL = existingSetTTL
+      }
+
+      const pipeline = redis.pipeline()
+
+      pipeline.setex(
+        tokenMetadataKey,
+        ttlSeconds,
+        JSON.stringify(tokenMetadata),
+      )
+
+      pipeline.sadd(userRefreshSetKey, hashedToken)
+
+      if (newSetTTL !== null && newSetTTL > 0) {
+        pipeline.expire(userRefreshSetKey, newSetTTL)
+      }
+
+      pipeline.setex(tokenUserMappingKey, ttlSeconds, userId.toString())
+
+      await pipeline.exec()
+    } catch (error) {
+      throw new DatabaseException(
+        'Failed to store refresh token',
+        error as Error,
+      )
+    }
+  }
+
+  /**
+   * Check if token is valid and update lastUsedAt + refresh TT
+   * If token not exist or expired→ cleanup mapping + set
+   */
+  static async validateAndTouch(token: string): Promise<boolean> {
+    try {
+      const hashedToken = this.hashToken(token)
+      const tokenMetadataKey = this.getTokenMetadataKey(hashedToken)
+      const tokenUserMappingKey = this.getTokenUserMappingKey(hashedToken)
+
+      const metadataJson = await redis.get(tokenMetadataKey)
+
+      if (!metadataJson) {
+        const userIdStr = await redis.get(tokenUserMappingKey)
+        if (userIdStr) {
+          const userId = Number(userIdStr)
+
+          const pipeline = redis.pipeline()
+          pipeline.srem(this.getUserRefreshSetKey(userId), hashedToken)
+          pipeline.del(tokenUserMappingKey)
+          await pipeline.exec()
+        }
+
+        return false
+      }
+
+      const tokenMetadata = JSON.parse(metadataJson)
+      if (tokenMetadata.status !== REFRESH_TOKEN_STATUS.ACTIVE) {
+        return false
+      }
+
+      tokenMetadata.lastUsedAt = new Date().toISOString()
+
+      const tokenTTL = await redis.ttl(tokenMetadataKey)
+      if (tokenTTL > 0) {
+        const pipeline = redis.pipeline()
+        pipeline.setex(
+          tokenMetadataKey,
+          tokenTTL,
+          JSON.stringify(tokenMetadata),
+        )
+        pipeline.setex(
+          tokenUserMappingKey,
+          tokenTTL,
+          tokenMetadata.userId.toString(),
+        )
+        await pipeline.exec()
+      } else {
+        /**
+         * In case TTL = 0 or -1 is unusual:
+         * key exists but has no TTL → safe guard by cleanup
+         */
+        const pipeline = redis.pipeline()
+        pipeline.srem(
+          this.getUserRefreshSetKey(tokenMetadata.userId),
+          hashedToken,
+        )
+        pipeline.del(tokenUserMappingKey)
+        await pipeline.exec()
+        return false
+      }
+
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  static async revoke(token: string): Promise<void> {
+    try {
+      const hashedToken = this.hashToken(token)
+      const tokenMetadataKey = this.getTokenMetadataKey(hashedToken)
+
+      const metadataJson = await redis.get(tokenMetadataKey)
+      if (!metadataJson) return
+
+      const tokenMetadata = JSON.parse(metadataJson)
+
+      const pipeline = redis.pipeline()
+
+      pipeline.del(tokenMetadataKey)
+      pipeline.srem(
+        this.getUserRefreshSetKey(tokenMetadata.userId),
+        hashedToken,
+      )
+      pipeline.del(this.getTokenUserMappingKey(hashedToken))
+
+      await pipeline.exec()
+    } catch (error) {
+      throw new DatabaseException(
+        'Failed to revoke refresh token',
+        error as Error,
+        { operation: 'revoke' },
+      )
+    }
+  }
+
+  static async revokeAll(userId: number): Promise<void> {
+    try {
+      const userRefreshSetKey = this.getUserRefreshSetKey(userId)
+      const hashedTokens = await redis.smembers(userRefreshSetKey)
+
+      if (!hashedTokens || hashedTokens.length === 0) {
+        await redis.del(userRefreshSetKey)
+        return
+      }
+
+      const pipeline = redis.pipeline()
+
+      hashedTokens.forEach((hashed) => {
+        pipeline.del(this.getTokenMetadataKey(hashed))
+        pipeline.del(this.getTokenUserMappingKey(hashed))
+      })
+
+      pipeline.del(userRefreshSetKey)
+
+      await pipeline.exec()
+    } catch (error) {
+      throw new DatabaseException(
+        'Failed to revoke all refresh tokens',
+        error as Error,
+      )
+    }
+  }
+}
+
+export default RefreshTokenStore

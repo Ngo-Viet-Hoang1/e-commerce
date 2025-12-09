@@ -1,18 +1,34 @@
 import jwt from 'jsonwebtoken'
-import { JWT_SCOPE } from '../../modules/auth/auth.constant'
 import type {
   AccessTokenPayload,
   IssueTokensOptions,
   RefreshTokenPayload,
-} from '../interfaces/jwt-payload.interface'
-import { UnauthorizedException } from '../models/app-error.model'
+} from '../../shared/interfaces/jwt-payload.interface'
+import { UnauthorizedException } from '../../shared/models/app-error.model'
+import { JWT_SCOPE } from './auth.enum'
+import RefreshTokenStore from './refresh-token.store'
 
 export class JwtUtils {
-  static issueTokens = (options: IssueTokensOptions) => {
+  static issueTokens = async (options: IssueTokensOptions) => {
     const { userId, roleIds = [], deviceId, ip } = options
 
     const accessToken = this.generateAccessToken(userId, roleIds)
     const refreshToken = this.generateRefreshToken(userId, deviceId, ip)
+
+    const decoded = jwt.decode(refreshToken) as jwt.JwtPayload
+    const ttlSeconds = decoded.exp
+      ? decoded.exp - Math.floor(Date.now() / 1000)
+      : 7 * 24 * 60 * 60
+
+    if (ttlSeconds <= 0) {
+      throw new UnauthorizedException('Invalid Refresh Token Expiry')
+    }
+
+    await RefreshTokenStore.store(userId, refreshToken, {
+      ip,
+      deviceId,
+      ttlSeconds,
+    })
 
     return { accessToken, refreshToken }
   }
