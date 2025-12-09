@@ -1,10 +1,11 @@
 import type { Request, Response } from 'express'
+import { UnauthorizedException } from '../../shared/models/app-error.model'
 import { SuccessResponse } from '../../shared/models/success-response.model'
-import { AuthUtils } from './auth.util'
+import { RequestUtils } from '../../shared/utils/request.util'
 import { userService, type CreateUserBody } from '../user'
 import type { LoginBody } from './auth.schema'
 import { authService } from './auth.service'
-import { RequestUtils } from '../../shared/utils/request.util'
+import { AuthUtils } from './auth.util'
 
 class AuthController {
   register = async (req: Request, res: Response) => {
@@ -31,6 +32,29 @@ class AuthController {
       res,
       { user: { userId, email }, accessToken },
       'Login successful',
+    )
+  }
+
+  refreshToken = async (req: Request, res: Response) => {
+    const { refreshToken } = req.cookies
+    if (!refreshToken) {
+      throw new UnauthorizedException('Refresh token not provided')
+    }
+
+    const meta = RequestUtils.getRequestMetadata(req)
+
+    const { userId, email, accessToken, newRefreshToken } =
+      await authService.refreshToken({
+        token: refreshToken,
+        ...meta,
+      })
+
+    AuthUtils.setRefreshTokenCookie(res, newRefreshToken)
+
+    SuccessResponse.send(
+      res,
+      { user: { userId, email }, accessToken },
+      'Token refreshed successfully',
     )
   }
 }

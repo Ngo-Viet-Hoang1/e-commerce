@@ -14,4 +14,6 @@ router.post(
 
 router.post('/login', validate(loginBodySchema, 'body'), authController.login)
 
+router.post('/refresh-token', authController.refreshToken)
+
 export default router
