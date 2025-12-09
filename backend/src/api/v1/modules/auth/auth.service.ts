@@ -1,5 +1,5 @@
 import { UnauthorizedException } from '../../shared/models/app-error.model'
-import { JwtUtils } from '../../shared/utils/jwt.util'
+import { JwtUtils } from './jwt.util'
 import { PasswordUtils } from '../../shared/utils/password.util'
 import { userRepository } from '../user'
 import type { LoginProps } from './auth.interface'
@@ -18,7 +18,7 @@ class AuthService {
     const roles = await userRepository.findRolesByUserId(user.id)
     const roleIds = roles?.userRoles.map((ur) => ur.role.id)
 
-    const { accessToken, refreshToken } = JwtUtils.issueTokens({
+    const { accessToken, refreshToken } = await JwtUtils.issueTokens({
       userId: user.id,
       roleIds,
       deviceId,
