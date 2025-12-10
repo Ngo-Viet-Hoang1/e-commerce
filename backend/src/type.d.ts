@@ -1,9 +1,10 @@
-import type { AccessTokenPayload } from './api/v1/shared/interfaces/jwt-payload.interface'
+import type { AccessTokenPayload } from '@v1/shared/interfaces/jwt-payload.interface'
 
 declare global {
   namespace Express {
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+    interface User extends AccessTokenPayload {}
     interface Request {
-      user?: AccessTokenPayload
       validatedData?: {
         body?: unknown
         query?: unknown
@@ -13,5 +14,3 @@ declare global {
     }
   }
 }
-
-export {}
