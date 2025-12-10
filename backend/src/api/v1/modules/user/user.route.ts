@@ -1,4 +1,5 @@
 import { Router } from 'express'
+import { authenticate } from '../../shared/middlewares/auth.middleware'
 import {
   validate,
   validateMultiple,
@@ -12,6 +13,7 @@ import {
 } from './user.schema'
 
 const router = Router()
+router.use(authenticate)
 
 router.get('/', validate(listUsersQuerySchema, 'query'), userController.findAll)
 
