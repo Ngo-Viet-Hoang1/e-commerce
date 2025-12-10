@@ -16,6 +16,12 @@ export const USER_SELECT_FIELDS = {
   deletedAt: true,
 } as const satisfies Prisma.UserSelect
 
+export const USER_SELECT_FOR_AUTH = {
+  ...USER_SELECT_FIELDS,
+  password: true,
+  twoFactorSecret: true,
+} as const satisfies Prisma.UserSelect
+
 class UserRepository {
   findById = async (id: number, includeDeleted = false) => {
     return executePrismaQuery(() =>
@@ -29,11 +35,33 @@ class UserRepository {
     )
   }
 
+  findRolesByUserId = async (id: number) => {
+    return executePrismaQuery(() =>
+      prisma.user.findUnique({
+        where: { id },
+        select: {
+          userRoles: {
+            select: { role: { select: { id: true, name: true } } },
+          },
+        },
+      }),
+    )
+  }
+
   findByEmail = async (email: string) => {
     return executePrismaQuery(() =>
       prisma.user.findUnique({
         where: { email },
         select: USER_SELECT_FIELDS,
+      }),
+    )
+  }
+
+  findByEmailForAuth = async (email: string) => {
+    return executePrismaQuery(() =>
+      prisma.user.findUnique({
+        where: { email },
+        select: USER_SELECT_FOR_AUTH,
       }),
     )
   }
