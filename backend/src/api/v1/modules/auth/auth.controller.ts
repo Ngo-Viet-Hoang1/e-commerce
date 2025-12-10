@@ -8,6 +8,13 @@ import { authService } from './auth.service'
 import { AuthUtils } from './auth.util'
 
 class AuthController {
+  me = async (req: Request, res: Response) => {
+    const user = req.user!
+    const me = await authService.me(user.id)
+
+    SuccessResponse.send(res, { me }, 'User profile fetched successfully')
+  }
+
   register = async (req: Request, res: Response) => {
     const data = req.validatedData?.body as CreateUserBody
 

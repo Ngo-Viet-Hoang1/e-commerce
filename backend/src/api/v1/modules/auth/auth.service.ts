@@ -1,12 +1,18 @@
 import logger from '../../shared/config/logger'
 import { UnauthorizedException } from '../../shared/models/app-error.model'
 import { PasswordUtils } from '../../shared/utils/password.util'
-import { userRepository } from '../user'
+import { userDtoSchema, userRepository, userService } from '../user'
 import type { LoginProps, RefreshTokenProps } from './auth.interface'
 import { JwtUtils } from './jwt.util'
 import RefreshTokenStore from './refresh-token.store'
 
 class AuthService {
+  me = async (userId: number) => {
+    const me = await userService.findById(userId)
+
+    return userDtoSchema.parse(me)
+  }
+
   login = async ({ email, password, deviceId, ip }: LoginProps) => {
     const user = await userRepository.findByEmailForAuth(email)
     if (!user) throw new UnauthorizedException('Invalid credentials')
