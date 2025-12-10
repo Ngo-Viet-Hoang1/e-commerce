@@ -1,5 +1,6 @@
 import crypto from 'crypto'
 import redis from '../../shared/config/database/redis'
+import logger from '../../shared/config/logger'
 import { DatabaseException } from '../../shared/models/app-error.model'
 import { REFRESH_TOKEN_STATUS } from './auth.enum'
 
@@ -9,24 +10,24 @@ class RefreshTokenStore {
   private static readonly USER_REFRESH_SET_PREFIX = 'user:'
   private static readonly USER_REFRESH_SET_SUFFIX = ':refreshTokens:v1'
 
-  private static getTokenMetadataKey(hashedToken: string): string {
+  private static getTokenMetadataKey = (hashedToken: string): string => {
     return `${this.REFRESH_TOKEN_KEY_PREFIX}${hashedToken}`
   }
 
-  private static getUserRefreshSetKey(userId: number): string {
+  private static getUserRefreshSetKey = (userId: number): string => {
     return `${this.USER_REFRESH_SET_PREFIX}${userId}${this.USER_REFRESH_SET_SUFFIX}`
   }
 
-  private static getTokenUserMappingKey(hashedToken: string): string {
+  private static getTokenUserMappingKey = (hashedToken: string): string => {
     return `${this.REFRESH_TOKEN_KEY_PREFIX}userId:${hashedToken}`
   }
 
-  static hashToken(token: string) {
+  static hashToken = (token: string) => {
     const secret = process.env.REFRESH_TOKEN_SECRET || 'fallback-secret'
     return crypto.createHmac('sha256', secret).update(token).digest('hex')
   }
 
-  static async store(
+  static store = async (
     userId: number,
     token: string,
     opts: {
@@ -34,7 +35,7 @@ class RefreshTokenStore {
       deviceId?: string
       ttlSeconds: number
     },
-  ) {
+  ) => {
     try {
       const hashedToken = this.hashToken(token)
 
@@ -95,7 +96,7 @@ class RefreshTokenStore {
    * Check if token is valid and update lastUsedAt + refresh TT
    * If token not exist or expired→ cleanup mapping + set
    */
-  static async validateAndTouch(token: string): Promise<boolean> {
+  static validateAndConsume = async (token: string): Promise<boolean> => {
     try {
       const hashedToken = this.hashToken(token)
       const tokenMetadataKey = this.getTokenMetadataKey(hashedToken)
@@ -108,10 +109,8 @@ class RefreshTokenStore {
         if (userIdStr) {
           const userId = Number(userIdStr)
 
-          const pipeline = redis.pipeline()
-          pipeline.srem(this.getUserRefreshSetKey(userId), hashedToken)
-          pipeline.del(tokenUserMappingKey)
-          await pipeline.exec()
+          logger.warn('[SECURITY] Token reuse detected ', { userId })
+          await this.revokeAll(userId)
         }
 
         return false
@@ -122,44 +121,26 @@ class RefreshTokenStore {
         return false
       }
 
-      tokenMetadata.lastUsedAt = new Date().toISOString()
-
-      const tokenTTL = await redis.ttl(tokenMetadataKey)
-      if (tokenTTL > 0) {
-        const pipeline = redis.pipeline()
-        pipeline.setex(
-          tokenMetadataKey,
-          tokenTTL,
-          JSON.stringify(tokenMetadata),
-        )
-        pipeline.setex(
-          tokenUserMappingKey,
-          tokenTTL,
-          tokenMetadata.userId.toString(),
-        )
-        await pipeline.exec()
-      } else {
-        /**
-         * In case TTL = 0 or -1 is unusual:
-         * key exists but has no TTL → safe guard by cleanup
-         */
-        const pipeline = redis.pipeline()
-        pipeline.srem(
-          this.getUserRefreshSetKey(tokenMetadata.userId),
-          hashedToken,
-        )
-        pipeline.del(tokenUserMappingKey)
-        await pipeline.exec()
-        return false
-      }
+      const pipeline = redis.pipeline()
+      pipeline.del(tokenMetadataKey)
+      pipeline.srem(
+        this.getUserRefreshSetKey(tokenMetadata.userId),
+        hashedToken,
+      )
+      pipeline.del(tokenUserMappingKey)
+      await pipeline.exec()
 
       return true
-    } catch {
+    } catch (error) {
+      throw new DatabaseException(
+        'Failed to validate refresh token',
+        error as Error,
+      )
       return false
     }
   }
 
-  static async revoke(token: string): Promise<void> {
+  static revoke = async (token: string): Promise<void> => {
     try {
       const hashedToken = this.hashToken(token)
       const tokenMetadataKey = this.getTokenMetadataKey(hashedToken)
@@ -188,7 +169,7 @@ class RefreshTokenStore {
     }
   }
 
-  static async revokeAll(userId: number): Promise<void> {
+  static revokeAll = async (userId: number): Promise<void> => {
     try {
       const userRefreshSetKey = this.getUserRefreshSetKey(userId)
       const hashedTokens = await redis.smembers(userRefreshSetKey)

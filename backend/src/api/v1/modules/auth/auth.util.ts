@@ -5,9 +5,9 @@ export class AuthUtils {
     res.cookie('refreshToken', token, {
       maxAge: 1000 * 60 * 60 * 24 * 7,
       httpOnly: true,
-      sameSite: 'lax',
+      sameSite: 'none',
       secure: process.env.NODE_ENV === 'production',
-      path: '/api/v1/auth/refresh-token',
+      path: '/api/v1/auth',
     })
   }
 }

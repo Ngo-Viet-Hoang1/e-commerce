@@ -67,25 +67,21 @@ export class JwtUtils {
     return jwt.sign(payload, secret, { expiresIn } as jwt.SignOptions)
   }
 
-  static verifyAccessToken = (
-    token: string,
-  ): jwt.JwtPayload | string | undefined => {
+  static verifyAccessToken = (token: string) => {
     const secret = process.env.JWT_SECRET || 'jwt-secret'
 
     try {
-      return jwt.verify(token, secret)
+      return jwt.verify(token, secret) as AccessTokenPayload
     } catch {
       throw new UnauthorizedException('Invalid Access Token')
     }
   }
 
-  static verifyRefreshToken = (
-    token: string,
-  ): jwt.JwtPayload | string | undefined => {
+  static verifyRefreshToken = (token: string) => {
     const secret = process.env.JWT_REFRESH_SECRET || 'jwt-refresh-secret'
 
     try {
-      return jwt.verify(token, secret)
+      return jwt.verify(token, secret) as RefreshTokenPayload
     } catch {
       throw new UnauthorizedException('Invalid Refresh Token')
     }
