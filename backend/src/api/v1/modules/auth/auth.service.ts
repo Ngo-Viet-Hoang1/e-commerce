@@ -38,6 +38,14 @@ class AuthService {
     return { userId: user.id, email: user.email, accessToken, refreshToken }
   }
 
+  logout = async (refreshToken: string) => {
+    await RefreshTokenStore.revoke(refreshToken)
+  }
+
+  logoutAll = async (userId: number) => {
+    await RefreshTokenStore.revokeAll(userId)
+  }
+
   refreshToken = async ({ token, deviceId, ip }: RefreshTokenProps) => {
     const payload = await JwtUtils.verifyRefreshToken(token)
     if (!payload) throw new UnauthorizedException('Invalid refresh token')

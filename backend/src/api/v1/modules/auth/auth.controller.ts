@@ -42,6 +42,29 @@ class AuthController {
     )
   }
 
+  logout = async (req: Request, res: Response) => {
+    const { refreshToken } = req.cookies
+    if (!refreshToken) {
+      throw new UnauthorizedException('Refresh token not provided')
+    }
+
+    await authService.logout(refreshToken)
+
+    AuthUtils.clearRefreshTokenCookie(res)
+
+    SuccessResponse.send(res, {}, 'Logout successful')
+  }
+
+  logoutAll = async (req: Request, res: Response) => {
+    const user = req.user!
+
+    await authService.logoutAll(user.id)
+
+    AuthUtils.clearRefreshTokenCookie(res)
+
+    SuccessResponse.send(res, {}, 'Logout successful')
+  }
+
   refreshToken = async (req: Request, res: Response) => {
     const { refreshToken } = req.cookies
     if (!refreshToken) {

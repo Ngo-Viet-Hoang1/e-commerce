@@ -17,6 +17,10 @@ router.post(
 
 router.post('/login', validate(loginBodySchema, 'body'), authController.login)
 
+router.post('/logout', authenticate, authController.logout)
+
+router.post('/logout-all', authenticate, authController.logoutAll)
+
 router.post('/refresh-token', authController.refreshToken)
 
 export default router
