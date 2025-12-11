@@ -143,7 +143,14 @@ const handleError = (error: AxiosError) => {
   if (error.response) {
     const { status, data } = error.response as {
       status: number
-      data: { message?: string; errors?: Record<string, string[]> }
+      data: {
+        message?: string
+        errors?: Record<string, string[]>
+        error?: {
+          details?: Record<string, string[]>
+          statusCode?: number
+        }
+      }
     }
 
     const errorMessages: Record<number, string> = {
@@ -162,12 +169,19 @@ const handleError = (error: AxiosError) => {
 
     const message =
       errorMessages[status] ?? data?.message ?? 'Something went wrong'
+    const validationErrors = data?.error?.details
 
     if (!error.config?.headers?.['X-Skip-Toast']) {
       toast.error(message)
+
+      if (validationErrors) {
+        Object.entries(validationErrors).forEach(([field, messsages]) =>
+          messsages.forEach((msg) => toast.error(msg)),
+        )
+      }
     }
 
-    return Promise.reject(new ApiError(message, status, data?.errors))
+    return Promise.reject(new ApiError(message, status, validationErrors))
   } else if (error.request) {
     toast.error('Network Error - Please check your connection')
     return Promise.reject(
