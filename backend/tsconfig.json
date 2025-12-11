@@ -1,0 +1,50 @@
+{
+  "compilerOptions": {
+    // Environment setup & latest features
+    "lib": ["ESNext"],
+    "target": "ESNext",
+    "module": "Preserve",
+    "moduleDetection": "force",
+    "jsx": "react-jsx",
+    "allowJs": true,
+
+    // Bundler mode
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "noEmit": true,
+
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@v1/*": ["src/api/v1/*"],
+      "@v1/routes/*": ["src/api/v1/shared/routes/*"],
+      "@v1/controllers/*": ["src/api/v1/shared/controllers/*"],
+      "@v1/models/*": ["src/api/v1/models/*"],
+      "@v1/middlewares/*": ["src/api/v1/shared/middlewares/*"],
+      "@v1/utils/*": ["src/api/v1/utils/*"],
+      "@v1/config/*": ["src/api/v1/shared/config/*"],
+      "@generated/*": ["./generated/*"]
+    },
+
+    // Best practices
+    "strict": true,
+    "skipLibCheck": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+
+    // Import resolution preferences
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+
+    // Some stricter flags (disabled by default)
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noPropertyAccessFromIndexSignature": false
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
