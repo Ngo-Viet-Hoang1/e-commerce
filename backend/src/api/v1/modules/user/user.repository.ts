@@ -48,6 +48,37 @@ class UserRepository {
     )
   }
 
+  findUserWithRolesAndPerms = async (id: number) => {
+    return executePrismaQuery(() =>
+      prisma.user.findUnique({
+        where: { id },
+        select: {
+          ...USER_SELECT_FIELDS,
+          userRoles: {
+            select: {
+              role: {
+                select: {
+                  id: true,
+                  name: true,
+                  rolePermissions: {
+                    select: {
+                      permission: {
+                        select: {
+                          resource: true,
+                          action: true,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      }),
+    )
+  }
+
   findByEmail = async (email: string) => {
     return executePrismaQuery(() =>
       prisma.user.findUnique({

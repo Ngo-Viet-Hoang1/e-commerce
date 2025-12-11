@@ -1,16 +1,28 @@
 import logger from '../../shared/config/logger'
 import { UnauthorizedException } from '../../shared/models/app-error.model'
 import { PasswordUtils } from '../../shared/utils/password.util'
-import { userDtoSchema, userRepository, userService } from '../user'
+import { userRepository } from '../user'
 import type { LoginProps, RefreshTokenProps } from './auth.interface'
 import { JwtUtils } from './jwt.util'
 import RefreshTokenStore from './refresh-token.store'
 
 class AuthService {
   me = async (userId: number) => {
-    const me = await userService.findById(userId)
+    const userWithRolesAndPerms =
+      await userRepository.findUserWithRolesAndPerms(userId)
+    if (!userWithRolesAndPerms) {
+      throw new UnauthorizedException('User not found')
+    }
 
-    return userDtoSchema.parse(me)
+    const roles = userWithRolesAndPerms.userRoles.map((ur) => ur.role.name)
+    const perms = userWithRolesAndPerms.userRoles.flatMap((ur) =>
+      ur.role.rolePermissions.map(
+        (rp) => `${rp.permission.resource}.${rp.permission.action}`,
+      ),
+    )
+    const { userRoles, ...me } = userWithRolesAndPerms
+
+    return { ...me, roles, perms }
   }
 
   login = async ({ email, password, deviceId, ip }: LoginProps) => {

@@ -1,5 +1,9 @@
 import { Router } from 'express'
-import { authenticate } from '../../shared/middlewares/auth.middleware'
+import { RESOURCES } from '../../shared/constants/rbac'
+import {
+  authenticate,
+  autoAuthorize,
+} from '../../shared/middlewares/auth.middleware'
 import {
   validate,
   validateMultiple,
@@ -14,6 +18,7 @@ import {
 
 const router = Router()
 router.use(authenticate)
+router.use(autoAuthorize(RESOURCES.USER))
 
 router.get('/', validate(listUsersQuerySchema, 'query'), userController.findAll)
 
