@@ -8,6 +8,7 @@ import { ThemeProvider } from './providers/ThemeProvider.tsx'
 
 import 'nprogress/nprogress.css'
 import './index.css'
+import { QueryProvider } from './providers/QueryProvider.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -21,8 +22,10 @@ createRoot(document.getElementById('root')!).render(
           /* empty */
         }}
       >
-        <App />
-        <Toaster />
+        <QueryProvider>
+          <App />
+        </QueryProvider>
+        <Toaster position="top-right" richColors closeButton />
       </ErrorBoundary>
     </ThemeProvider>
   </StrictMode>,
