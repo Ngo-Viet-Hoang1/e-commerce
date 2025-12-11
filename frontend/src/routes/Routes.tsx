@@ -1,11 +1,14 @@
+import AdminLayout from '@/components/layouts/AdminLayout'
+import AuthLayout from '@/components/layouts/AuthLayout'
 import RootLayout from '@/components/layouts/RootLayout'
+import AdminLogin from '@/pages/admin/AdminLogin'
+import Login from '@/pages/user/auth/Login'
+import Register from '@/pages/user/auth/Register'
 import { lazy } from 'react'
 import { createBrowserRouter } from 'react-router'
-import ProtectedRoute from './ProtectedRoute'
+import { adminRoutes } from './adminRoutes'
+import { userRoutes } from './userRoutes'
 
-const Home = lazy(() => import('@/pages/common/Home'))
-const About = lazy(() => import('@/pages/common/About'))
-const DashBoard = lazy(() => import('@/pages/user/Dashboard'))
 const NotFound = lazy(() => import('@/pages/common/NotFound'))
 const ErrorPage = lazy(() => import('@/pages/common/ErrorPage'))
 
@@ -14,18 +17,37 @@ const router = createBrowserRouter([
     path: '/',
     Component: RootLayout,
     errorElement: <ErrorPage />,
+    children: userRoutes,
+  },
+  {
+    path: '/auth',
+    Component: AuthLayout,
+    errorElement: <ErrorPage />,
     children: [
       {
-        index: true,
-        element: <Home />,
+        path: 'login',
+        element: <Login />,
       },
       {
-        path: 'about',
-        element: <About />,
+        path: 'register',
+        element: <Register />,
       },
+    ],
+  },
+  {
+    path: '/admin',
+    Component: AdminLayout,
+    errorElement: <ErrorPage />,
+    children: adminRoutes,
+  },
+  {
+    path: '/admin/auth',
+    Component: AuthLayout,
+    errorElement: <ErrorPage />,
+    children: [
       {
-        element: <ProtectedRoute isAllowed />,
-        children: [{ path: 'dashboard', element: <DashBoard /> }],
+        path: 'login',
+        element: <AdminLogin />,
       },
     ],
   },
