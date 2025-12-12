@@ -1,3 +1,4 @@
+import App from '@/App'
 import AdminLayout from '@/components/layouts/AdminLayout'
 import AuthLayout from '@/components/layouts/AuthLayout'
 import RootLayout from '@/components/layouts/RootLayout'
@@ -15,45 +16,51 @@ const ErrorPage = lazy(() => import('@/pages/common/ErrorPage'))
 const router = createBrowserRouter([
   {
     path: '/',
-    Component: RootLayout,
-    errorElement: <ErrorPage />,
-    children: userRoutes,
-  },
-  {
-    path: '/auth',
-    Component: AuthLayout,
-    errorElement: <ErrorPage />,
+    element: <App />,
     children: [
       {
-        path: 'login',
-        element: <Login />,
+        path: '/',
+        Component: RootLayout,
+        errorElement: <ErrorPage />,
+        children: userRoutes,
       },
       {
-        path: 'register',
-        element: <Register />,
+        path: '/auth',
+        Component: AuthLayout,
+        errorElement: <ErrorPage />,
+        children: [
+          {
+            path: 'login',
+            element: <Login />,
+          },
+          {
+            path: 'register',
+            element: <Register />,
+          },
+        ],
       },
-    ],
-  },
-  {
-    path: '/admin',
-    Component: AdminLayout,
-    errorElement: <ErrorPage />,
-    children: adminRoutes,
-  },
-  {
-    path: '/admin/auth',
-    Component: AuthLayout,
-    errorElement: <ErrorPage />,
-    children: [
       {
-        path: 'login',
-        element: <AdminLogin />,
+        path: '/admin',
+        Component: AdminLayout,
+        errorElement: <ErrorPage />,
+        children: adminRoutes,
+      },
+      {
+        path: '/admin/auth',
+        Component: AuthLayout,
+        errorElement: <ErrorPage />,
+        children: [
+          {
+            path: 'login',
+            element: <AdminLogin />,
+          },
+        ],
+      },
+      {
+        path: '*',
+        element: <NotFound />,
       },
     ],
-  },
-  {
-    path: '*',
-    element: <NotFound />,
   },
 ])
 

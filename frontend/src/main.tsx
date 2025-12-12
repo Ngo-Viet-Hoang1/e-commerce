@@ -2,13 +2,14 @@ import { StrictMode, type ErrorInfo } from 'react'
 import { createRoot } from 'react-dom/client'
 import { ErrorBoundary } from 'react-error-boundary'
 import { Toaster } from 'sonner'
-import App from './App.tsx'
 import ErrorFallback from './components/common/ErrorFallback.tsx'
 import { ThemeProvider } from './providers/ThemeProvider.tsx'
 
 import 'nprogress/nprogress.css'
+import { RouterProvider } from 'react-router-dom'
 import './index.css'
 import { QueryProvider } from './providers/QueryProvider.tsx'
+import router from './routes/Routes.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -23,7 +24,7 @@ createRoot(document.getElementById('root')!).render(
         }}
       >
         <QueryProvider>
-          <App />
+          <RouterProvider router={router} />
         </QueryProvider>
         <Toaster position="top-right" richColors closeButton />
       </ErrorBoundary>
