@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import {
   ACCESS_TOKEN_KEY,
   LOGIN_ROUTE,
@@ -14,6 +15,11 @@ import axios, {
   type InternalAxiosRequestConfig,
 } from 'axios'
 import { toast } from 'sonner'
+
+export interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
+  skipToast?: boolean
+  skipProgress?: boolean
+}
 
 interface AxiosInstanceProps {
   baseURL: string
@@ -62,8 +68,8 @@ const createAuthAxiosInstance = ({
   const api = axios.create(config)
 
   api.interceptors.request.use(
-    (config: InternalAxiosRequestConfig) => {
-      if (!config.headers?.['X-Skip-Progress']) {
+    (config: CustomAxiosRequestConfig) => {
+      if (!config.skipProgress) {
         progress.start()
       }
       const token = localStorage.getItem(tokenKey)
@@ -98,13 +104,11 @@ const createAuthAxiosInstance = ({
         console.error('API Response Error:', error)
       }
 
-      if (!error.response && originalRequest) {
-        progress.stop()
+      if (!error.response && originalRequest && !originalRequest._retry) {
         originalRequest.retryCount = originalRequest.retryCount ?? 0
 
         if (originalRequest.retryCount < MAX_RETRIES) {
           originalRequest.retryCount++
-          progress.stop()
           console.log(
             `🔄 Retrying request (${originalRequest.retryCount}/${MAX_RETRIES})...`,
           )
@@ -116,7 +120,11 @@ const createAuthAxiosInstance = ({
         }
       }
 
-      if (error.response?.status === 401 && !originalRequest._retry) {
+      if (
+        error.response?.status === 401 &&
+        originalRequest &&
+        !originalRequest._retry
+      ) {
         if (isRefreshing) {
           return new Promise((resolve, reject) => {
             failedQueue.push({ resolve, reject })
@@ -132,15 +140,20 @@ const createAuthAxiosInstance = ({
         isRefreshing = true
 
         try {
-          const { data } = await api.post(
-            `${config.baseURL}${refreshTokenEndpoint}`,
-            {},
-            { headers: { 'X-Skip-Progress': 'true' } },
-          )
+          const refreshApi = axios.create({
+            baseURL: config.baseURL,
+            withCredentials: true,
+          })
+
+          const { data } = await refreshApi.post(refreshTokenEndpoint)
 
           const { access_token } = data
           if (!access_token) {
+            localStorage.removeItem(tokenKey)
+            const error = new ApiError('No access token received', 401)
+            processQueue(error, null)
             navigateTo(loginRoute)
+            return Promise.reject(error)
           }
           localStorage.setItem(tokenKey, access_token)
 
@@ -153,7 +166,6 @@ const createAuthAxiosInstance = ({
           processQueue(refreshError as Error, null)
           localStorage.removeItem(tokenKey)
           navigateTo(loginRoute)
-
           return Promise.reject(refreshError)
         } finally {
           isRefreshing = false
@@ -168,7 +180,7 @@ const createAuthAxiosInstance = ({
   return api
 }
 
-const handleError = (axiosError: AxiosError<IErrorResponse>) => {
+const handleError = (axiosError: AxiosError<IErrorResponse>): ApiError => {
   if (axiosError.response?.data) {
     const { message, error } = axiosError.response.data
 
@@ -191,7 +203,8 @@ const handleError = (axiosError: AxiosError<IErrorResponse>) => {
       axiosError.response.data.message ??
       'Something went wrong'
 
-    if (!axiosError.config?.headers?.['X-Skip-Toast']) {
+    const customConfig = axiosError.config as CustomAxiosRequestConfig
+    if (!customConfig?.skipToast) {
       toast.error(msg)
 
       if (error.details) {
@@ -201,27 +214,23 @@ const handleError = (axiosError: AxiosError<IErrorResponse>) => {
       }
     }
 
-    return Promise.reject(
-      new ApiError(
-        msg,
-        error.statusCode,
-        error.details as Record<string, string[]> | undefined,
-      ),
+    return new ApiError(
+      msg,
+      error.statusCode,
+      error.details as Record<string, string[]> | undefined,
     )
   } else if (axiosError.request) {
-    toast.error('Network Error - Please check your connection')
-    return Promise.reject(
-      new ApiError(
-        'Network Error - Please check your connection',
-        undefined,
-        undefined,
-        true,
-      ),
+    if (!(axiosError.config as CustomAxiosRequestConfig)?.skipToast) {
+      toast.error('Network Error - Please check your connection')
+    }
+    return new ApiError(
+      'Network Error - Please check your connection',
+      undefined,
+      undefined,
+      true,
     )
   } else {
-    return Promise.reject(
-      new ApiError(axiosError.message ?? 'An unexpected error occurred'),
-    )
+    return new ApiError(axiosError.message ?? 'An unexpected error occurred')
   }
 }
 
