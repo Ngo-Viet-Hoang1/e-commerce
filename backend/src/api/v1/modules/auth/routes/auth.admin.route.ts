@@ -1,12 +1,13 @@
 import { Router } from 'express'
-import { authenticate } from '../../../shared/middlewares/auth.middleware'
+import {
+  authenticate,
+  requireAdmin,
+} from '../../../shared/middlewares/auth.middleware'
 import { validate } from '../../../shared/schemas'
 import { loginBodySchema } from '../auth.schema'
 import { adminAuthController } from '../controllers/auth.admin.controller'
 
 const router = Router()
-
-router.get('/me', authenticate, adminAuthController.me)
 
 router.post(
   '/login',
@@ -14,10 +15,17 @@ router.post(
   adminAuthController.login,
 )
 
-router.post('/logout', authenticate, adminAuthController.logout)
-
-router.post('/logout-all', authenticate, adminAuthController.logoutAll)
-
 router.post('/refresh-token', adminAuthController.refreshToken)
+
+router.get('/me', authenticate, requireAdmin, adminAuthController.me)
+
+router.post('/logout', authenticate, requireAdmin, adminAuthController.logout)
+
+router.post(
+  '/logout-all',
+  authenticate,
+  requireAdmin,
+  adminAuthController.logoutAll,
+)
 
 export default router
