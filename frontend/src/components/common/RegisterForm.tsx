@@ -9,18 +9,14 @@ import {
   FieldSet,
 } from '@/components/ui/field'
 import { cn } from '@/lib/utils'
+import { registerInputsSchema, type RegisterInputs } from '@/schema/auth.schema'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useEffect } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { Spinner } from '../ui/spinner'
 import FormField from './FormField'
-
-export interface SignUpInputs {
-  username: string
-  email: string
-  password: string
-  confirmPassword: string
-}
 
 const RegisterForm = ({ className, ...props }: React.ComponentProps<'div'>) => {
   const navigate = useNavigate()
@@ -29,22 +25,27 @@ const RegisterForm = ({ className, ...props }: React.ComponentProps<'div'>) => {
     register,
     handleSubmit,
     watch,
-    formState: { errors, isSubmitting },
-  } = useForm<SignUpInputs>()
+    trigger,
+    formState: { errors, isSubmitting, touchedFields },
+  } = useForm<RegisterInputs>({
+    resolver: zodResolver(registerInputsSchema),
+    reValidateMode: 'onChange',
+  })
 
-  const onSubmit: SubmitHandler<SignUpInputs> = async ({
+  const password = watch('password')
+
+  useEffect(() => {
+    const { confirmPassword } = touchedFields
+    if (confirmPassword) {
+      trigger('confirmPassword')
+    }
+  }, [password, trigger, touchedFields])
+
+  const onSubmit: SubmitHandler<RegisterInputs> = async ({
     username,
     email,
     password,
-    confirmPassword,
   }) => {
-    if (password !== confirmPassword) {
-      return toast.error('Passwords do not match')
-    }
-
-    if (!email || !password)
-      return toast.error('Email and password are required')
-
     try {
       const res = await AuthService.register(email, password, username)
       if (res?.data?.success) {
@@ -66,7 +67,7 @@ const RegisterForm = ({ className, ...props }: React.ComponentProps<'div'>) => {
         <CardContent className="grid p-0 md:grid-cols-2">
           <form onSubmit={handleSubmit(onSubmit)} className="p-6 md:p-8">
             <FieldSet disabled={isSubmitting}>
-              <FieldGroup className="gap-3">
+              <FieldGroup className="gap-4">
                 <div className="flex flex-col items-center gap-2 text-center">
                   <h1 className="text-2xl font-bold">Create your account</h1>
                   <p className="text-muted-foreground text-sm text-balance">
@@ -78,9 +79,7 @@ const RegisterForm = ({ className, ...props }: React.ComponentProps<'div'>) => {
                   label="Username"
                   type="text"
                   placeholder="John Doe"
-                  register={register('username', {
-                    required: 'Username is required',
-                  })}
+                  register={register('username')}
                   description="This will be your public display name."
                   error={errors.username?.message}
                 />
@@ -89,44 +88,27 @@ const RegisterForm = ({ className, ...props }: React.ComponentProps<'div'>) => {
                   label="Email"
                   type="email"
                   placeholder="email@example.com"
-                  register={register('email', {
-                    required: 'Email is required',
-                  })}
+                  register={register('email')}
                   description="We'll use this to contact you."
                   error={errors.email?.message}
                 />
-                <Field>
-                  <Field className="grid grid-cols-2 gap-4">
-                    <FormField
-                      id="password"
-                      label="Password"
-                      type="password"
-                      placeholder="***********"
-                      register={register('password', {
-                        required: 'Password is required',
-                        minLength: {
-                          value: 8,
-                          message:
-                            'Password must be at least 8 characters long',
-                        },
-                      })}
-                      error={errors.password?.message}
-                    />
-                    <FormField
-                      id="confirm-password"
-                      label="Confirm Password"
-                      type="password"
-                      placeholder="***********"
-                      register={register('confirmPassword', {
-                        required: 'Confirm Password is required',
-                        validate: (value) =>
-                          value === watch('password') ||
-                          'Passwords do not match',
-                      })}
-                      error={errors.confirmPassword?.message}
-                    />
-                  </Field>
-                </Field>
+                <FormField
+                  id="password"
+                  label="Password"
+                  type="password"
+                  placeholder="***********"
+                  register={register('password')}
+                  description="Password must be at least 8 characters"
+                  error={errors.password?.message}
+                />
+                <FormField
+                  id="confirm-password"
+                  label="Confirm Password"
+                  type="password"
+                  placeholder="***********"
+                  register={register('confirmPassword')}
+                  error={errors.confirmPassword?.message}
+                />
                 <Field>
                   <Button type="submit" disabled={isSubmitting}>
                     {isSubmitting && <Spinner />}Create Account
