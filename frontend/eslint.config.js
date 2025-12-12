@@ -17,7 +17,7 @@ export default defineConfig([
       reactHooks.configs.flat.recommended,
       reactRefresh.configs.vite,
       ...tseslint.configs.stylisticTypeChecked,
-      ...query.configs.recommended.rules,
+      ...query.configs['flat/recommended']
     ],
     plugins: {
       '@tanstack/query': query,
