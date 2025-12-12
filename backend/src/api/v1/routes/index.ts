@@ -1,10 +1,11 @@
 import { Router } from 'express'
-import authRoute from '../modules/auth/auth.route.js'
+import authRoute from '../modules/auth/routes/auth.route.js'
 import categoryRoute from '../modules/category/category.route.js'
 import userRoute from '../modules/user/user.route.js'
 import errorRoute from './error.route.js'
 import homeRoute from './home.route.js'
 import brandRoute from '../modules/brand/brand.route.js'
+import adminRoute from './admin.route.js'
 
 const router = Router()
 
@@ -14,5 +15,7 @@ router.use('/users', userRoute)
 router.use('/brands', brandRoute)
 router.use('/categories', categoryRoute)
 router.use('/errors', errorRoute)
+
+router.use('/admin', adminRoute)
 
 export default router
