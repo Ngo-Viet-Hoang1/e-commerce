@@ -1,4 +1,4 @@
-import AuthService from '@/api/services/auth.service'
+import AuthService from '@/api/services/user/auth.service'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import {
@@ -47,8 +47,8 @@ const RegisterForm = ({ className, ...props }: React.ComponentProps<'div'>) => {
     password,
   }) => {
     try {
-      const res = await AuthService.register(email, password, username)
-      if (res?.data?.success) {
+      const res = await AuthService.register({ email, password, username })
+      if (res?.success) {
         toast.success('Registration successful! Please log in.')
         navigate('/auth/login')
       }
