@@ -1,6 +1,5 @@
 import App from '@/App'
 import AdminLayout from '@/components/layouts/AdminLayout'
-import AuthLayout from '@/components/layouts/AuthLayout'
 import RootLayout from '@/components/layouts/RootLayout'
 import AdminLogin from '@/pages/admin/AdminLogin'
 import Login from '@/pages/user/auth/Login'
@@ -8,8 +7,10 @@ import Register from '@/pages/user/auth/Register'
 import { lazy } from 'react'
 import { createBrowserRouter } from 'react-router'
 import { adminRoutes } from './adminRoutes'
+import GuestRoute from './GuestRoute'
 import { userRoutes } from './userRoutes'
 
+const Forbidden = lazy(() => import('@/pages/common/Forbidden'))
 const NotFound = lazy(() => import('@/pages/common/NotFound'))
 const ErrorPage = lazy(() => import('@/pages/common/ErrorPage'))
 
@@ -26,7 +27,7 @@ const router = createBrowserRouter([
       },
       {
         path: '/auth',
-        Component: AuthLayout,
+        Component: GuestRoute,
         errorElement: <ErrorPage />,
         children: [
           {
@@ -47,7 +48,7 @@ const router = createBrowserRouter([
       },
       {
         path: '/admin/auth',
-        Component: AuthLayout,
+        Component: GuestRoute,
         errorElement: <ErrorPage />,
         children: [
           {
@@ -55,6 +56,10 @@ const router = createBrowserRouter([
             element: <AdminLogin />,
           },
         ],
+      },
+      {
+        path: 'forbidden',
+        element: <Forbidden />,
       },
       {
         path: '*',

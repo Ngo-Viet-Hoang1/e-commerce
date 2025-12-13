@@ -16,7 +16,7 @@ export const userRoutes: RouteObject[] = [
     element: <About />,
   },
   {
-    element: <ProtectedRoute isAllowed redirectPath="/auth/login" />,
+    element: <ProtectedRoute type="user" redirectPath="/auth/login" />,
     children: [{ path: 'dashboard', element: <DashBoard /> }],
   },
 ]
