@@ -12,6 +12,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 import { loginSchema, type LoginInputs } from '@/schema/auth.schema'
+import { useAuthStore } from '@/store/zustand/useAuthStore'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
@@ -20,6 +21,7 @@ import { Spinner } from '../ui/spinner'
 import FormField from './FormField'
 
 const LoginForm = ({ className, ...props }: React.ComponentProps<'div'>) => {
+  const { setAccessToken, setMe } = useAuthStore()
   const navigate = useNavigate()
   const {
     register,
@@ -35,13 +37,24 @@ const LoginForm = ({ className, ...props }: React.ComponentProps<'div'>) => {
     password,
   }) => {
     try {
-      // const res = await AuthService.login({ email, password })
-      // if (res.data.success) {
-      //   toast.success(res.data.message ?? 'Login successful!')
-      //   navigate('/')
-      // }
+      const { success, data, message } = await AuthService.login({
+        email,
+        password,
+      })
+
+      if (success && data?.accessToken) {
+        setAccessToken(data.accessToken)
+
+        const meResponse = await AuthService.getMe()
+        if (meResponse.success && meResponse.data?.me) {
+          setMe(meResponse.data.me)
+        }
+
+        toast.success(message ?? 'Login successful!')
+        navigate('/')
+      }
     } catch {
-      toast.error('Login failed. Please try again.')
+      toast.error('Login failed. Please check your credentials and try again.')
     }
   }
 

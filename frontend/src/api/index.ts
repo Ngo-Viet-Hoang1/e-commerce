@@ -6,6 +6,11 @@ import {
 } from '@/constants'
 import type { IErrorResponse } from '@/interfaces/base-response.interface'
 import { ApiError } from '@/models/ApiError'
+import {
+  useAdminAuthStore,
+  useAuthStore,
+  type AuthStore,
+} from '@/store/zustand/useAuthStore'
 import { navigateTo } from '@/utils/navigate.util'
 import { progress } from '@/utils/nprogress.util'
 import axios, {
@@ -26,6 +31,7 @@ interface AxiosInstanceProps {
   tokenKey: string
   refreshTokenEndpoint: string
   loginRoute: string
+  authStore: () => AuthStore
 }
 
 const createAuthAxiosInstance = ({
@@ -33,6 +39,7 @@ const createAuthAxiosInstance = ({
   tokenKey,
   refreshTokenEndpoint,
   loginRoute,
+  authStore,
 }: AxiosInstanceProps) => {
   interface QueueItem {
     resolve: (value?: unknown) => void
@@ -72,7 +79,8 @@ const createAuthAxiosInstance = ({
       if (!config.skipProgress) {
         progress.start()
       }
-      const token = localStorage.getItem(tokenKey)
+      // const token = localStorage.getItem(tokenKey)
+      const { accessToken: token } = authStore()
 
       if (token) {
         config.headers.Authorization = `Bearer ${token}`
@@ -125,6 +133,7 @@ const createAuthAxiosInstance = ({
         originalRequest &&
         !originalRequest._retry
       ) {
+        progress.stop()
         if (isRefreshing) {
           return new Promise((resolve, reject) => {
             failedQueue.push({ resolve, reject })
@@ -145,26 +154,29 @@ const createAuthAxiosInstance = ({
             withCredentials: true,
           })
 
-          const { data } = await refreshApi.post(refreshTokenEndpoint)
+          const res = await refreshApi.post(refreshTokenEndpoint)
+          const accessToken = res.data.data.accessToken
 
-          const { access_token } = data
-          if (!access_token) {
-            localStorage.removeItem(tokenKey)
+          if (!accessToken) {
+            authStore().reset()
             const error = new ApiError('No access token received', 401)
             processQueue(error, null)
             navigateTo(loginRoute)
             return Promise.reject(error)
           }
-          localStorage.setItem(tokenKey, access_token)
 
-          originalRequest.headers.Authorization = `Bearer ${access_token}`
+          // localStorage.setItem(tokenKey, accessToken)
+          authStore().setAccessToken(accessToken)
 
-          processQueue(null, access_token)
+          originalRequest.headers.Authorization = `Bearer ${accessToken}`
+
+          processQueue(null, accessToken)
 
           return api(originalRequest)
         } catch (refreshError) {
           processQueue(refreshError as Error, null)
-          localStorage.removeItem(tokenKey)
+          // localStorage.removeItem(tokenKey)
+          authStore().reset()
           navigateTo(loginRoute)
           return Promise.reject(refreshError)
         } finally {
@@ -243,6 +255,7 @@ export const api = createAuthAxiosInstance({
   tokenKey: ACCESS_TOKEN_KEY.USER,
   refreshTokenEndpoint: REFRESH_TOKEN_ENDPOINT.USER,
   loginRoute: LOGIN_ROUTE.USER,
+  authStore: () => useAuthStore.getState(),
 })
 
 export const adminApi = createAuthAxiosInstance({
@@ -250,4 +263,5 @@ export const adminApi = createAuthAxiosInstance({
   tokenKey: ACCESS_TOKEN_KEY.ADMIN,
   refreshTokenEndpoint: REFRESH_TOKEN_ENDPOINT.ADMIN,
   loginRoute: LOGIN_ROUTE.ADMIN,
+  authStore: () => useAdminAuthStore.getState(),
 })
