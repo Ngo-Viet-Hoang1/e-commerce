@@ -1,3 +1,4 @@
+import router from '@/api/v1/routes'
 import { corsMiddleware } from '@/api/v1/shared/middlewares/cors.middleware'
 import {
   globalErrorHandler,
@@ -5,8 +6,8 @@ import {
 } from '@/api/v1/shared/middlewares/error-handler.middleware'
 import { limiter } from '@/api/v1/shared/middlewares/rate-limiter.middleware'
 import { requestIdMiddleware } from '@/api/v1/shared/middlewares/request-id.middleware'
-import router from '@/api/v1/routes'
 import compression from 'compression'
+import cookieParser from 'cookie-parser'
 import dotenv from 'dotenv'
 import express from 'express'
 import helmet from 'helmet'
@@ -46,6 +47,7 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('combined'))
 }
 // Body parsing middleware
+app.use(cookieParser())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(express.static(path.join(__dirname, '..', 'public')))

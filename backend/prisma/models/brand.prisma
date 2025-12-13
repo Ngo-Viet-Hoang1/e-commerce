@@ -1,0 +1,14 @@
+model Brand {
+    id          Int       @id @default(autoincrement())
+    name        String    @db.VarChar(255) @unique
+    description String?   @db.Text
+    logoUrl     String?   @map("logo_url") @db.VarChar(1024)
+    website     String?   @db.VarChar(1024)
+    createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz
+    updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+    deletedAt   DateTime? @db.Timestamptz
+    
+    products    Product[]
+
+    @@map("brand")
+}
