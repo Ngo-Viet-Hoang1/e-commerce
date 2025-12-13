@@ -1,0 +1,28 @@
+model Attribute {
+  id           Int       @id @default(autoincrement())
+  name         String    @db.VarChar(150)
+  inputType    String?   @db.VarChar(50)
+  isFilterable Boolean   @default(false)
+  isSearchable Boolean   @default(false)
+  createdAt    DateTime  @default(now()) @db.Timestamptz
+  updatedAt    DateTime  @default(now()) @db.Timestamptz
+  deletedAt    DateTime? @db.Timestamptz
+
+  values AttributeValue[]
+
+  @@map("attributes")
+}
+
+model AttributeValue {
+  id          Int       @id @default(autoincrement())
+  attributeId Int?
+  valueText   String    @db.VarChar(255)
+  valueMeta   Json?
+  createdAt   DateTime  @default(now()) @db.Timestamptz
+  updatedAt   DateTime  @default(now()) @db.Timestamptz
+  deletedAt   DateTime? @db.Timestamptz
+
+  attribute Attribute? @relation(fields: [attributeId], references: [id])
+
+  @@map("attribute_values")
+}
