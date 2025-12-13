@@ -10,4 +10,13 @@ export class AuthUtils {
       path: '/api/v1/auth',
     })
   }
+
+  static clearRefreshTokenCookie = (res: Response) => {
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      sameSite: 'none',
+      secure: process.env.NODE_ENV === 'production',
+      path: '/api/v1/auth',
+    })
+  }
 }

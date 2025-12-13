@@ -7,6 +7,24 @@ import { JwtUtils } from './jwt.util'
 import RefreshTokenStore from './refresh-token.store'
 
 class AuthService {
+  me = async (userId: number) => {
+    const userWithRolesAndPerms =
+      await userRepository.findUserWithRolesAndPerms(userId)
+    if (!userWithRolesAndPerms) {
+      throw new UnauthorizedException('User not found')
+    }
+
+    const roles = userWithRolesAndPerms.userRoles.map((ur) => ur.role.name)
+    const perms = userWithRolesAndPerms.userRoles.flatMap((ur) =>
+      ur.role.rolePermissions.map(
+        (rp) => `${rp.permission.resource}.${rp.permission.action}`,
+      ),
+    )
+    const { userRoles, ...me } = userWithRolesAndPerms
+
+    return { ...me, roles, perms }
+  }
+
   login = async ({ email, password, deviceId, ip }: LoginProps) => {
     const user = await userRepository.findByEmailForAuth(email)
     if (!user) throw new UnauthorizedException('Invalid credentials')
@@ -30,6 +48,14 @@ class AuthService {
     await userRepository.update(user.id, { lastLoginAt: new Date() })
 
     return { userId: user.id, email: user.email, accessToken, refreshToken }
+  }
+
+  logout = async (refreshToken: string) => {
+    await RefreshTokenStore.revoke(refreshToken)
+  }
+
+  logoutAll = async (userId: number) => {
+    await RefreshTokenStore.revokeAll(userId)
   }
 
   refreshToken = async ({ token, deviceId, ip }: RefreshTokenProps) => {

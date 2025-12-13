@@ -8,6 +8,13 @@ import { authService } from './auth.service'
 import { AuthUtils } from './auth.util'
 
 class AuthController {
+  me = async (req: Request, res: Response) => {
+    const user = req.user!
+    const me = await authService.me(user.id)
+
+    SuccessResponse.send(res, { me }, 'User profile fetched successfully')
+  }
+
   register = async (req: Request, res: Response) => {
     const data = req.validatedData?.body as CreateUserBody
 
@@ -33,6 +40,29 @@ class AuthController {
       { user: { userId, email }, accessToken },
       'Login successful',
     )
+  }
+
+  logout = async (req: Request, res: Response) => {
+    const { refreshToken } = req.cookies
+    if (!refreshToken) {
+      throw new UnauthorizedException('Refresh token not provided')
+    }
+
+    await authService.logout(refreshToken)
+
+    AuthUtils.clearRefreshTokenCookie(res)
+
+    SuccessResponse.send(res, {}, 'Logout successful')
+  }
+
+  logoutAll = async (req: Request, res: Response) => {
+    const user = req.user!
+
+    await authService.logoutAll(user.id)
+
+    AuthUtils.clearRefreshTokenCookie(res)
+
+    SuccessResponse.send(res, {}, 'Logout successful')
   }
 
   refreshToken = async (req: Request, res: Response) => {
