@@ -52,8 +52,8 @@ export const updateBrandBodySchema = z.object({
     .max(500, 'Description must be at most 500 characters')
     .trim()
     .optional(),
-  logoUrl: z.string().optional(),
-  website: z.string().optional(),
+  logoUrl: z.string().url('Logo URL must be a valid URL').optional(),
+  website: z.string().url('Website must be a valid URL').optional(),
 })
 
 export type BrandCreate = z.infer<typeof createBrandBodySchema>
