@@ -27,7 +27,7 @@ const router = createBrowserRouter([
       },
       {
         path: '/auth',
-        Component: GuestRoute,
+        element: <GuestRoute redirectPath="/" authType="user" />,
         errorElement: <ErrorPage />,
         children: [
           {
@@ -48,7 +48,9 @@ const router = createBrowserRouter([
       },
       {
         path: '/admin/auth',
-        Component: GuestRoute,
+        element: (
+          <GuestRoute authType="admin" redirectPath="/admin/auth/login" />
+        ),
         errorElement: <ErrorPage />,
         children: [
           {
