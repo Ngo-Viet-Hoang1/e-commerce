@@ -1,0 +1,11 @@
+model Badge {
+  id          Int      @id @default(autoincrement())
+  code        String   @unique @db.VarChar(100)
+  name        String   @db.VarChar(255)
+  description String?  @db.Text
+  iconUrl     String?  @db.VarChar(1024)
+  criteria    Json?
+  createdAt   DateTime @default(now()) @db.Timestamptz
+  updatedAt   DateTime @default(now()) @db.Timestamptz
+  deletedAt   DateTime? @db.Timestamptz
+}
