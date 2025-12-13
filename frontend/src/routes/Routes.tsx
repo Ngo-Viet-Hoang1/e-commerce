@@ -1,5 +1,5 @@
 import App from '@/App'
-import AdminLayout from '@/components/layouts/AdminLayout'
+import AdminLayout from '@/components/layouts/admin/AdminLayout'
 import RootLayout from '@/components/layouts/RootLayout'
 import AdminLogin from '@/pages/admin/AdminLogin'
 import Login from '@/pages/user/auth/Login'
