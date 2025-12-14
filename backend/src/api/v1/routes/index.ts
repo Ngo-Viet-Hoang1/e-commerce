@@ -10,6 +10,7 @@ import attributeValueRoute from '../modules/attributeValue/attributeValue.route'
 import brandRoute from '../modules/brand/brand.route.js'
 import badgeRoute from '../modules/badge/badge.route.js'
 import productRoute from '../modules/product/product.route.js'
+import productBadgeRoute from '../modules/product-badge/product-badge.route.js'
 import productFaqRoute from '../modules/product-faq/product-faq.route.js'
 
 const router = Router()
@@ -23,6 +24,7 @@ router.use('/badges', badgeRoute)
 router.use('/products', productRoute)
 router.use('/productFaqs', productFaqRoute)
 router.use('/errors', errorRoute)
+router.use('/product-badges', productBadgeRoute)
 router.use('/orders', orderRouter)
 router.use('/attributes', attributeRoute)
 router.use('/attributes', attributeValueRoute)

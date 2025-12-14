@@ -31,7 +31,8 @@ model User {
   orders Order[]
 
   userRoles UserRole[]
-
+  productBadges ProductBadge[]
+  
   @@index([createdAt])
   @@index([email])
   @@index([googleId])

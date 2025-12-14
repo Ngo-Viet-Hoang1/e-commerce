@@ -1,27 +1,29 @@
 model Product {
-    id               Int       @id @default(autoincrement())
-    name             String    @unique @db.VarChar(255)
-    sku              String    @unique @db.VarChar(100)
-    shortDescription String?   @db.VarChar(255)
-    description      String?   @db.Text
-    status           String    @db.VarChar(50)
-    brandId          Int
-    categoryId       Int
-    isFeatured       Boolean   @default(false)
-    metaData         Json?     @db.JsonB
-    weightGrams      Int?
-    dimensions       Json?     @db.JsonB
-    publishedAt      DateTime? @db.Timestamptz
-    createdAt        DateTime  @default(now()) @db.Timestamptz
-    updatedAt        DateTime  @updatedAt @db.Timestamptz
-    deletedAt        DateTime? @db.Timestamptz
+  id               Int       @id @default(autoincrement())
+  name             String    @unique @db.VarChar(255)
+  sku              String    @unique @db.VarChar(100)
+  shortDescription String?   @db.VarChar(255)
+  description      String?   @db.Text
+  status           String    @db.VarChar(50)
+  brandId          Int
+  categoryId       Int
+  isFeatured       Boolean   @default(false)
+  metaData         Json?     @db.JsonB
+  weightGrams      Int?
+  dimensions       Json?     @db.JsonB
+  publishedAt      DateTime? @db.Timestamptz
+  createdAt        DateTime  @default(now()) @db.Timestamptz
+  updatedAt        DateTime  @updatedAt @db.Timestamptz
+  deletedAt        DateTime? @db.Timestamptz
 
     brand    Brand    @relation(fields: [brandId], references: [id])
     category Category @relation(fields: [categoryId], references: [id])
     faqs     ProductFaq[]
 
-    @@index([name])
-    @@index([sku])
-    @@index([status])
-    @@index([isFeatured])
+  productBadges ProductBadge[]
+
+  @@index([name])
+  @@index([sku])
+  @@index([status])
+  @@index([isFeatured])
 }
