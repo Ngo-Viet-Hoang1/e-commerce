@@ -2,7 +2,7 @@ import { lazy } from 'react'
 import { Navigate, type RouteObject } from 'react-router-dom'
 import ProtectedRoute from './ProtectedRoute'
 
-const DashBoard = lazy(() => import('@/pages/user/Dashboard'))
+const AdminDashboard = lazy(() => import('@/pages/admin/AdminDashboard'))
 
 export const adminRoutes: RouteObject[] = [
   {
@@ -14,7 +14,7 @@ export const adminRoutes: RouteObject[] = [
     children: [
       {
         path: 'dashboard',
-        element: <DashBoard />,
+        element: <AdminDashboard />,
       },
     ],
   },

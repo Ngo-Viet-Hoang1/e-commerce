@@ -49,7 +49,7 @@ const router = createBrowserRouter([
       {
         path: '/admin/auth',
         element: (
-          <GuestRoute authType="admin" redirectPath="/admin/auth/login" />
+          <GuestRoute authType="admin" redirectPath="/admin/dashboard" />
         ),
         errorElement: <ErrorPage />,
         children: [
