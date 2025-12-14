@@ -10,6 +10,7 @@ import attributeValueRoute from '../modules/attributeValue/attributeValue.route'
 import brandRoute from '../modules/brand/brand.route.js'
 import badgeRoute from '../modules/badge/badge.route.js'
 import productRoute from '../modules/product/product.route.js'
+import warrantyPoliciesRoute from '../modules/warrantyPolicies/warrantyPolicies.route.js'
 
 const router = Router()
 
@@ -24,5 +25,7 @@ router.use('/errors', errorRoute)
 router.use('/orders', orderRouter)
 router.use('/attributes', attributeRoute)
 router.use('/attributes', attributeValueRoute)
+router.use('/warranty-policies', warrantyPoliciesRoute)
+router.use('/products', warrantyPoliciesRoute)
 
 export default router

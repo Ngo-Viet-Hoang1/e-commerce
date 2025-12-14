@@ -10,5 +10,7 @@ model Brand {
     
     products    Product[]
 
+    warranties WarrantyPolicy[]
+
     @@map("brand")
 }
