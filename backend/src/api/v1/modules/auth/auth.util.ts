@@ -37,40 +37,44 @@ export class AuthUtils {
   }
 
   static setAdminRefreshToken = (res: Response, token: string): void => {
+    const isProduction = process.env.NODE_ENV === 'production'
     res.cookie('adminRefreshToken', token, {
       maxAge: 1000 * 60 * 60 * 24 * 7,
       httpOnly: true,
-      sameSite: 'none',
-      secure: process.env.NODE_ENV === 'production',
-      path: '/api/v1/admin/auth',
+      sameSite: isProduction ? 'none' : 'lax',
+      secure: isProduction,
+      path: '/',
     })
   }
 
   static clearAdminRefreshToken = (res: Response) => {
+    const isProduction = process.env.NODE_ENV === 'production'
     res.clearCookie('adminRefreshToken', {
       httpOnly: true,
-      sameSite: 'none',
-      secure: process.env.NODE_ENV === 'production',
-      path: '/api/v1/admin/auth',
+      sameSite: isProduction ? 'none' : 'lax',
+      secure: isProduction,
+      path: '/',
     })
   }
 
   static setUserRefreshToken = (res: Response, token: string): void => {
+    const isProduction = process.env.NODE_ENV === 'production'
     res.cookie('userRefreshToken', token, {
       maxAge: 1000 * 60 * 60 * 24 * 7,
       httpOnly: true,
-      sameSite: 'none',
-      secure: process.env.NODE_ENV === 'production',
-      path: '/api/v1/auth',
+      sameSite: isProduction ? 'none' : 'lax',
+      secure: isProduction,
+      path: '/',
     })
   }
 
   static clearUserRefreshToken = (res: Response) => {
+    const isProduction = process.env.NODE_ENV === 'production'
     res.clearCookie('userRefreshToken', {
       httpOnly: true,
-      sameSite: 'none',
-      secure: process.env.NODE_ENV === 'production',
-      path: '/api/v1/auth',
+      sameSite: isProduction ? 'none' : 'lax',
+      secure: isProduction,
+      path: '/',
     })
   }
 }
