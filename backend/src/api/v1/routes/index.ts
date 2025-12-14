@@ -7,6 +7,7 @@ import homeRoute from './home.route.js'
 import brandRoute from '../modules/brand/brand.route.js'
 import badgeRoute from '../modules/badge/badge.route.js'
 import productRoute from '../modules/product/product.route.js'
+import productBadgeRoute from '../modules/product-badge/product-badge.route.js'
 
 const router = Router()
 
@@ -18,5 +19,6 @@ router.use('/categories', categoryRoute)
 router.use('/badges', badgeRoute)
 router.use('/products', productRoute)
 router.use('/errors', errorRoute)
+router.use('/product-badges', productBadgeRoute)
 
 export default router

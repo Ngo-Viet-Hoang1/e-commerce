@@ -29,7 +29,8 @@ model User {
   deletedAt       DateTime? @db.Timestamptz
 
   userRoles UserRole[]
-
+  productBadges ProductBadge[]
+  
   @@index([createdAt])
   @@index([email])
   @@index([googleId])
