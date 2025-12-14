@@ -1,3 +1,4 @@
+import AdminAuthService from '@/api/services/admin/auth.admin.service'
 import AuthService from '@/api/services/user/auth.service'
 import { ACCESS_TOKEN_KEY } from '@/constants'
 import type { AuthActions, AuthState } from '@/interfaces/auth.interface'
@@ -8,11 +9,16 @@ import { devtools } from 'zustand/middleware'
 interface CreateAuthStoreProps {
   name: string
   tokenKey: string
+  getMeService: () => ReturnType<typeof AuthService.getMe>
 }
 
 export type AuthStore = AuthState & AuthActions
 
-const createAuthStore = ({ name, tokenKey }: CreateAuthStoreProps) => {
+const createAuthStore = ({
+  name,
+  tokenKey,
+  getMeService,
+}: CreateAuthStoreProps) => {
   const initialState: AuthState = {
     me: null,
     accessToken: null,
@@ -61,7 +67,7 @@ const createAuthStore = ({ name, tokenKey }: CreateAuthStoreProps) => {
             })
 
             try {
-              const { success, data } = await AuthService.getMe()
+              const { success, data } = await getMeService()
               if (success && data?.me) {
                 set({ me: data.me, isInitialized: true })
               } else {
@@ -96,9 +102,11 @@ const createAuthStore = ({ name, tokenKey }: CreateAuthStoreProps) => {
 export const useAuthStore = createAuthStore({
   name: 'UserAuthStore',
   tokenKey: ACCESS_TOKEN_KEY.USER,
+  getMeService: () => AuthService.getMe(),
 })
 
 export const useAdminAuthStore = createAuthStore({
   name: 'AdminAuthStore',
   tokenKey: ACCESS_TOKEN_KEY.ADMIN,
+  getMeService: () => AdminAuthService.getMe(),
 })
