@@ -18,6 +18,7 @@ model Product {
 
     brand    Brand    @relation(fields: [brandId], references: [id])
     category Category @relation(fields: [categoryId], references: [id])
+    faqs     ProductFaq[]
 
     @@index([name])
     @@index([sku])

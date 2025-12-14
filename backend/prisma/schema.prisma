@@ -35,6 +35,9 @@ model User {
   @@index([googleId])
   @@index([isActive, emailVerified])
   @@index([deletedAt])
+
+  productFaqs ProductFaq[]
+  productFaqsAnswered ProductFaq[] @relation("AnsweredByUser")
 }
 
 model Role {
