@@ -28,8 +28,6 @@ model User {
   updatedAt       DateTime  @updatedAt @db.Timestamptz
   deletedAt       DateTime? @db.Timestamptz
 
-  orders Order[]
-
   userRoles UserRole[]
 
   @@index([createdAt])
