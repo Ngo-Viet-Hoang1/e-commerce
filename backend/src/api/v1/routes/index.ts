@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import authRoute from '../modules/auth/auth.route.js'
+import authRoute from '../modules/auth/routes/auth.route.js'
 import categoryRoute from '../modules/category/category.route.js'
 import userRoute from '../modules/user/user.route.js'
 import errorRoute from './error.route.js'
@@ -12,6 +12,7 @@ import badgeRoute from '../modules/badge/badge.route.js'
 import productRoute from '../modules/product/product.route.js'
 import productBadgeRoute from '../modules/product-badge/product-badge.route.js'
 import productFaqRoute from '../modules/product-faq/product-faq.route.js'
+import adminRoute from './admin.route.js'
 
 const router = Router()
 
@@ -28,5 +29,7 @@ router.use('/product-badges', productBadgeRoute)
 router.use('/orders', orderRouter)
 router.use('/attributes', attributeRoute)
 router.use('/attributes', attributeValueRoute)
+
+router.use('/admin', adminRoute)
 
 export default router

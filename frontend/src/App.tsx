@@ -1,8 +1,15 @@
-import { RouterProvider } from 'react-router'
-import router from './routes/Routes'
+import { useEffect } from 'react'
+import { Outlet, useNavigate } from 'react-router'
+import { setNavigator } from './utils/navigate.util'
 
 function App() {
-  return <RouterProvider router={router} />
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    setNavigator(navigate)
+  }, [navigate])
+
+  return <Outlet />
 }
 
 export default App

@@ -1,13 +1,8 @@
-import { Suspense, useEffect } from 'react'
-import { Link, NavLink, Outlet, useNavigation } from 'react-router-dom'
+import { Suspense } from 'react'
+import { Link, NavLink, Outlet } from 'react-router-dom'
+import { Spinner } from '../ui/spinner'
 
 export default function RootLayout() {
-  const navigation = useNavigation()
-
-  useEffect(() => {
-    //   navigation.state === 'loading'
-  }, [])
-
   return (
     <div className="flex min-h-dvh w-full flex-col">
       <header className="sticky top-0 z-40 border-b bg-white/80 backdrop-blur-sm">
@@ -27,7 +22,7 @@ export default function RootLayout() {
         <Suspense
           fallback={
             <div className="flex flex-1 items-center justify-center">
-              <div className="text-gray-500">Loading...</div>
+              <Spinner className="size-8" />
             </div>
           }
         >

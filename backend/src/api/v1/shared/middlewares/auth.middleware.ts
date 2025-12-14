@@ -1,15 +1,15 @@
 import type { NextFunction, Request, RequestHandler, Response } from 'express'
-import { ACTIONS } from '../constants/rbac/actions.constant'
-import { ROLES } from '../constants/rbac/roles.constant'
 import { userRepository } from '../../modules/user/user.repository'
 import passport from '../config/passport'
+import { ACTIONS } from '../constants/rbac/actions.constant'
+import { ROLES } from '../constants/rbac/roles.constant'
 import type { AccessTokenPayload } from '../interfaces/jwt-payload.interface'
 import {
   ForbiddenException,
   UnauthorizedException,
 } from '../models/app-error.model'
 
-export const authenticate = (
+export const authenticate = async (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -17,9 +17,9 @@ export const authenticate = (
   passport.authenticate(
     'jwt',
     { session: false },
-    (
+    async (
       err: Error | null,
-      user: AccessTokenPayload,
+      payload: AccessTokenPayload,
       info: {
         name?: string
         message?: string
@@ -29,44 +29,126 @@ export const authenticate = (
         return next(err)
       }
 
-      if (!user) {
+      if (!payload) {
         const message = getAuthErrorMessage(info)
-        return next(new UnauthorizedException(message))
+        return next(
+          new UnauthorizedException(message ?? 'Authentication failed'),
+        )
       }
 
-      req.user = user
+      const userWithRolesAndPerms =
+        await userRepository.findUserWithRolesAndPerms(payload.id)
+      if (!userWithRolesAndPerms) {
+        return next(new UnauthorizedException('User not found'))
+      }
+
+      req.userWithRolesAndPerms = userWithRolesAndPerms
+      req.user = payload
       return next()
     },
   )(req, res, next)
 }
 
+export const requireAdmin = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const userWithRolesAndPerms = req.userWithRolesAndPerms
+
+  if (!userWithRolesAndPerms) {
+    throw new UnauthorizedException('Authentication required')
+  }
+
+  if (userWithRolesAndPerms.deletedAt || !userWithRolesAndPerms.isActive) {
+    return next(new UnauthorizedException('Account is inactive'))
+  }
+
+  const isAdmin = userWithRolesAndPerms.userRoles.some(
+    (ur) => ur.role.name === ROLES.ADMIN,
+  )
+
+  if (!isAdmin) throw new ForbiddenException('Admin access required')
+  next()
+}
+
+export const requireUser = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const userWithRolesAndPerms = req.userWithRolesAndPerms
+
+  if (!userWithRolesAndPerms) {
+    throw new UnauthorizedException('Authentication required')
+  }
+
+  if (userWithRolesAndPerms.deletedAt || !userWithRolesAndPerms.isActive) {
+    return next(new UnauthorizedException('Account is inactive'))
+  }
+
+  const isUser = userWithRolesAndPerms.userRoles.some(
+    (ur) => ur.role.name === ROLES.USER,
+  )
+
+  if (!isUser) throw new ForbiddenException('User access required')
+  next()
+}
+
+export const requireRole = (...roleNames: string[]) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const userWithRolesAndPerms = req.userWithRolesAndPerms
+
+    if (!userWithRolesAndPerms) {
+      throw new UnauthorizedException('Authentication required')
+    }
+
+    if (userWithRolesAndPerms.deletedAt || !userWithRolesAndPerms.isActive) {
+      return next(new UnauthorizedException('Account is inactive'))
+    }
+
+    const hasRole = userWithRolesAndPerms.userRoles.some((ur) =>
+      roleNames.includes(ur.role.name),
+    )
+
+    if (!hasRole) {
+      throw new ForbiddenException(
+        `Access denied. Required roles: ${roleNames.join(', ')}`,
+      )
+    }
+
+    next()
+  }
+}
+
 export const authorize = (resource: string, action: string) => {
   return async (req: Request, res: Response, next: NextFunction) => {
-    const user = req.user!
+    const userWithRolesAndPerms = req.userWithRolesAndPerms
+
+    if (!userWithRolesAndPerms) {
+      throw new UnauthorizedException('Authentication required')
+    }
+
     const permission = `${resource}.${action}`
-    const userWithRolesAndPerms =
-      await userRepository.findUserWithRolesAndPerms(user.id)
-    const roleIds = userWithRolesAndPerms?.userRoles.map((ur) => ur.role.id)
-    const perms = userWithRolesAndPerms?.userRoles.flatMap((ur) =>
+    const roleIds = userWithRolesAndPerms.userRoles.map((ur) => ur.role.id)
+    const perms = userWithRolesAndPerms.userRoles.flatMap((ur) =>
       ur.role.rolePermissions.map(
         (rp) => `${rp.permission.resource}.${rp.permission.action}`,
       ),
     )
-    const isAdmin = userWithRolesAndPerms?.userRoles.some(
+    const isAdmin = userWithRolesAndPerms.userRoles.some(
       (ur) => ur.role.name === ROLES.ADMIN,
     )
 
-    if (isAdmin) {
-      return next()
-    }
+    if (isAdmin) return next()
 
-    if (roleIds?.length === 0) {
+    if (!roleIds || roleIds.length === 0) {
       throw new ForbiddenException(
         'You do not have permission to perform this action',
       )
     }
 
-    if (perms?.length === 0 || !perms?.includes(permission)) {
+    if (!perms || perms.length === 0 || !perms.includes(permission)) {
       throw new ForbiddenException(
         'You do not have permission to perform this action',
       )
@@ -84,21 +166,6 @@ export const resourceAuth = (resource: string) => {
     delete: authorize(resource, ACTIONS.DELETE),
     list: authorize(resource, ACTIONS.READ),
     manage: authorize(resource, ACTIONS.MANAGE),
-    any: (...actions: string[]): RequestHandler => {
-      return async (req, res, next) => {
-        for (const action of actions) {
-          try {
-            await authorize(resource, action)(req, res, next)
-            return
-          } catch {
-            return
-          }
-        }
-        throw new ForbiddenException(
-          'You do not have permission to perform this action',
-        )
-      }
-    },
     all: (...actions: string[]): RequestHandler[] => {
       return actions.map((action) => authorize(resource, action))
     },

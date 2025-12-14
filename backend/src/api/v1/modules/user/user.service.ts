@@ -1,4 +1,5 @@
 import type { Prisma } from '@generated/prisma/client'
+import { ROLES } from '../../shared/constants/rbac'
 import {
   ConflictException,
   NotFoundException,
@@ -65,6 +66,13 @@ class UserService {
       email: data.email,
       password: hashedPassword,
       name: data.name,
+      userRoles: {
+        create: [
+          {
+            role: { connect: { name: ROLES.USER } },
+          },
+        ],
+      },
     })
 
     return user
