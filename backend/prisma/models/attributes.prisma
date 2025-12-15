@@ -24,5 +24,7 @@ model AttributeValue {
 
   attribute Attribute? @relation(fields: [attributeId], references: [id])
 
+  productVariants ProductVariant[]
+
   @@map("attribute_values")
 }
