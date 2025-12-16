@@ -1,26 +1,17 @@
 import type { Request, Response } from 'express'
-import { UnauthorizedException } from '../../shared/models/app-error.model'
-import { SuccessResponse } from '../../shared/models/success-response.model'
-import { RequestUtils } from '../../shared/utils/request.util'
-import { userService, type CreateUserBody } from '../user'
-import type { LoginBody } from './auth.schema'
-import { authService } from './auth.service'
-import { AuthUtils } from './auth.util'
+import { UnauthorizedException } from '../../../shared/models/app-error.model'
+import { SuccessResponse } from '../../../shared/models/success-response.model'
+import { RequestUtils } from '../../../shared/utils/request.util'
+import type { LoginBody } from '../auth.schema'
+import { authService } from '../auth.service'
+import { AuthUtils } from '../auth.util'
 
-class AuthController {
+class AdminAuthController {
   me = async (req: Request, res: Response) => {
     const user = req.user!
     const me = await authService.me(user.id)
 
-    SuccessResponse.send(res, { me }, 'User profile fetched successfully')
-  }
-
-  register = async (req: Request, res: Response) => {
-    const data = req.validatedData?.body as CreateUserBody
-
-    const user = await userService.create(data)
-
-    SuccessResponse.send(res, { user }, 'User registered successfully')
+    SuccessResponse.send(res, { me }, 'Admin profile fetched successfully')
   }
 
   login = async (req: Request, res: Response) => {
@@ -33,7 +24,7 @@ class AuthController {
         ...meta,
       })
 
-    AuthUtils.setRefreshTokenCookie(res, refreshToken)
+    AuthUtils.setAdminRefreshToken(res, refreshToken)
 
     SuccessResponse.send(
       res,
@@ -43,14 +34,14 @@ class AuthController {
   }
 
   logout = async (req: Request, res: Response) => {
-    const { refreshToken } = req.cookies
+    const { adminRefreshToken: refreshToken } = req.cookies
     if (!refreshToken) {
       throw new UnauthorizedException('Refresh token not provided')
     }
 
     await authService.logout(refreshToken)
 
-    AuthUtils.clearRefreshTokenCookie(res)
+    AuthUtils.clearAdminRefreshToken(res)
 
     SuccessResponse.send(res, {}, 'Logout successful')
   }
@@ -60,13 +51,13 @@ class AuthController {
 
     await authService.logoutAll(user.id)
 
-    AuthUtils.clearRefreshTokenCookie(res)
+    AuthUtils.clearAdminRefreshToken(res)
 
     SuccessResponse.send(res, {}, 'Logout successful')
   }
 
   refreshToken = async (req: Request, res: Response) => {
-    const { refreshToken } = req.cookies
+    const { adminRefreshToken: refreshToken } = req.cookies
     if (!refreshToken) {
       throw new UnauthorizedException('Refresh token not provided')
     }
@@ -79,7 +70,7 @@ class AuthController {
         ...meta,
       })
 
-    AuthUtils.setRefreshTokenCookie(res, newRefreshToken)
+    AuthUtils.setAdminRefreshToken(res, newRefreshToken)
 
     SuccessResponse.send(
       res,
@@ -89,5 +80,5 @@ class AuthController {
   }
 }
 
-export const authController = new AuthController()
-export default AuthController
+export const adminAuthController = new AdminAuthController()
+export default AdminAuthController

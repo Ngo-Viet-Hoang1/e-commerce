@@ -31,12 +31,16 @@ model User {
   orders Order[]
 
   userRoles UserRole[]
-
+  productBadges ProductBadge[]
+  
   @@index([createdAt])
   @@index([email])
   @@index([googleId])
   @@index([isActive, emailVerified])
   @@index([deletedAt])
+
+  productFaqs ProductFaq[]
+  productFaqsAnswered ProductFaq[] @relation("AnsweredByUser")
 }
 
 model Role {
