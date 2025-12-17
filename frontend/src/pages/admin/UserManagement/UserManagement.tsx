@@ -1,26 +1,27 @@
 import AdminUserService from '@/api/services/admin/user.admin.service'
-import type { User } from '@/interfaces/user.interface'
-import { useEffect, useState } from 'react'
-import { DataTable } from '../../../components/common/table/DataTable'
+import type { PaginationParams } from '@/interfaces/pagination.interface'
+import { useCallback, useRef } from 'react'
+import {
+  DataTable,
+  type DataTableRef,
+} from '../../../components/common/table/DataTable'
 import { userColumns } from './Columns'
 
 const UserManagement = () => {
-  const [users, setUsers] = useState<User[]>([])
+  const tableRef = useRef<DataTableRef>(null)
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      const res = await AdminUserService.getAll()
-      const { success, data } = res
-
-      if (success && data) {
-        setUsers(data)
-      }
-    }
-
-    fetchUsers()
+  const fetchData = useCallback((params: PaginationParams) => {
+    return AdminUserService.getPaginated(params)
   }, [])
 
-  return <DataTable columns={userColumns} data={users} />
+  return (
+    <DataTable
+      ref={tableRef}
+      fetchData={fetchData}
+      columns={userColumns}
+      searchPlaceholder="Search by email or name..."
+    />
+  )
 }
 
 export default UserManagement
