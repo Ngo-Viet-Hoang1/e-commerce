@@ -23,6 +23,8 @@ model Order {
   deliveredAt DateTime? @db.Timestamptz
   deletedAt   DateTime? @db.Timestamptz
 
+  orderItems OrderItem[]
+
   @@index([createdAt])
   @@index([status])
   @@index([paymentStatus])

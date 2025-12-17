@@ -11,6 +11,7 @@ import productFaqRoute from '../modules/product-faq/product-faq.route.js'
 import productVariantRoute from '../modules/product-variant/product-variant.route.js'
 import productRoute from '../modules/product/product.route.js'
 import warrantyPoliciesRoute from '../modules/warrantyPolicies/warrantyPolicies.route.js'
+import orderItemRoute from '../modules/order-items/order-items.route.js'
 import userRoute from '../modules/user/user.route.js'
 import adminRoute from './admin.route.js'
 import errorRoute from './error.route.js'
@@ -34,6 +35,7 @@ router.use('/attributes', attributeValueRoute)
 router.use('/warranty-policies', warrantyPoliciesRoute)
 router.use('/products', warrantyPoliciesRoute)
 router.use('/product-variants', productVariantRoute)
+router.use('/order-items', orderItemRoute)
 
 router.use('/admin', adminRoute)
 
