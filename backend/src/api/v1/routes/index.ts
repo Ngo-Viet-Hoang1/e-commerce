@@ -14,6 +14,7 @@ import userRoute from '../modules/user/user.route.js'
 import adminRoute from './admin.route.js'
 import errorRoute from './error.route.js'
 import homeRoute from './home.route.js'
+import paymentRoute from '../modules/payment/payment.route.js'
 
 const router = Router()
 
@@ -31,6 +32,7 @@ router.use('/orders', orderRouter)
 router.use('/attributes', attributeRoute)
 router.use('/attributes', attributeValueRoute)
 router.use('/product-variants', productVariantRoute)
+router.use('/payments', paymentRoute)
 
 router.use('/admin', adminRoute)
 
