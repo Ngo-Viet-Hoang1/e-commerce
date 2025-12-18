@@ -8,36 +8,9 @@ import type {
 
 class ProductImageService {
   findAll = async (query: ListProductImagesQuery) => {
-    const { page, limit, sort, order, search } = query
+    const { page, limit, sort, order } = query
 
-    const where: Prisma.ProductImageWhereInput = {
-      ...(search && {
-        OR: [
-          {
-            altText: {
-              contains: search,
-              mode: 'insensitive',
-            },
-          },
-          {
-            product: {
-              name: {
-                contains: search,
-                mode: 'insensitive',
-              },
-            },
-          },
-          {
-            variant: {
-              sku: {
-                contains: search,
-                mode: 'insensitive',
-              },
-            },
-          },
-        ],
-      }),
-    }
+    const where: Prisma.ProductImageWhereInput = {}
 
     const [images, total] = await Promise.all([
       productImageRepository.findMany({
@@ -82,13 +55,11 @@ class ProductImageService {
 
   deleteById = async (imageId: number) => {
     await this.findById(imageId)
-
     return productImageRepository.delete(imageId)
   }
 
   softDeleteById = async (imageId: number) => {
     await this.findById(imageId)
-
     return productImageRepository.update(imageId, {
       deletedAt: new Date(),
     })
@@ -96,7 +67,6 @@ class ProductImageService {
 
   restoreById = async (imageId: number) => {
     await this.findById(imageId)
-
     return productImageRepository.restore(imageId)
   }
 }
