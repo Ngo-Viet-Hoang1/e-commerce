@@ -23,6 +23,8 @@ model ProductVariant {
     product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
     attributeValues AttributeValue[]
+    productImages   ProductImage[]
+    productVideos   ProductVideo[]
 
     @@index([productId])
     @@index([deletedAt])
