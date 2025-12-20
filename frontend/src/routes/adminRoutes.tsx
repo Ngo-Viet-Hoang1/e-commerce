@@ -6,6 +6,12 @@ const AdminDashboard = lazy(() => import('@/pages/admin/AdminDashboard'))
 const UserManagement = lazy(
   () => import('@/pages/admin/UserManagement/UserManagement'),
 )
+const CategoryManagement = lazy(
+  () => import('@/pages/admin/CategoryMangement/CategoryManagement'),
+)
+const BrandManagement = lazy(
+  () => import('@/pages/admin/BrandManagement/BrandManagement'),
+)
 
 export const adminRoutes: RouteObject[] = [
   {
@@ -22,6 +28,14 @@ export const adminRoutes: RouteObject[] = [
       {
         path: 'user-management',
         element: <UserManagement />,
+      },
+      {
+        path: 'category-management',
+        element: <CategoryManagement />,
+      },
+      {
+        path: 'brand-management',
+        element: <BrandManagement />,
       },
     ],
   },

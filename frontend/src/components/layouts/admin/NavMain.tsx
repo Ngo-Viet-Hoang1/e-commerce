@@ -47,12 +47,12 @@ const navMain: {
         url: '/admin/user-management',
       },
       {
-        title: 'Starred',
-        url: '#',
+        title: 'Category Management',
+        url: '/admin/category-management',
       },
       {
-        title: 'Settings',
-        url: '#',
+        title: 'Brand Management',
+        url: '/admin/brand-management',
       },
     ],
   },
