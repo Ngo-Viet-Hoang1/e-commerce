@@ -47,8 +47,8 @@ const navMain: {
         url: '/admin/user-management',
       },
       {
-        title: 'Starred',
-        url: '#',
+        title: 'Order Management',
+        url: '/admin/order-management',
       },
       {
         title: 'Settings',
