@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/incompatible-library */
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
 import {
@@ -11,7 +12,7 @@ import {
 import useDebounce from '@/hooks/useDebounce'
 import type { IPaginatedResponse } from '@/interfaces/base-response.interface'
 import type { PaginationParams } from '@/interfaces/pagination.interface'
-import { ApiError } from '@/models/ApiError'
+import type { UseQueryResult } from '@tanstack/react-query'
 import {
   type ColumnDef,
   type ColumnFiltersState,
@@ -22,24 +23,15 @@ import {
   useReactTable,
   type VisibilityState,
 } from '@tanstack/react-table'
-import {
-  forwardRef,
-  useCallback,
-  useEffect,
-  useImperativeHandle,
-  useState,
-} from 'react'
+import { useEffect, useState } from 'react'
 import { DataTablePagination } from './DataTablePagination'
 import { DataTableViewOptions } from './DataTableViewOptions'
 
-interface DataTableProps<
-  TData,
-  TValue,
-  TParams extends PaginationParams = PaginationParams,
-> {
+interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
+  query: UseQueryResult<IPaginatedResponse<TData>, Error>
 
-  fetchData: (params: TParams) => Promise<IPaginatedResponse<TData>>
+  onParamsChange: (params: PaginationParams) => void
 
   searchPlaceholder?: string
   searchable?: boolean
@@ -47,96 +39,63 @@ interface DataTableProps<
   renderToolbar?: (table: TableType<TData>) => React.ReactNode
 }
 
-export interface DataTableRef<TData = unknown> {
-  refetch: () => void
-  getSelectedRows: () => TData[]
-  clearSelection: () => void
-}
+export function DataTable<TData, TValue>({
+  columns,
+  query,
+  onParamsChange,
+  searchPlaceholder = 'Search...',
+  searchable = true,
+  defaultPageSize = 10,
+  renderToolbar,
+}: DataTableProps<TData, TValue>) {
+  const { data: response, isLoading, error } = query
 
-function DataTableInner<
-  TData,
-  TValue,
-  TParams extends PaginationParams = PaginationParams,
->(
-  {
-    columns,
-    fetchData,
-    searchPlaceholder = 'Search...',
-    searchable = true,
-    defaultPageSize = 10,
-  }: DataTableProps<TData, TValue, TParams>,
-  ref: React.Ref<DataTableRef>,
-) {
-  const [data, setData] = useState<TData[]>([])
-  const [totalRows, setTotalRows] = useState(0)
-  const [pageCount, setPageCount] = useState(0)
-
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const data = response?.data ?? []
+  const totalRows = response?.meta?.total ?? 0
+  const pageCount = response?.meta?.totalPages ?? 0
 
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
-
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: defaultPageSize,
   })
-
   const [globalFilter, setGlobalFilter] = useState('')
+
   const debouncedSearch = useDebounce(globalFilter, 500)
 
-  const loadData = useCallback(async () => {
-    setIsLoading(true)
-    setError(null)
-
-    try {
-      const params = {
-        page: pagination.pageIndex + 1,
-        limit: pagination.pageSize,
-      } as TParams
-
-      if (debouncedSearch) {
-        params.search = debouncedSearch
-      }
-
-      if (sorting.length > 0) {
-        params.sort = sorting[0].id
-        params.order = sorting[0].desc ? 'desc' : 'asc'
-      }
-
-      if (columnFilters.length > 0) {
-        params.filters = columnFilters.reduce<Record<string, unknown>>(
-          (acc, filter) => {
-            acc[filter.id] = filter.value
-            return acc
-          },
-          {},
-        )
-      }
-
-      const result = await fetchData(params as TParams)
-
-      setData(result.data ?? [])
-      setTotalRows(result.meta.total)
-      setPageCount(result.meta.totalPages)
-    } catch (err) {
-      if (err instanceof ApiError) {
-        setError(err.message)
-      } else {
-        setError('Failed to load data')
-      }
-    } finally {
-      setIsLoading(false)
-    }
-  }, [fetchData, pagination, sorting, columnFilters, debouncedSearch])
-
+  // ===== EMIT PARAMS CHANGES =====
   useEffect(() => {
-    loadData()
-  }, [loadData])
+    const params: PaginationParams = {
+      page: pagination.pageIndex + 1,
+      limit: pagination.pageSize,
+    }
 
-  // Reset to page 1 when search or filters change
+    if (debouncedSearch) {
+      params.search = debouncedSearch
+    }
+
+    if (sorting.length > 0) {
+      params.sort = sorting[0].id
+      params.order = sorting[0].desc ? 'desc' : 'asc'
+    }
+
+    if (columnFilters.length > 0) {
+      params.filters = columnFilters.reduce<Record<string, unknown>>(
+        (acc, filter) => {
+          acc[filter.id] = filter.value
+          return acc
+        },
+        {},
+      )
+    }
+
+    onParamsChange(params)
+  }, [pagination, sorting, columnFilters, debouncedSearch, onParamsChange])
+
+  // ===== RESET TO PAGE 1 ON FILTER/SEARCH =====
   useEffect(() => {
     if (pagination.pageIndex !== 0) {
       setPagination((prev) => ({ ...prev, pageIndex: 0 }))
@@ -146,13 +105,10 @@ function DataTableInner<
   const table = useReactTable({
     data,
     columns,
-
     manualPagination: true,
     manualSorting: true,
     manualFiltering: true,
-
     pageCount,
-
     state: {
       sorting,
       columnFilters,
@@ -161,26 +117,14 @@ function DataTableInner<
       pagination,
       globalFilter,
     },
-
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     onPaginationChange: setPagination,
     onGlobalFilterChange: setGlobalFilter,
-
     getCoreRowModel: getCoreRowModel(),
   })
-
-  useImperativeHandle(
-    ref,
-    (): DataTableRef<TData> => ({
-      refetch: () => loadData(),
-      getSelectedRows: () =>
-        table.getSelectedRowModel().rows.map((row) => row.original) as TData[],
-      clearSelection: () => setRowSelection({}),
-    }),
-  )
 
   return (
     <div>
@@ -233,7 +177,7 @@ function DataTableInner<
                   colSpan={columns.length}
                   className="text-destructive h-24 text-center"
                 >
-                  {error}
+                  {error.message || 'Failed to load data'}
                 </TableCell>
               </TableRow>
             ) : table.getRowModel().rows?.length ? (
@@ -270,13 +214,3 @@ function DataTableInner<
     </div>
   )
 }
-
-export const DataTable = forwardRef(DataTableInner) as <
-  TData,
-  TValue,
-  TParams extends PaginationParams = PaginationParams,
->(
-  props: DataTableProps<TData, TValue, TParams> & {
-    ref?: React.Ref<DataTableRef>
-  },
-) => React.ReactElement
