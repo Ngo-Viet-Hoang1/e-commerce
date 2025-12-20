@@ -137,7 +137,11 @@ export function DataTable<TData, TValue>({
             className="w-full shrink-0 sm:w-64 md:w-72"
           />
         )}
-        <DataTableViewOptions table={table} />
+
+        <div className="ml-auto flex flex-wrap items-center gap-2">
+          {renderToolbar?.(table)}
+          <DataTableViewOptions table={table} />
+        </div>
       </div>
 
       <div className="overflow-hidden rounded-md border">

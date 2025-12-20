@@ -1,5 +1,6 @@
 import AdminUserService from '@/api/services/admin/user.admin.service'
 import type { PaginationParams } from '@/interfaces/pagination.interface'
+import type { User } from '@/interfaces/user.interface'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
@@ -20,6 +21,23 @@ export const useUsers = (params: PaginationParams) => {
     queryFn: () => AdminUserService.getPaginated(params),
 
     placeholderData: (previousData) => previousData,
+  })
+}
+
+export const useCreateUser = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (userData: Partial<User>) => AdminUserService.create(userData),
+
+    onSuccess: () => {
+      toast.success('User created successfully')
+      queryClient.invalidateQueries({ queryKey: queryKeys.users.lists() })
+    },
+
+    onError: () => {
+      toast.error('Failed to create user')
+    },
   })
 }
 

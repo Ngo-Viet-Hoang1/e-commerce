@@ -2,6 +2,7 @@ import { ConfirmDialog } from '@/components/common/ConfirmDialog'
 import { DataTable } from '@/components/common/table/DataTable'
 import {
   createModalState,
+  isCreateMode,
   isDeleteMode,
   type ModalState,
 } from '@/interfaces/modal.interface'
@@ -9,7 +10,9 @@ import type { PaginationParams } from '@/interfaces/pagination.interface'
 import type { User } from '@/interfaces/user.interface'
 import { useState } from 'react'
 import createUserColumns from './Columns'
+import { CreateUserForm } from './CreateUserForm'
 import { useDeleteUser, useUsers } from './user.queries'
+import UserTableToolbar from './UserTableToolbar'
 
 const UserManagement = () => {
   const [modalState, setModalState] = useState<ModalState<User>>(null)
@@ -33,7 +36,16 @@ const UserManagement = () => {
         query={usersQuery}
         onParamsChange={setParams}
         searchPlaceholder="Search by email or name..."
+        renderToolbar={() => (
+          <UserTableToolbar
+            onCreate={() => setModalState(createModalState.create())}
+          />
+        )}
       />
+
+      {isCreateMode(modalState) && (
+        <CreateUserForm open onClose={() => setModalState(null)} />
+      )}
 
       {/* Delete Confirmation */}
       {isDeleteMode(modalState) && (
