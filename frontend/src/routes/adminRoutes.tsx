@@ -3,9 +3,6 @@ import { Navigate, type RouteObject } from 'react-router-dom'
 import ProtectedRoute from './ProtectedRoute'
 
 const AdminDashboard = lazy(() => import('@/pages/admin/AdminDashboard'))
-const UserManagement = lazy(
-  () => import('@/pages/admin/UserManagement/UserManagement'),
-)
 
 export const adminRoutes: RouteObject[] = [
   {
@@ -18,10 +15,6 @@ export const adminRoutes: RouteObject[] = [
       {
         path: 'dashboard',
         element: <AdminDashboard />,
-      },
-      {
-        path: 'user-management',
-        element: <UserManagement />,
       },
     ],
   },
