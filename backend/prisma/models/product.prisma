@@ -23,6 +23,8 @@ model Product {
   faqs          ProductFaq[]
   productBadges ProductBadge[]
   variants      ProductVariant[]
+  productImages ProductImage[]
+  productVideos ProductVideo[]
 
   @@index([name])
   @@index([sku])
