@@ -24,6 +24,8 @@ model ProductVariant {
 
     attributeValues AttributeValue[]
     orderItems OrderItem[]
+    productImages   ProductImage[]
+    productVideos   ProductVideo[]
 
     @@index([productId])
     @@index([deletedAt])

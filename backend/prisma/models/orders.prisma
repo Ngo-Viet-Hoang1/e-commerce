@@ -24,6 +24,7 @@ model Order {
   deletedAt   DateTime? @db.Timestamptz
 
   orderItems OrderItem[]
+  payment Payment[]
 
   @@index([createdAt])
   @@index([status])
