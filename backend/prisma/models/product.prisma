@@ -23,6 +23,7 @@ model Product {
   faqs          ProductFaq[]
   productBadges ProductBadge[]
   variants      ProductVariant[]
+  orderItems OrderItem[]
   productImages ProductImage[]
   productVideos ProductVideo[]
 
