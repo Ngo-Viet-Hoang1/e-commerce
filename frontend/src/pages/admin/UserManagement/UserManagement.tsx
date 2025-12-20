@@ -4,6 +4,7 @@ import {
   createModalState,
   isCreateMode,
   isDeleteMode,
+  isEditMode,
   type ModalState,
 } from '@/interfaces/modal.interface'
 import type { PaginationParams } from '@/interfaces/pagination.interface'
@@ -11,6 +12,7 @@ import type { User } from '@/interfaces/user.interface'
 import { useState } from 'react'
 import createUserColumns from './Columns'
 import { CreateUserForm } from './CreateUserForm'
+import { EditUserForm } from './EditUserForm'
 import { useDeleteUser, useUsers } from './user.queries'
 import UserTableToolbar from './UserTableToolbar'
 
@@ -26,6 +28,7 @@ const UserManagement = () => {
   const deleteMutation = useDeleteUser()
 
   const columns = createUserColumns({
+    onEdit: (user) => setModalState(createModalState.edit(user)),
     onDelete: (user) => setModalState(createModalState.delete(user)),
   })
 
@@ -45,6 +48,14 @@ const UserManagement = () => {
 
       {isCreateMode(modalState) && (
         <CreateUserForm open onClose={() => setModalState(null)} />
+      )}
+
+      {isEditMode(modalState) && (
+        <EditUserForm
+          open
+          userId={modalState.data.id}
+          onClose={() => setModalState(null)}
+        />
       )}
 
       {/* Delete Confirmation */}

@@ -7,4 +7,10 @@ export const createUserSchema = z.object({
   password: passwordSchema,
 })
 
+export const updateUserSchema = z.object({
+  name: z.string().min(1),
+  email: emailSchema,
+})
+
+export type UpdateUserInputs = z.infer<typeof updateUserSchema>
 export type CreateUserInputs = z.infer<typeof createUserSchema>

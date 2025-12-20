@@ -3,6 +3,7 @@ import type { PaginationParams } from '@/interfaces/pagination.interface'
 import type { User } from '@/interfaces/user.interface'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import type { UpdateUserInputs } from './user.schema'
 
 export const queryKeys = {
   users: {
@@ -24,6 +25,14 @@ export const useUsers = (params: PaginationParams) => {
   })
 }
 
+export const useUser = (id: number) => {
+  return useQuery({
+    queryKey: queryKeys.users.detail(id),
+    queryFn: () => AdminUserService.getById(id),
+    enabled: !!id,
+  })
+}
+
 export const useCreateUser = () => {
   const queryClient = useQueryClient()
 
@@ -37,6 +46,31 @@ export const useCreateUser = () => {
 
     onError: () => {
       toast.error('Failed to create user')
+    },
+  })
+}
+
+export const useUpdateUser = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ id, data }: { id: number; data: UpdateUserInputs }) =>
+      AdminUserService.update(id, data),
+
+    onSuccess: (_, { id }) => {
+      toast.success('User updated successfully')
+
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.users.detail(id),
+      })
+
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.users.lists(),
+      })
+    },
+
+    onError: () => {
+      toast.error('Failed to update user')
     },
   })
 }
