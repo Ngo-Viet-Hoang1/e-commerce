@@ -1,0 +1,18 @@
+model Payment {
+    id            Int       @id @default(autoincrement())
+    orderId       Int
+    userId        Int
+    paymentMethod String    @db.VarChar(50)
+    paymentStatus String    @db.VarChar(50)
+    amount        Float
+    currency      String    @db.VarChar(10)
+    transactionId String    @db.VarChar(100)
+    metaData      Json?     @db.JsonB
+    paidAt        DateTime? @db.Timestamptz
+    createdAt     DateTime  @default(now()) @db.Timestamptz
+    updatedAt     DateTime? @updatedAt @db.Timestamptz
+    deletedAt     DateTime? @db.Timestamptz
+
+    order Order @relation(fields: [orderId], references: [orderId])
+    user  User  @relation(fields: [userId], references: [id])
+}

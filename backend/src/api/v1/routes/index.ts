@@ -17,6 +17,7 @@ import errorRoute from './error.route.js'
 import homeRoute from './home.route.js'
 import productImageRoute from '../modules/product-image/product-image.route.js'
 import { productVideoRouter } from '../modules/product-video/product-video.route.js'
+import paymentRoute from '../modules/payment/payment.route.js'
 
 const router = Router()
 
@@ -38,6 +39,7 @@ router.use('/products', warrantyPoliciesRoute)
 router.use('/product-variants', productVariantRoute)
 router.use('/product-images', productImageRoute)
 router.use('/product-videos', productVideoRouter)
+router.use('/payments', paymentRoute)
 
 router.use('/admin', adminRoute)
 
