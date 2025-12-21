@@ -47,6 +47,10 @@ const navMain: {
         url: '/admin/user-management',
       },
       {
+        title: 'Order Management',
+        url: '/admin/order-management',
+      },
+      {
         title: 'Category Management',
         url: '/admin/category-management',
       },

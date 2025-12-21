@@ -71,6 +71,17 @@ export const updateOrderBodySchema = z.object({
   deletedAt: z.string().optional(),
 })
 
+export const updateOrderStatusBodySchema = z.object({
+  status: z.enum([
+    'pending',
+    'processing',
+    'shipped',
+    'delivered',
+    'cancelled',
+    'refunded',
+  ]),
+})
+
 const ORDER_SORT_FIELDS = [
   'createdAt',
   'updatedAt',
@@ -94,3 +105,4 @@ export type OrderIdParam = z.infer<typeof orderIdParamSchema>
 
 export type CreateOrderBody = z.infer<typeof createOrderBodySchema>
 export type UpdateOrderBody = z.infer<typeof updateOrderBodySchema>
+export type UpdateOrderStatusBody = z.infer<typeof updateOrderStatusBodySchema>
