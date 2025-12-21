@@ -51,8 +51,12 @@ const navMain: {
         url: '/admin/order-management',
       },
       {
-        title: 'Settings',
-        url: '#',
+        title: 'Category Management',
+        url: '/admin/category-management',
+      },
+      {
+        title: 'Brand Management',
+        url: '/admin/brand-management',
       },
     ],
   },

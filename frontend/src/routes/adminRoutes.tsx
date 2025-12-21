@@ -9,6 +9,12 @@ const UserManagement = lazy(
 const OrderManagement = lazy(
   () => import('@/pages/admin/OrderManagement/OrderManagement'),
 )
+const CategoryManagement = lazy(
+  () => import('@/pages/admin/CategoryMangement/CategoryManagement'),
+)
+const BrandManagement = lazy(
+  () => import('@/pages/admin/BrandManagement/BrandManagement'),
+)
 
 export const adminRoutes: RouteObject[] = [
   {
@@ -29,6 +35,14 @@ export const adminRoutes: RouteObject[] = [
       {
         path: 'order-management',
         element: <OrderManagement />,
+      },
+      {
+        path: 'category-management',
+        element: <CategoryManagement />,
+      },
+      {
+        path: 'brand-management',
+        element: <BrandManagement />,
       },
     ],
   },
