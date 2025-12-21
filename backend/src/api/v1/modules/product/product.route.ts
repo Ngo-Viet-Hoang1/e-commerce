@@ -6,6 +6,7 @@ import {
 import { productController } from './product.controller'
 import {
   createProductBodySchema,
+  createSimpleProductBodySchema,
   listProductsQuerySchema,
   productIdParamSchema,
   updateProductBodySchema,
@@ -29,6 +30,12 @@ router.post(
   '/',
   validate(createProductBodySchema, 'body'),
   productController.create,
+)
+
+router.post(
+  '/simple',
+  validate(createSimpleProductBodySchema, 'body'),
+  productController.createSimple,
 )
 
 router.put(

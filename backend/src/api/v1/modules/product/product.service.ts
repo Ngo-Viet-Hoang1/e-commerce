@@ -1,4 +1,5 @@
 import type { Prisma } from '@generated/prisma/client'
+import { prisma } from '../../shared/config/database/postgres'
 import {
   ConflictException,
   NotFoundException,
@@ -6,6 +7,7 @@ import {
 import productRepository from './product.repository'
 import type {
   CreateProductBody,
+  CreateSimpleProductBody,
   ListProductsQuery,
   UpdateProductBody,
 } from './product.schema'
@@ -157,6 +159,181 @@ class ProductService {
 
   exists = async (id: number): Promise<boolean> => {
     return productRepository.exists(id)
+  }
+
+  createSimple = async (data: CreateSimpleProductBody) => {
+    const [brandExists, categoryExists] = await Promise.all([
+      prisma.brand.findUnique({ where: { id: data.brandId } }),
+      prisma.category.findUnique({ where: { id: data.categoryId } }),
+    ])
+
+    if (!brandExists) {
+      throw new NotFoundException(`Brand with ID ${data.brandId} not found`)
+    }
+    if (!categoryExists) {
+      throw new NotFoundException(
+        `Category with ID ${data.categoryId} not found`,
+      )
+    }
+
+    const defaultVariants = data.variants.filter((v) => v.isDefault)
+    if (defaultVariants.length === 0) {
+      if (data.variants.length > 0 && data.variants[0]) {
+        data.variants[0].isDefault = true
+      }
+    } else if (defaultVariants.length > 1) {
+      throw new ConflictException('Only one variant can be set as default')
+    }
+
+    // Check for duplicate variant SKUs
+    const variantSkus = data.variants.map((v) => v.sku)
+    const uniqueSkus = new Set(variantSkus)
+    if (uniqueSkus.size !== variantSkus.length) {
+      throw new ConflictException('Duplicate variant SKUs found')
+    }
+
+    //  Check if product SKU or variant SKUs already exist
+    const existingProduct = await prisma.product.findFirst({
+      where: { sku: data.sku },
+    })
+    if (existingProduct) {
+      throw new ConflictException(`Product with SKU ${data.sku} already exists`)
+    }
+
+    const existingVariant = await prisma.productVariant.findFirst({
+      where: { sku: { in: variantSkus } },
+    })
+    if (existingVariant) {
+      throw new ConflictException(
+        `Variant with SKU ${existingVariant.sku} already exists`,
+      )
+    }
+
+    //  Create product with variants in transaction
+    const product = await prisma.$transaction(async (tx) => {
+      const createdProduct = await tx.product.create({
+        data: {
+          name: data.name,
+          sku: data.sku,
+          description: data.description || null,
+          status: data.status,
+          brandId: data.brandId,
+          categoryId: data.categoryId,
+        },
+      })
+
+      // Create Variants with Attributes
+      const createdVariants = await Promise.all(
+        data.variants.map(async (variant) => {
+          const attributeValueIds: number[] = []
+
+          if (variant.attributes && variant.attributes.length > 0) {
+            for (const attr of variant.attributes) {
+              // Find or create Attribute
+              let attribute = await tx.attribute.findFirst({
+                where: {
+                  name: attr.attributeName,
+                  deletedAt: null,
+                },
+              })
+
+              if (!attribute) {
+                attribute = await tx.attribute.create({
+                  data: {
+                    name: attr.attributeName,
+                    inputType: 'text',
+                    isFilterable: true,
+                    isSearchable: false,
+                  },
+                })
+              }
+
+              // Find or create AttributeValue
+              let attributeValue = await tx.attributeValue.findFirst({
+                where: {
+                  attributeId: attribute.id,
+                  valueText: attr.value,
+                  deletedAt: null,
+                },
+              })
+
+              if (!attributeValue) {
+                attributeValue = await tx.attributeValue.create({
+                  data: {
+                    attributeId: attribute.id,
+                    valueText: attr.value,
+                  },
+                })
+              }
+
+              attributeValueIds.push(attributeValue.id)
+            }
+          }
+
+          return await tx.productVariant.create({
+            data: {
+              productId: createdProduct.id,
+              sku: variant.sku,
+              title: variant.title,
+              price: variant.price,
+              costPrice: variant.costPrice,
+              stockQuantity: variant.stockQuantity,
+              isDefault: variant.isDefault,
+              attributeValues:
+                attributeValueIds.length > 0
+                  ? {
+                      connect: attributeValueIds.map((id) => ({ id })),
+                    }
+                  : undefined,
+            },
+          })
+        }),
+      )
+
+      // Create Product-level Images
+      if (data.images && data.images.length > 0) {
+        const defaultVariant = createdVariants.find((v) => v.isDefault)
+        const firstVariantId = defaultVariant?.id || createdVariants[0]?.id
+
+        if (firstVariantId) {
+          await tx.productImage.createMany({
+            data: data.images.map((img, index) => ({
+              productId: createdProduct.id,
+              variantId: firstVariantId,
+              url: img.url,
+              altText: img.altText,
+              isPrimary: img.isPrimary,
+              sortOrder: index,
+            })),
+          })
+        }
+      }
+
+      // Create Variant-specific Images
+      await Promise.all(
+        data.variants.map(async (variant, variantIndex) => {
+          if (variant.images && variant.images.length > 0) {
+            const createdVariant = createdVariants[variantIndex]
+            if (createdVariant) {
+              await tx.productImage.createMany({
+                data: variant.images.map((img, imgIndex) => ({
+                  productId: createdProduct.id,
+                  variantId: createdVariant.id,
+                  url: img.url,
+                  altText: img.altText,
+                  isPrimary: img.isPrimary,
+                  sortOrder: imgIndex,
+                })),
+              })
+            }
+          }
+        }),
+      )
+
+      return createdProduct
+    })
+
+    return await productRepository.findById(product.id)
   }
 }
 

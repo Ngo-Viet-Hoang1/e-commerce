@@ -29,6 +29,73 @@ export const PRODUCT_SELECT_FIELDS = {
   createdAt: true,
   updatedAt: true,
   deletedAt: true,
+  variants: {
+    select: {
+      id: true,
+      sku: true,
+      title: true,
+      barcode: true,
+      price: true,
+      costPrice: true,
+      msrp: true,
+      stockQuantity: true,
+      backorderable: true,
+      isDefault: true,
+      createdAt: true,
+      updatedAt: true,
+      deletedAt: true,
+      attributeValues: {
+        select: {
+          id: true,
+          valueText: true,
+          attribute: {
+            select: {
+              id: true,
+              name: true,
+              inputType: true,
+            },
+          },
+        },
+      },
+      productImages: {
+        select: {
+          imageId: true,
+          url: true,
+          altText: true,
+          isPrimary: true,
+          sortOrder: true,
+        },
+        where: {
+          deletedAt: null,
+        },
+        orderBy: {
+          sortOrder: 'asc' as const,
+        },
+      },
+    },
+    where: {
+      deletedAt: null,
+    },
+    orderBy: {
+      isDefault: 'desc' as const,
+    },
+  },
+  // Include product-level images
+  productImages: {
+    select: {
+      imageId: true,
+      url: true,
+      altText: true,
+      isPrimary: true,
+      sortOrder: true,
+    },
+    where: {
+      deletedAt: null,
+    },
+    orderBy: {
+      sortOrder: 'asc' as const,
+    },
+  },
 } as const satisfies Prisma.ProductSelect
 
 class ProductRepository {
