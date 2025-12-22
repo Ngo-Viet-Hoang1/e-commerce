@@ -61,21 +61,21 @@ const navMain: {
     ],
   },
   {
-    title: 'Models',
+    title: 'Product Management',
     url: '#',
     icon: Bot,
     items: [
       {
-        title: 'Genesis',
-        url: '#',
+        title: 'Products',
+        url: '/admin/products',
       },
       {
-        title: 'Explorer',
-        url: '#',
+        title: 'Add Product',
+        url: '/admin/products/create',
       },
       {
-        title: 'Quantum',
-        url: '#',
+        title: 'Edit Product',
+        url: '/admin/products/edit/:id',
       },
     ],
   },

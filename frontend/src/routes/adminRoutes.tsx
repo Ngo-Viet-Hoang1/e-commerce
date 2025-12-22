@@ -15,7 +15,15 @@ const CategoryManagement = lazy(
 const BrandManagement = lazy(
   () => import('@/pages/admin/BrandManagement/BrandManagement'),
 )
-
+const ProductManagement = lazy(
+  () => import('@/pages/admin/ProductManagement/ProductManagement'),
+)
+const CreateProductPage = lazy(
+  () => import('@/pages/admin/ProductManagement/CreateProductPage'),
+)
+const EditProductPage = lazy(
+  () => import('@/pages/admin/ProductManagement/EditProductPage'),
+)
 export const adminRoutes: RouteObject[] = [
   {
     index: true,
@@ -43,6 +51,18 @@ export const adminRoutes: RouteObject[] = [
       {
         path: 'brand-management',
         element: <BrandManagement />,
+      },
+      {
+        path: '/admin/products',
+        element: <ProductManagement />,
+      },
+      {
+        path: '/admin/products/create',
+        element: <CreateProductPage />,
+      },
+      {
+        path: '/admin/products/edit/:id',
+        element: <EditProductPage />,
       },
     ],
   },
