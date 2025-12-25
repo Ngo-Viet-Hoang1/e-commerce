@@ -91,6 +91,7 @@ export const PRODUCT_SELECT_FIELDS = {
     },
     where: {
       deletedAt: null,
+      variantId: null,
     },
     orderBy: {
       sortOrder: 'asc' as const,

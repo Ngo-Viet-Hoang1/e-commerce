@@ -1,5 +1,6 @@
 import type { Prisma } from '@generated/prisma/client'
 import { prisma } from '../../shared/config/database/postgres'
+import sanitizeHtml from 'sanitize-html'
 import {
   ConflictException,
   NotFoundException,
@@ -215,7 +216,7 @@ class ProductService {
         data: {
           name: data.name,
           sku: data.sku,
-          description: data.description || null,
+          description: sanitizeHtml(data.description || ''),
           status: data.status,
           brandId: data.brandId,
           categoryId: data.categoryId,
@@ -292,21 +293,16 @@ class ProductService {
 
       // Create Product-level Images
       if (data.images && data.images.length > 0) {
-        const defaultVariant = createdVariants.find((v) => v.isDefault)
-        const firstVariantId = defaultVariant?.id || createdVariants[0]?.id
-
-        if (firstVariantId) {
-          await tx.productImage.createMany({
-            data: data.images.map((img, index) => ({
-              productId: createdProduct.id,
-              variantId: firstVariantId,
-              url: img.url,
-              altText: img.altText,
-              isPrimary: img.isPrimary,
-              sortOrder: index,
-            })),
-          })
-        }
+        await tx.productImage.createMany({
+          data: data.images.map((img, index) => ({
+            productId: createdProduct.id,
+            variantId: null,
+            url: img.url,
+            altText: img.altText,
+            isPrimary: img.isPrimary,
+            sortOrder: index,
+          })),
+        })
       }
 
       // Create Variant-specific Images
