@@ -13,12 +13,12 @@ interface CreateProductColumnsProps {
   onDelete: (product: Product) => void
 }
 
-const statusColors = {
-  active: 'bg-green-500',
-  inactive: 'bg-gray-500',
-  draft: 'bg-yellow-500',
-  out_of_stock: 'bg-red-500',
-}
+const statusStyles = {
+  active: 'bg-green-100 text-green-700',
+  inactive: 'bg-gray-100 text-gray-600',
+  draft: 'bg-yellow-100 text-yellow-700',
+  out_of_stock: 'bg-red-100 text-red-700',
+} as const
 
 export default function createProductColumns({
   onView,
@@ -28,42 +28,6 @@ export default function createProductColumns({
   return [
     rowSelectionColumn<Product>(),
 
-    {
-      accessorKey: 'productImages',
-      header: () => <TableCellAlign align="center">Image</TableCellAlign>,
-      cell: ({ row }) => {
-        const images = row.original.productImages ?? []
-        const firstImage = images[0]
-
-        return (
-          <div className="">
-            {firstImage ? (
-              <img
-                src={firstImage.url}
-                alt={firstImage.altText ?? 'Product Image'}
-                className="h-16 w-16 rounded-md border object-cover text-xs font-medium"
-              />
-            ) : (
-              <div className="bg-muted flex h-16 w-16 items-center justify-center rounded-md border text-xs font-medium">
-                <ImageIcon className="text-muted-foreground h-6 w-6" />
-              </div>
-            )}
-          </div>
-        )
-      },
-    },
-    {
-      accessorKey: 'isFeatured',
-      header: 'Featured',
-      cell: ({ row }) => {
-        const isFeatured = row.getValue('isFeatured')
-        return isFeatured ? (
-          <span className="text-yellow-500">⭐</span>
-        ) : (
-          <span className="">-</span>
-        )
-      },
-    },
     {
       accessorKey: 'stock',
       header: () => <TableCellAlign align="center">Stock</TableCellAlign>,
@@ -99,9 +63,55 @@ export default function createProductColumns({
       accessorKey: 'name',
       header: 'Product Name',
       cell: ({ row }) => {
+        const isFeatured = row.original.isFeatured
+        const images = row.original.productImages ?? []
+        const firstImage = images[0]
+
         return (
-          <div className="max-w-[200px] truncate font-medium">
-            {row.getValue('name')}
+          <div className="flex items-center gap-2">
+            {firstImage ? (
+              <img
+                src={firstImage.url}
+                alt={firstImage.altText ?? 'Product Image'}
+                className="h-16 w-16 rounded-md border object-cover text-xs font-medium"
+              />
+            ) : (
+              <div className="bg-muted flex h-16 w-16 items-center justify-center rounded-md border text-xs font-medium">
+                <ImageIcon className="text-muted-foreground h-6 w-6" />
+              </div>
+            )}
+            <div className="max-w-[200px] truncate font-medium">
+              {row.getValue('name')}
+            </div>
+            {isFeatured && <span className="text-yellow-500">⭐</span>}
+          </div>
+        )
+      },
+    },
+    {
+      accessorKey: 'price',
+      header: 'Price Range',
+      cell: ({ row }) => {
+        const variants = row.original.variants ?? []
+        if (variants.length === 0) return <div>-</div>
+
+        const prices = variants
+          .filter((v) => v.price != null)
+          .map((v) => v.price)
+
+        if (prices.length === 0) return <div>-</div>
+        const minPrice = Math.min(...prices)
+        const maxPrice = Math.max(...prices)
+
+        if (minPrice === maxPrice) {
+          return <div className="font-medium">{formatCurrency(minPrice)}</div>
+        }
+
+        return (
+          <div className="flex flex-col items-center text-sm leading-tight font-semibold tabular-nums">
+            <span>{formatCurrency(minPrice)}</span>
+            <span className="text-muted-foreground text-xs">–</span>
+            <span>{formatCurrency(maxPrice)}</span>
           </div>
         )
       },
@@ -138,32 +148,6 @@ export default function createProductColumns({
       },
     },
     {
-      accessorKey: 'price',
-      header: 'Price Range',
-      cell: ({ row }) => {
-        const variants = row.original.variants ?? []
-        if (variants.length === 0) return <div>-</div>
-
-        const prices = variants
-          .filter((v) => v.price != null)
-          .map((v) => v.price)
-
-        if (prices.length === 0) return <div>-</div>
-        const minPrice = Math.min(...prices)
-        const maxPrice = Math.max(...prices)
-
-        if (minPrice === maxPrice) {
-          return <div className="font-medium">{formatCurrency(minPrice)}</div>
-        }
-
-        return (
-          <div className="text-sm font-medium">
-            {formatCurrency(minPrice)} - {formatCurrency(maxPrice)}
-          </div>
-        )
-      },
-    },
-    {
       accessorKey: 'status',
       header: 'Status',
       cell: ({ row }) => {
@@ -171,7 +155,7 @@ export default function createProductColumns({
         return (
           <Badge
             variant="outline"
-            className={`${statusColors[status as keyof typeof statusColors]} border-none text-white`}
+            className={`${statusStyles[status as keyof typeof statusStyles]} min-h-7 justify-center`}
           >
             {status}
           </Badge>
