@@ -223,51 +223,126 @@ class ProductService {
         },
       })
 
-      // Create Variants with Attributes
+      const allAttributeNames = new Set<string>()
+      const allAttributeData = new Map<string, Set<string>>() // Map<attributeName, Set<values>>
+
+      for (const variant of data.variants) {
+        if (variant.attributes && variant.attributes.length > 0) {
+          for (const attr of variant.attributes) {
+            const normalizedName = attr.attributeName.trim().toLowerCase()
+            allAttributeNames.add(normalizedName)
+
+            if (!allAttributeData.has(normalizedName)) {
+              allAttributeData.set(normalizedName, new Set())
+            }
+            allAttributeData.get(normalizedName)!.add(attr.value.trim())
+          }
+        }
+      }
+
+      const existingAttributes = await tx.attribute.findMany({
+        where: {
+          name: { in: Array.from(allAttributeNames), mode: 'insensitive' },
+          deletedAt: null,
+        },
+        include: {
+          values: {
+            where: { deletedAt: null },
+          },
+        },
+      })
+      // Create Maps for quick lookup
+      const attributeMap = new Map<string, (typeof existingAttributes)[0]>()
+      existingAttributes.forEach((attr) => {
+        attributeMap.set(attr.name.toLowerCase(), attr)
+      })
+
+      const attributesToCreate = Array.from(allAttributeNames)
+        .filter((name) => !attributeMap.has(name))
+        .map((name) => ({
+          name:
+            data.variants
+              .flatMap((v) => v.attributes || [])
+              .find((a) => a.attributeName.trim().toLowerCase() === name)
+              ?.attributeName.trim() || name, // Preserve original casing
+          inputType: 'text',
+          isFilterable: true,
+          isSearchable: false,
+        }))
+
+      if (attributesToCreate.length > 0) {
+        const newAttributes = await tx.attribute.createManyAndReturn({
+          data: attributesToCreate,
+        })
+
+        newAttributes.forEach((attr) => {
+          attributeMap.set(attr.name.toLowerCase(), { ...attr, values: [] })
+        })
+      }
+
+      const attributeValuesToCreate: Array<{
+        attributeId: number
+        valueText: string
+      }> = []
+
+      for (const [attrName, values] of allAttributeData.entries()) {
+        const attribute = attributeMap.get(attrName)
+        if (!attribute) continue
+
+        const existingValues = new Set(
+          attribute.values.map((v) => v.valueText.toLowerCase()),
+        )
+
+        for (const value of values) {
+          if (!existingValues.has(value.toLowerCase())) {
+            attributeValuesToCreate.push({
+              attributeId: attribute.id,
+              valueText: value,
+            })
+          }
+        }
+      }
+
+      if (attributeValuesToCreate.length > 0) {
+        await tx.attributeValue.createMany({
+          data: attributeValuesToCreate,
+          skipDuplicates: true, // ← Important: Skip if race condition happens
+        })
+      }
+
+      const allAttributeValues = await tx.attributeValue.findMany({
+        where: {
+          attributeId: {
+            in: Array.from(attributeMap.values()).map((a) => a.id),
+          },
+          deletedAt: null,
+        },
+      })
+
+      // Create lookup map: "color|red" → attributeValueId
+      const attributeValueMap = new Map<string, number>()
+      allAttributeValues.forEach((av) => {
+        const attribute = Array.from(attributeMap.values()).find(
+          (a) => a.id === av.attributeId,
+        )
+        if (attribute) {
+          const key = `${attribute.name.toLowerCase()}|${av.valueText.toLowerCase()}`
+          attributeValueMap.set(key, av.id)
+        }
+      })
+
+      // ✅ Create Variants (using cached data)
       const createdVariants = await Promise.all(
         data.variants.map(async (variant) => {
           const attributeValueIds: number[] = []
 
           if (variant.attributes && variant.attributes.length > 0) {
             for (const attr of variant.attributes) {
-              // Find or create Attribute
-              let attribute = await tx.attribute.findFirst({
-                where: {
-                  name: attr.attributeName,
-                  deletedAt: null,
-                },
-              })
-
-              if (!attribute) {
-                attribute = await tx.attribute.create({
-                  data: {
-                    name: attr.attributeName,
-                    inputType: 'text',
-                    isFilterable: true,
-                    isSearchable: false,
-                  },
-                })
+              const key = `${attr.attributeName.trim().toLowerCase()}|${attr.value.trim().toLowerCase()}`
+              const valueId = attributeValueMap.get(key)
+              if (valueId) {
+                attributeValueIds.push(valueId)
               }
-
-              // Find or create AttributeValue
-              let attributeValue = await tx.attributeValue.findFirst({
-                where: {
-                  attributeId: attribute.id,
-                  valueText: attr.value,
-                  deletedAt: null,
-                },
-              })
-
-              if (!attributeValue) {
-                attributeValue = await tx.attributeValue.create({
-                  data: {
-                    attributeId: attribute.id,
-                    valueText: attr.value,
-                  },
-                })
-              }
-
-              attributeValueIds.push(attributeValue.id)
             }
           }
 

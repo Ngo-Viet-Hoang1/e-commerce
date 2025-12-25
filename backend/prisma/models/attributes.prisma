@@ -1,6 +1,6 @@
 model Attribute {
   id           Int       @id @default(autoincrement())
-  name         String    @db.VarChar(150)
+  name         String    @unique @db.VarChar(150)
   inputType    String?   @db.VarChar(50)
   isFilterable Boolean   @default(false)
   isSearchable Boolean   @default(false)
@@ -15,16 +15,16 @@ model Attribute {
 
 model AttributeValue {
   id          Int       @id @default(autoincrement())
-  attributeId Int?
+  attributeId Int
   valueText   String    @db.VarChar(255)
   valueMeta   Json?
   createdAt   DateTime  @default(now()) @db.Timestamptz
   updatedAt   DateTime  @default(now()) @db.Timestamptz
   deletedAt   DateTime? @db.Timestamptz
 
-  attribute Attribute? @relation(fields: [attributeId], references: [id])
-
+  attribute       Attribute        @relation(fields: [attributeId], references: [id])
   productVariants ProductVariant[]
 
+  @@unique([attributeId, valueText])
   @@map("attribute_values")
 }
