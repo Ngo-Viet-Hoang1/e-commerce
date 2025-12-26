@@ -81,7 +81,7 @@ export const useDeleteProduct = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (id: number) => AdminProductService.softDelete(id),
+    mutationFn: (id: number) => AdminProductService.delete(id),
 
     onSuccess: () => {
       toast.success('Product deleted successfully')

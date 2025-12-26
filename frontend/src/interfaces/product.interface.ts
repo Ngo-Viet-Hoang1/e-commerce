@@ -35,6 +35,7 @@ export interface ProductVariant {
   title?: string | null
   price: number
   costPrice?: number | null
+  msrp?: number | null
   stockQuantity: number
   isDefault: boolean
   createdAt: Date
@@ -73,6 +74,7 @@ export interface CreateProductVariant {
   title?: string
   price: number
   costPrice?: number
+  msrp?: number
   stockQuantity: number
   isDefault: boolean
   attributes?: {
@@ -90,9 +92,10 @@ export interface CreateProduct {
   name: string
   sku: string
   description?: string
-  status: 'active' | 'inactive' | 'draft'
+  status: 'active' | 'inactive' | 'draft' | 'out_of_stock'
   brandId: number
   categoryId: number
+  isFeatured?: boolean
   variants: CreateProductVariant[]
   images?: {
     url: string
@@ -100,3 +103,5 @@ export interface CreateProduct {
     isPrimary: boolean
   }[]
 }
+
+export type UpdateProduct = CreateProduct
