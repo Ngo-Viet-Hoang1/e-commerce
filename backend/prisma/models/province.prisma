@@ -1,0 +1,22 @@
+model Province {
+  id                       Int      @id @default(autoincrement())
+  code                     String   @unique @db.VarChar(10)      
+  name                     String   @unique @db.VarChar(100)     
+  nameEn                   String?  @db.VarChar(100)            
+  fullName                 String?  @db.VarChar(200)             
+  fullNameEn               String?  @db.VarChar(200)             
+  codeName                 String?  @db.VarChar(100)             
+  administrativeUnitId     Int?                                 
+  administrativeUnitShortName String? @db.VarChar(50)        
+  administrativeUnitFullName  String? @db.VarChar(100)       
+  administrativeUnitFullNameEn  String? @db.VarChar(100)      
+
+  wards                    Ward[]
+
+  createdAt                DateTime @default(now()) @db.Timestamptz
+  updatedAt                DateTime @default(now()) @updatedAt @db.Timestamptz
+
+  @@index([code])
+  @@index([name])
+  @@index([codeName])
+}

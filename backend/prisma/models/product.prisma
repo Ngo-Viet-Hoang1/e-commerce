@@ -26,6 +26,7 @@ model Product {
   orderItems OrderItem[]
   productImages ProductImage[]
   productVideos ProductVideo[]
+  specifications ProductSpecification[]
 
   @@index([name])
   @@index([sku])

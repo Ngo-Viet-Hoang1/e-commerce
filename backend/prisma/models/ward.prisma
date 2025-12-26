@@ -1,0 +1,25 @@
+model Ward {
+  id                       Int      @id @default(autoincrement())
+  code                     String   @unique @db.VarChar(20)      
+  name                     String   @db.VarChar(150)        
+  nameEn                   String?  @db.VarChar(150)           
+  fullName                 String?  @db.VarChar(200)            
+  fullNameEn               String?  @db.VarChar(200)            
+  codeName                 String?  @db.VarChar(150)             
+  provinceCode             String   @db.VarChar(10)             
+  province                 Province @relation(fields: [provinceCode], references: [code], onDelete: Cascade)
+
+  administrativeUnitId     Int?
+  administrativeUnitShortName String? @db.VarChar(50)        
+  administrativeUnitFullName  String? @db.VarChar(100)       
+  administrativeUnitShortNameEn String? @db.VarChar(50)     
+  administrativeUnitFullNameEn  String? @db.VarChar(100)     
+
+  createdAt                DateTime @default(now()) @db.Timestamptz
+  updatedAt                DateTime @default(now()) @updatedAt @db.Timestamptz
+
+  @@index([provinceCode])
+  @@index([code])
+  @@index([name])
+  @@index([codeName])
+}
