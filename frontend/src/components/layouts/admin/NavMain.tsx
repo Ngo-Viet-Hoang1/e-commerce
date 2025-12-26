@@ -58,6 +58,10 @@ const navMain: {
         title: 'Brand Management',
         url: '/admin/brand-management',
       },
+      {
+        title: 'Badge Management',
+        url: '/admin/badge-management',
+      },
     ],
   },
   {
