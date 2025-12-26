@@ -1,0 +1,14 @@
+model ProductBadge {
+  productId Int
+  badgeId   Int
+  awardedAt DateTime  @default(now()) @db.Timestamptz
+  awardedBy Int?
+  deleteAt  DateTime? @db.Timestamptz
+
+  product     Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  badge       Badge   @relation(fields: [badgeId], references: [id])
+  awardedUser User?   @relation(fields: [awardedBy], references: [id])
+
+  @@id([productId, badgeId])
+  @@map("product_badges")
+}

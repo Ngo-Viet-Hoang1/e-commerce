@@ -1,0 +1,1924 @@
+[
+  {
+    "name": "Samsung Galaxy Z Fold7 12GB 256GB",
+    "sku": "SAMSUNG-GALAXY-Z-FOLD7",
+    "description": "Samsung Galaxy Z Fold7 màn hình gập, AI tích hợp, bút S Pen",
+    "status": "active",
+    "brandId": 2,
+    "categoryId": 1,
+    "isFeatured": true,
+    "variants": [
+      {
+        "sku": "Z-FOLD7-256GB-SILVER",
+        "title": "256GB - Xám bóng",
+        "price": 39990000,
+        "costPrice": 36000000,
+        "msrp": 42990000,
+        "stockQuantity": 18,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "256GB" },
+          { "attributeName": "Màu sắc", "value": "Xám bóng" }
+        ]
+      },
+      {
+        "sku": "Z-FOLD7-256GB-BLUE",
+        "title": "256GB - Xanh bóng",
+        "price": 39990000,
+        "costPrice": 36000000,
+        "msrp": 42990000,
+        "stockQuantity": 20,
+        "isDefault": true,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "256GB" },
+          { "attributeName": "Màu sắc", "value": "Xanh bóng" }
+        ]
+      },
+      {
+        "sku": "Z-FOLD7-256GB-BLACK",
+        "title": "256GB - Đen tuyến",
+        "price": 39990000,
+        "costPrice": 36000000,
+        "msrp": 42990000,
+        "stockQuantity": 22,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "256GB" },
+          { "attributeName": "Màu sắc", "value": "Đen tuyến" }
+        ]
+      },
+      {
+        "sku": "Z-FOLD7-512GB-SILVER",
+        "title": "512GB - Xám bóng",
+        "price": 44990000,
+        "costPrice": 40500000,
+        "msrp": 47990000,
+        "stockQuantity": 15,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "512GB" },
+          { "attributeName": "Màu sắc", "value": "Xám bóng" }
+        ]
+      },
+      {
+        "sku": "Z-FOLD7-512GB-BLUE",
+        "title": "512GB - Xanh bóng",
+        "price": 44990000,
+        "costPrice": 40500000,
+        "msrp": 47990000,
+        "stockQuantity": 16,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "512GB" },
+          { "attributeName": "Màu sắc", "value": "Xanh bóng" }
+        ]
+      },
+      {
+        "sku": "Z-FOLD7-512GB-BLACK",
+        "title": "512GB - Đen tuyến",
+        "price": 44990000,
+        "costPrice": 40500000,
+        "msrp": 47990000,
+        "stockQuantity": 14,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "512GB" },
+          { "attributeName": "Màu sắc", "value": "Đen tuyến" }
+        ]
+      }
+    ],
+    "images": [
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/a/samsung-galaxy-z-fold-7_1.png",
+        "altText": "Samsung Galaxy Z Fold7",
+        "isPrimary": true
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/a/samsung-galaxy-z-fold-7-xanh.jpg",
+        "altText": "Samsung Galaxy Z Fold7 - Xanh",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/358x/media/catalog/product/s/a/samsung-galaxy-z-fold-7-2.jpg",
+        "altText": "Samsung Galaxy Z Fold7 - View 3",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/358x/media/catalog/product/s/a/samsung-galaxy-z-fold-7-1.jpg",
+        "altText": "Samsung Galaxy Z Fold7 - View 4",
+        "isPrimary": false
+      }
+    ]
+  },
+  {
+    "name": "iPhone 17 256GB Chính hãng",
+    "sku": "IPHONE-17-256GB",
+    "description": "iPhone 17 256GB Chính hãng với thiết kế đột phá, hiệu năng vượt trội",
+    "status": "active",
+    "brandId": 1,
+    "categoryId": 1,
+    "isFeatured": true,
+    "variants": [
+      {
+        "sku": "IPHONE-17-256GB-BLACK",
+        "title": "256GB - Đen",
+        "price": 24990000,
+        "costPrice": 22500000,
+        "msrp": 26990000,
+        "stockQuantity": 30,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "256GB" },
+          { "attributeName": "Màu sắc", "value": "Đen" }
+        ]
+      },
+      {
+        "sku": "IPHONE-17-256GB-BLUE",
+        "title": "256GB - Xanh Lam Khói",
+        "price": 24990000,
+        "costPrice": 22500000,
+        "msrp": 26990000,
+        "stockQuantity": 28,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "256GB" },
+          { "attributeName": "Màu sắc", "value": "Xanh Lam Khói" }
+        ]
+      },
+      {
+        "sku": "IPHONE-17-256GB-WHITE",
+        "title": "256GB - Trắng",
+        "price": 24990000,
+        "costPrice": 22500000,
+        "msrp": 26990000,
+        "stockQuantity": 32,
+        "isDefault": true,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "256GB" },
+          { "attributeName": "Màu sắc", "value": "Trắng" }
+        ]
+      },
+      {
+        "sku": "IPHONE-17-512GB-BLACK",
+        "title": "512GB - Đen",
+        "price": 28990000,
+        "costPrice": 26000000,
+        "msrp": 30990000,
+        "stockQuantity": 20,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "512GB" },
+          { "attributeName": "Màu sắc", "value": "Đen" }
+        ]
+      },
+      {
+        "sku": "IPHONE-17-512GB-BLUE",
+        "title": "512GB - Xanh Lam Khói",
+        "price": 28990000,
+        "costPrice": 26000000,
+        "msrp": 30990000,
+        "stockQuantity": 18,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "512GB" },
+          { "attributeName": "Màu sắc", "value": "Xanh Lam Khói" }
+        ]
+      },
+      {
+        "sku": "IPHONE-17-512GB-WHITE",
+        "title": "512GB - Trắng",
+        "price": 28990000,
+        "costPrice": 26000000,
+        "msrp": 30990000,
+        "stockQuantity": 22,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "512GB" },
+          { "attributeName": "Màu sắc", "value": "Trắng" }
+        ]
+      }
+    ],
+    "images": [
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/i/p/iphone-17-256gb-5.jpg",
+        "altText": "iPhone 17 256GB Chính hãng",
+        "isPrimary": true
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/358x/media/catalog/product/i/p/iphone_17_256gb_2.jpg",
+        "altText": "iPhone 17 - View 2",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/358x/media/catalog/product/i/p/iphone_17_256gb-2.jpg",
+        "altText": "iPhone 17 - View 3",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/358x/media/catalog/product/2/5/256gb_2.jpg",
+        "altText": "iPhone 17 - View 4",
+        "isPrimary": false
+      }
+    ]
+  },
+  {
+    "name": "iPhone 17 Pro 256GB Chính hãng",
+    "sku": "IPHONE-17-PRO-256GB",
+    "description": "iPhone 17 Pro với chip A19 Pro, camera tiên tiến, hiệu năng đỉnh cao",
+    "status": "active",
+    "brandId": 1,
+    "categoryId": 1,
+    "isFeatured": true,
+    "variants": [
+      {
+        "sku": "IPHONE-17-PRO-256GB-BLUE",
+        "title": "256GB - Xanh Đậm",
+        "price": 34790000,
+        "costPrice": 31500000,
+        "msrp": 36990000,
+        "stockQuantity": 25,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "256GB" },
+          { "attributeName": "Màu sắc", "value": "Xanh Đậm" }
+        ]
+      },
+      {
+        "sku": "IPHONE-17-PRO-256GB-BLACK",
+        "title": "256GB - Bạc",
+        "price": 34990000,
+        "costPrice": 31500000,
+        "msrp": 36990000,
+        "stockQuantity": 28,
+        "isDefault": true,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "256GB" },
+          { "attributeName": "Màu sắc", "value": "Bạc" }
+        ]
+      },
+      {
+        "sku": "IPHONE-17-PRO-512GB-BLUE",
+        "title": "512GB - Xanh Đậm",
+        "price": 39790000,
+        "costPrice": 36000000,
+        "msrp": 41990000,
+        "stockQuantity": 20,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "512GB" },
+          { "attributeName": "Màu sắc", "value": "Xanh Đậm" }
+        ]
+      },
+      {
+        "sku": "IPHONE-17-PRO-512GB-BLACK",
+        "title": "512GB - Bạc",
+        "price": 39990000,
+        "costPrice": 36000000,
+        "msrp": 41990000,
+        "stockQuantity": 22,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "512GB" },
+          { "attributeName": "Màu sắc", "value": "Bạc" }
+        ]
+      },
+      {
+        "sku": "IPHONE-17-PRO-1TB-BLUE",
+        "title": "1TB - Xanh Đậm",
+        "price": 45990000,
+        "costPrice": 42000000,
+        "msrp": 47990000,
+        "stockQuantity": 15,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "1TB" },
+          { "attributeName": "Màu sắc", "value": "Xanh Đậm" }
+        ]
+      },
+      {
+        "sku": "IPHONE-17-PRO-1TB-BLACK",
+        "title": "1TB - Bạc",
+        "price": 45990000,
+        "costPrice": 42000000,
+        "msrp": 47990000,
+        "stockQuantity": 18,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "1TB" },
+          { "attributeName": "Màu sắc", "value": "Bạc" }
+        ]
+      }
+    ],
+    "images": [
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/i/p/iphone-17-pro-5_1.jpg",
+        "altText": "iPhone 17 Pro",
+        "isPrimary": true
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/358x/media/catalog/product/i/p/iphone-17-pro-2.jpg",
+        "altText": "iPhone 17 Pro - View 2",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/358x/media/catalog/product/i/p/iphone-17-pro-3.jpg",
+        "altText": "iPhone 17 Pro - View 3",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/i/p/iphone-17-pro_1.jpg",
+        "altText": "iPhone 17 Pro - View 4",
+        "isPrimary": false
+      }
+    ]
+  },
+  {
+    "name": "OPPO Find X9 Pro 16GB 512GB",
+    "sku": "OPPO-FIND-X9-PRO",
+    "description": "OPPO Find X9 Pro với chip MediaTek Dimensity 9500, camera Hasselblad",
+    "status": "active",
+    "brandId": 4,
+    "categoryId": 1,
+    "isFeatured": true,
+    "variants": [
+      {
+        "sku": "OPPO-X9-PRO-16GB-512GB-WHITE",
+        "title": "X9 Pro 16GB 512GB - Trắng",
+        "price": 32990000,
+        "costPrice": 29500000,
+        "msrp": 34990000,
+        "stockQuantity": 22,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "X9 Pro 16GB 512GB" },
+          { "attributeName": "Màu sắc", "value": "Trắng" }
+        ]
+      },
+      {
+        "sku": "OPPO-X9-PRO-16GB-512GB-GRAY",
+        "title": "X9 Pro 16GB 512GB - Xám",
+        "price": 32990000,
+        "costPrice": 29500000,
+        "msrp": 34990000,
+        "stockQuantity": 20,
+        "isDefault": true,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "X9 Pro 16GB 512GB" },
+          { "attributeName": "Màu sắc", "value": "Xám" }
+        ]
+      },
+      {
+        "sku": "OPPO-X9-16GB-512GB-WHITE",
+        "title": "X9 16GB 512GB - Trắng",
+        "price": 28990000,
+        "costPrice": 26000000,
+        "msrp": 30990000,
+        "stockQuantity": 25,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "X9 16GB 512GB" },
+          { "attributeName": "Màu sắc", "value": "Trắng" }
+        ]
+      },
+      {
+        "sku": "OPPO-X9-16GB-512GB-GRAY",
+        "title": "X9 16GB 512GB - Xám",
+        "price": 28990000,
+        "costPrice": 26000000,
+        "msrp": 30990000,
+        "stockQuantity": 23,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "X9 16GB 512GB" },
+          { "attributeName": "Màu sắc", "value": "Xám" }
+        ]
+      },
+      {
+        "sku": "OPPO-X9-12GB-256GB-WHITE",
+        "title": "X9 12GB 256GB - Trắng",
+        "price": 24990000,
+        "costPrice": 22500000,
+        "msrp": 26990000,
+        "stockQuantity": 30,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "X9 12GB 256GB" },
+          { "attributeName": "Màu sắc", "value": "Trắng" }
+        ]
+      },
+      {
+        "sku": "OPPO-X9-12GB-256GB-GRAY",
+        "title": "X9 12GB 256GB - Xám",
+        "price": 24990000,
+        "costPrice": 22500000,
+        "msrp": 26990000,
+        "stockQuantity": 28,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "X9 12GB 256GB" },
+          { "attributeName": "Màu sắc", "value": "Xám" }
+        ]
+      }
+    ],
+    "images": [
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/l/slider-oppo-find-x9-pro.jpg",
+        "altText": "OPPO Find X9 Pro",
+        "isPrimary": true
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/l/slider-oppo-find-x9-pro_1.jpg",
+        "altText": "OPPO Find X9 Pro - View 2",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/o/p/oppo_find_x9_pro_16gb_512gb.jpg",
+        "altText": "OPPO Find X9 Pro - View 3",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/o/p/oppo_find_x9_pro_16gb_512gb-1.jpg",
+        "altText": "OPPO Find X9 Pro - View 4",
+        "isPrimary": false
+      }
+    ]
+  },
+  {
+    "name": "Samsung Galaxy S25 FE",
+    "sku": "SAMSUNG-GALAXY-S25-FE",
+    "description": "Samsung Galaxy S25 FE với thiết kế cao cấp, hiệu năng mạnh mẽ",
+    "status": "active",
+    "brandId": 2,
+    "categoryId": 1,
+    "isFeatured": true,
+    "variants": [
+      {
+        "sku": "S25-FE-8GB-512GB-BLACK",
+        "title": "8GB 512GB - Đen",
+        "price": 13890000,
+        "costPrice": 12500000,
+        "msrp": 15890000,
+        "stockQuantity": 30,
+        "isDefault": false,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "8GB 512GB" },
+          { "attributeName": "Màu sắc", "value": "Đen" }
+        ]
+      },
+      {
+        "sku": "S25-FE-8GB-512GB-BLUE-MINT",
+        "title": "8GB 512GB - Xanh dương nhạt",
+        "price": 13890000,
+        "costPrice": 12500000,
+        "msrp": 15890000,
+        "stockQuantity": 25,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "8GB 512GB" },
+          { "attributeName": "Màu sắc", "value": "Xanh dương nhạt" }
+        ]
+      },
+      {
+        "sku": "S25-FE-8GB-512GB-NAVY",
+        "title": "8GB 512GB - Xanh navy",
+        "price": 13890000,
+        "costPrice": 12500000,
+        "msrp": 15890000,
+        "stockQuantity": 28,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "8GB 512GB" },
+          { "attributeName": "Màu sắc", "value": "Xanh navy" }
+        ]
+      },
+      {
+        "sku": "S25-FE-8GB-128GB-BLACK",
+        "title": "8GB 128GB - Đen",
+        "price": 11890000,
+        "costPrice": 10500000,
+        "msrp": 13890000,
+        "stockQuantity": 35,
+        "isDefault": true,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "8GB 128GB" },
+          { "attributeName": "Màu sắc", "value": "Đen" }
+        ]
+      },
+      {
+        "sku": "S25-FE-8GB-128GB-BLUE-MINT",
+        "title": "8GB 128GB - Xanh dương nhạt",
+        "price": 11890000,
+        "costPrice": 10500000,
+        "msrp": 13890000,
+        "stockQuantity": 32,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "8GB 128GB" },
+          { "attributeName": "Màu sắc", "value": "Xanh dương nhạt" }
+        ]
+      },
+      {
+        "sku": "S25-FE-8GB-128GB-NAVY",
+        "title": "8GB 128GB - Xanh navy",
+        "price": 11890000,
+        "costPrice": 10500000,
+        "msrp": 13890000,
+        "stockQuantity": 30,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "8GB 128GB" },
+          { "attributeName": "Màu sắc", "value": "Xanh navy" }
+        ]
+      }
+    ],
+    "images": [
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/a/samsung-galaxy-s25-fe-2.jpg",
+        "altText": "Samsung Galaxy S25 FE",
+        "isPrimary": true
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/a/samsung-galaxy-s25-fe-3.jpg",
+        "altText": "Samsung Galaxy S25 FE - View 2",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/a/samsung-galaxy-s25-fe-1.jpg",
+        "altText": "Samsung Galaxy S25 FE - View 3",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/a/samsung-galaxy-s25-fe-jetblack-5.jpg",
+        "altText": "Samsung Galaxy S25 FE - Đen",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/a/samsung-galaxy-s25-fe-icyblue-5.jpg",
+        "altText": "Samsung Galaxy S25 FE - Xanh dương nhạt",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/a/samsung-galaxy-s25-fe-navy-5.jpg",
+        "altText": "Samsung Galaxy S25 FE - Xanh navy",
+        "isPrimary": false
+      }
+    ]
+  },
+  {
+    "name": "Xiaomi 15T 5G 12GB 512GB",
+    "sku": "XIAOMI-15T-5G",
+    "description": "Xiaomi 15T 5G với RAM 12GB, bộ nhớ 512GB, hiệu năng mạnh mẽ",
+    "status": "active",
+    "brandId": 5,
+    "categoryId": 1,
+    "isFeatured": true,
+    "variants": [
+      {
+        "sku": "XIAOMI-15T-12GB-512GB-BLACK",
+        "title": "15T - 12GB/512GB - Đen",
+        "price": 11990000,
+        "costPrice": 10500000,
+        "msrp": 13990000,
+        "stockQuantity": 25,
+        "isDefault": true,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "15T 12GB 512GB" },
+          { "attributeName": "Màu sắc", "value": "Đen" }
+        ]
+      },
+      {
+        "sku": "XIAOMI-15T-12GB-512GB-PINK",
+        "title": "15T - 12GB/512GB - Vàng hồng",
+        "price": 11990000,
+        "costPrice": 10500000,
+        "msrp": 13990000,
+        "stockQuantity": 22,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "15T 12GB 512GB" },
+          { "attributeName": "Màu sắc", "value": "Vàng hồng" }
+        ]
+      },
+      {
+        "sku": "XIAOMI-15T-PRO-12GB-512GB-BLACK",
+        "title": "15T Pro - 12GB/512GB - Đen",
+        "price": 14990000,
+        "costPrice": 13500000,
+        "msrp": 16990000,
+        "stockQuantity": 18,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "15T Pro 12GB 512GB" },
+          { "attributeName": "Màu sắc", "value": "Đen" }
+        ]
+      },
+      {
+        "sku": "XIAOMI-15T-PRO-12GB-512GB-PINK",
+        "title": "15T Pro - 12GB/512GB - Vàng hồng",
+        "price": 14990000,
+        "costPrice": 13500000,
+        "msrp": 16990000,
+        "stockQuantity": 15,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "15T Pro 12GB 512GB" },
+          { "attributeName": "Màu sắc", "value": "Vàng hồng" }
+        ]
+      }
+    ],
+    "images": [
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/x/i/xiaomi-15t-5g-22.jpg",
+        "altText": "Xiaomi 15T 5G",
+        "isPrimary": true
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/x/i/xiaomi-15t-5g-11.jpg",
+        "altText": "Xiaomi 15T 5G - View 2",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/x/i/xiaomi-15t-5g-12.jpg",
+        "altText": "Xiaomi 15T 5G - View 3",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/x/i/xiaomi-15t-5g-15.jpg",
+        "altText": "Xiaomi 15T 5G - View 4",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/x/i/xiaomi-15t-5g-23.jpg",
+        "altText": "Xiaomi 15T 5G - View 5",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/x/i/xiaomi-15t-5g-26.jpg",
+        "altText": "Xiaomi 15T 5G - View 6",
+        "isPrimary": false
+      }
+    ]
+  },
+  {
+    "name": "Xiaomi 15 Ultra 5G 16GB 1TB",
+    "sku": "XIAOMI-15-ULTRA-5G",
+    "description": "Xiaomi 15 Ultra 5G với ống kính Leica, màn hình AMOLED 6.73 inches, camera ấn tượng",
+    "status": "active",
+    "brandId": 5,
+    "categoryId": 1,
+    "isFeatured": true,
+    "variants": [
+      {
+        "sku": "XIAOMI-15-ULTRA-16GB-1TB-SILVER",
+        "title": "15 Ultra 16GB 1TB - Bạc",
+        "price": 29490000,
+        "costPrice": 26500000,
+        "msrp": 38250000,
+        "stockQuantity": 18,
+        "isDefault": true,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "15 Ultra 16GB 1TB" },
+          { "attributeName": "Màu sắc", "value": "Bạc" }
+        ]
+      },
+      {
+        "sku": "XIAOMI-15-ULTRA-16GB-512GB-SILVER",
+        "title": "15 Ultra 16GB 512GB - Bạc",
+        "price": 26490000,
+        "costPrice": 23500000,
+        "msrp": 35250000,
+        "stockQuantity": 20,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "15 Ultra 16GB 512GB" },
+          { "attributeName": "Màu sắc", "value": "Bạc" }
+        ]
+      },
+      {
+        "sku": "XIAOMI-15-5G-12GB-512GB-SILVER",
+        "title": "15 5G 12GB 512GB - Bạc",
+        "price": 21990000,
+        "costPrice": 19500000,
+        "msrp": 29250000,
+        "stockQuantity": 25,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "15 5G 12GB 512GB" },
+          { "attributeName": "Màu sắc", "value": "Bạc" }
+        ]
+      },
+      {
+        "sku": "XIAOMI-15-5G-12GB-256GB-SILVER",
+        "title": "15 5G 12GB 256GB - Bạc",
+        "price": 18990000,
+        "costPrice": 16800000,
+        "msrp": 26250000,
+        "stockQuantity": 28,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "15 5G 12GB 256GB" },
+          { "attributeName": "Màu sắc", "value": "Bạc" }
+        ]
+      }
+    ],
+    "images": [
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/l/slider-xiaomi-15-ultra-5g.jpg",
+        "altText": "Xiaomi 15 Ultra 5G",
+        "isPrimary": true
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/l/slider-xiaomi-15-ultra-5g-1.jpg",
+        "altText": "Xiaomi 15 Ultra 5G - View 2",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/l/slider-xiaomi-15-ultra-5g-2.jpg",
+        "altText": "Xiaomi 15 Ultra 5G - View 3",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/l/slider-xiaomi-15-ultra-5g-4.jpg",
+        "altText": "Xiaomi 15 Ultra 5G - View 4",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/p/h/photo_2025-04-16_11-45-37.jpg",
+        "altText": "Xiaomi 15 Ultra 5G - View 5",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/p/h/photo_2025-04-16_11-46-01.jpg",
+        "altText": "Xiaomi 15 Ultra 5G - View 6",
+        "isPrimary": false
+      }
+    ]
+  },
+  {
+    "name": "Samsung Galaxy S24 Ultra 12GB",
+    "sku": "SAMSUNG-GALAXY-S24-ULTRA",
+    "description": "Samsung Galaxy S24 Ultra với S Pen tích hợp, AI thông minh, camera 200MP",
+    "status": "active",
+    "brandId": 2,
+    "categoryId": 1,
+    "isFeatured": true,
+    "variants": [
+      {
+        "sku": "S24-ULTRA-12GB-1TB-GRAY",
+        "title": "12GB 1TB - Xám",
+        "price": 28590000,
+        "costPrice": 25500000,
+        "msrp": 29450000,
+        "stockQuantity": 18,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "12GB 1TB" },
+          { "attributeName": "Màu sắc", "value": "Xám" }
+        ]
+      },
+      {
+        "sku": "S24-ULTRA-12GB-1TB-PURPLE",
+        "title": "12GB 1TB - Tím",
+        "price": 28590000,
+        "costPrice": 25500000,
+        "msrp": 29450000,
+        "stockQuantity": 16,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "12GB 1TB" },
+          { "attributeName": "Màu sắc", "value": "Tím" }
+        ]
+      },
+      {
+        "sku": "S24-ULTRA-12GB-1TB-BLACK",
+        "title": "12GB 1TB - Đen",
+        "price": 28590000,
+        "costPrice": 25500000,
+        "msrp": 29450000,
+        "stockQuantity": 20,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "12GB 1TB" },
+          { "attributeName": "Màu sắc", "value": "Đen" }
+        ]
+      },
+      {
+        "sku": "S24-ULTRA-12GB-512GB-GRAY",
+        "title": "12GB 512GB - Xám",
+        "price": 24590000,
+        "costPrice": 22000000,
+        "msrp": 25450000,
+        "stockQuantity": 22,
+        "isDefault": true,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "12GB 512GB" },
+          { "attributeName": "Màu sắc", "value": "Xám" }
+        ]
+      },
+      {
+        "sku": "S24-ULTRA-12GB-512GB-PURPLE",
+        "title": "12GB 512GB - Tím",
+        "price": 24590000,
+        "costPrice": 22000000,
+        "msrp": 25450000,
+        "stockQuantity": 20,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "12GB 512GB" },
+          { "attributeName": "Màu sắc", "value": "Tím" }
+        ]
+      },
+      {
+        "sku": "S24-ULTRA-12GB-512GB-BLACK",
+        "title": "12GB 512GB - Đen",
+        "price": 24590000,
+        "costPrice": 22000000,
+        "msrp": 25450000,
+        "stockQuantity": 24,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "12GB 512GB" },
+          { "attributeName": "Màu sắc", "value": "Đen" }
+        ]
+      }
+    ],
+    "images": [
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/a/samsung_galaxy_s24_ultra_256gb_-_1.png",
+        "altText": "Samsung Galaxy S24 Ultra",
+        "isPrimary": true
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/s/ss-s24-timultra-22.png",
+        "altText": "Samsung Galaxy S24 Ultra - Tím",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/s/ss-s24-ultra-xam-222.png",
+        "altText": "Samsung Galaxy S24 Ultra - Xám",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/s/ss-s24-ultra-den-600.png",
+        "altText": "Samsung Galaxy S24 Ultra - Đen",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/a/samsung-galaxy-s24-ultra_6_.png",
+        "altText": "Samsung Galaxy S24 Ultra - View 5",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/a/samsung-galaxy-s24-ultra_12_.png",
+        "altText": "Samsung Galaxy S24 Ultra - View 6",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/a/samsung-galaxy-s24-ultra_9_.png",
+        "altText": "Samsung Galaxy S24 Ultra - View 7",
+        "isPrimary": false
+      }
+    ]
+  },
+  {
+    "name": "iPhone 15 128GB Chính hãng VN/A",
+    "sku": "IPHONE-15-128GB",
+    "description": "iPhone 15 với Dynamic Island, màn hình Super Retina XDR 6.1 inches, chip A16 Bionic",
+    "status": "active",
+    "brandId": 1,
+    "categoryId": 1,
+    "isFeatured": true,
+    "variants": [
+      {
+        "sku": "IPHONE-15-128GB-BLACK",
+        "title": "128GB - Đen",
+        "price": 16990000,
+        "costPrice": 15500000,
+        "msrp": 19990000,
+        "stockQuantity": 35,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "128GB" },
+          { "attributeName": "Màu sắc", "value": "Đen" }
+        ]
+      },
+      {
+        "sku": "IPHONE-15-128GB-PINK",
+        "title": "128GB - Hồng",
+        "price": 16990000,
+        "costPrice": 15500000,
+        "msrp": 19990000,
+        "stockQuantity": 32,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "128GB" },
+          { "attributeName": "Màu sắc", "value": "Hồng" }
+        ]
+      },
+      {
+        "sku": "IPHONE-15-128GB-BLUE",
+        "title": "128GB - Xanh dương",
+        "price": 16990000,
+        "costPrice": 15500000,
+        "msrp": 19990000,
+        "stockQuantity": 30,
+        "isDefault": true,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "128GB" },
+          { "attributeName": "Màu sắc", "value": "Xanh dương" }
+        ]
+      },
+      {
+        "sku": "IPHONE-15-128GB-GREEN",
+        "title": "128GB - Xanh lá",
+        "price": 16990000,
+        "costPrice": 15500000,
+        "msrp": 19990000,
+        "stockQuantity": 28,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "128GB" },
+          { "attributeName": "Màu sắc", "value": "Xanh lá" }
+        ]
+      },
+      {
+        "sku": "IPHONE-15-256GB-BLACK",
+        "title": "256GB - Đen",
+        "price": 19990000,
+        "costPrice": 18000000,
+        "msrp": 22990000,
+        "stockQuantity": 25,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "256GB" },
+          { "attributeName": "Màu sắc", "value": "Đen" }
+        ]
+      },
+      {
+        "sku": "IPHONE-15-256GB-PINK",
+        "title": "256GB - Hồng",
+        "price": 19990000,
+        "costPrice": 18000000,
+        "msrp": 22990000,
+        "stockQuantity": 22,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "256GB" },
+          { "attributeName": "Màu sắc", "value": "Hồng" }
+        ]
+      },
+      {
+        "sku": "IPHONE-15-256GB-BLUE",
+        "title": "256GB - Xanh dương",
+        "price": 19990000,
+        "costPrice": 18000000,
+        "msrp": 22990000,
+        "stockQuantity": 20,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "256GB" },
+          { "attributeName": "Màu sắc", "value": "Xanh dương" }
+        ]
+      },
+      {
+        "sku": "IPHONE-15-256GB-GREEN",
+        "title": "256GB - Xanh lá",
+        "price": 19990000,
+        "costPrice": 18000000,
+        "msrp": 22990000,
+        "stockQuantity": 18,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "256GB" },
+          { "attributeName": "Màu sắc", "value": "Xanh lá" }
+        ]
+      }
+    ],
+    "images": [
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/v/n/vn1b93_1_2.jpg",
+        "altText": "iPhone 15",
+        "isPrimary": true
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/i/p/iphone-15-plus_1__1.png",
+        "altText": "iPhone 15 - View 2",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/358x/media/catalog/product/i/p/iphone-15-128-gbden.png",
+        "altText": "iPhone 15 - Đen",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/358x/media/catalog/product/i/p/iphone-15-128gb-xanh-duong.png",
+        "altText": "iPhone 15 - Xanh dương",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/358x/media/catalog/product/i/p/iphone-15-128gb-xanh-la.png",
+        "altText": "iPhone 15 - Xanh lá",
+        "isPrimary": false
+      }
+    ]
+  },
+  {
+    "name": "OPPO Find X8 16GB 512GB",
+    "sku": "OPPO-FIND-X8",
+    "description": "OPPO Find X8 với chip MediaTek Dimensity 9400, camera Hasselblad",
+    "status": "active",
+    "brandId": 4,
+    "categoryId": 1,
+    "isFeatured": true,
+    "variants": [
+      {
+        "sku": "OPPO-FIND-X8-GRAY",
+        "title": "Xám",
+        "price": 19490000,
+        "costPrice": 17500000,
+        "msrp": 22990000,
+        "stockQuantity": 25,
+        "attributes": [{ "attributeName": "Màu sắc", "value": "Xám" }]
+      },
+      {
+        "sku": "OPPO-FIND-X8-BLACK",
+        "title": "Đen",
+        "price": 19490000,
+        "costPrice": 17500000,
+        "msrp": 22990000,
+        "stockQuantity": 28,
+        "isDefault": true,
+        "attributes": [{ "attributeName": "Màu sắc", "value": "Đen" }]
+      }
+    ],
+    "images": [
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/d/i/dien-thoai-oppo-find-x8-xam-1.png",
+        "altText": "OPPO Find X8 - Xám",
+        "isPrimary": true
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/d/i/dien-thoai-oppo-find-x8-xam_1_.png",
+        "altText": "OPPO Find X8 - View 2",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/d/i/dien-thoai-oppo-find-x8-xam_2_.png",
+        "altText": "OPPO Find X8 - View 3",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/d/i/dien-thoai-oppo-find-x8-den_7__1.png",
+        "altText": "OPPO Find X8 - Đen",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/d/i/dien-thoai-oppo-find-x8-den_6__1.png",
+        "altText": "OPPO Find X8 - View 5",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/d/i/dien-thoai-oppo-find-x8-den_8__1.png",
+        "altText": "OPPO Find X8 - View 6",
+        "isPrimary": false
+      }
+    ]
+  },
+  {
+    "name": "TECNO SPARK 30 Pro 8GB 256GB Transformer",
+    "sku": "TECNO-SPARK-30-PRO",
+    "description": "TECNO SPARK 30 Pro với chip MediaTek Helio G100, RAM 8GB, bộ nhớ 256GB",
+    "status": "active",
+    "brandId": 7,
+    "categoryId": 1,
+    "isFeatured": true,
+    "variants": [
+      {
+        "sku": "TECNO-SPARK-30-PRO-BLACK",
+        "title": "Đen",
+        "price": 3990000,
+        "costPrice": 3500000,
+        "msrp": 5200000,
+        "stockQuantity": 35,
+        "isDefault": true,
+        "attributes": [{ "attributeName": "Màu sắc", "value": "Đen" }]
+      },
+      {
+        "sku": "TECNO-SPARK-30-PRO-SILVER",
+        "title": "Bạc",
+        "price": 3990000,
+        "costPrice": 3500000,
+        "msrp": 5200000,
+        "stockQuantity": 30,
+        "attributes": [{ "attributeName": "Màu sắc", "value": "Bạc" }]
+      },
+      {
+        "sku": "TECNO-SPARK-30-PRO-RED",
+        "title": "Đỏ",
+        "price": 3990000,
+        "costPrice": 3500000,
+        "msrp": 5200000,
+        "stockQuantity": 28,
+        "attributes": [{ "attributeName": "Màu sắc", "value": "Đỏ" }]
+      }
+    ],
+    "images": [
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/t/e/tecno_spark_30_pro_8gb_256gb_transformer_-_ch_c_t_i_cellphones_-_1_1.png",
+        "altText": "TECNO SPARK 30 Pro",
+        "isPrimary": true
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/t/e/tecno_spark_30_pro_8gb_256gb_transformer_-_ch_c_t_i_cellphones_-_2.png",
+        "altText": "TECNO SPARK 30 Pro - View 2",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/i/m/image_-_2024-12-26t185059.208.png",
+        "altText": "TECNO SPARK 30 Pro - View 3",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/i/m/image_-_2024-12-26t185124.283_1.png",
+        "altText": "TECNO SPARK 30 Pro - View 4",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/d/i/dien-thoai-tecno-spark-30-pro-8gb-256gb.png",
+        "altText": "TECNO SPARK 30 Pro - View 5",
+        "isPrimary": false
+      }
+    ]
+  },
+  {
+    "name": "Xiaomi Pad Mini 8GB 256GB",
+    "sku": "XIAOMI-PAD-MINI",
+    "description": "Xiaomi Pad Mini với chip MediaTek Dimensity 9400+, màn hình 8.8 inch",
+    "status": "active",
+    "brandId": 5,
+    "categoryId": 3,
+    "isFeatured": true,
+    "variants": [
+      {
+        "sku": "XIAOMI-PAD-MINI-PURPLE",
+        "title": "Tím",
+        "price": 13990000,
+        "costPrice": 12500000,
+        "msrp": 15990000,
+        "stockQuantity": 20,
+        "attributes": [{ "attributeName": "Màu sắc", "value": "Tím" }]
+      },
+      {
+        "sku": "XIAOMI-PAD-MINI-GRAY",
+        "title": "Xám",
+        "price": 13990000,
+        "costPrice": 12500000,
+        "msrp": 15990000,
+        "stockQuantity": 22,
+        "isDefault": true,
+        "attributes": [{ "attributeName": "Màu sắc", "value": "Xám" }]
+      }
+    ],
+    "images": [
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/x/i/xiaomi-pad-mini.jpg",
+        "altText": "Xiaomi Pad Mini",
+        "isPrimary": true
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/x/i/xiaomi-pad-mini-11.jpg",
+        "altText": "Xiaomi Pad Mini - View 2",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/x/i/xiaomi-pad-mini-1.jpg",
+        "altText": "Xiaomi Pad Mini - View 3",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/x/i/xiaomi-pad-mini-12.jpg",
+        "altText": "Xiaomi Pad Mini - View 4",
+        "isPrimary": false
+      }
+    ]
+  },
+  {
+    "name": "iPhone 13 128GB Chính hãng VN/A",
+    "sku": "IPHONE-13-128GB",
+    "description": "iPhone 13 với chip A15 Bionic, camera kép, pin trâu",
+    "status": "active",
+    "brandId": 1,
+    "categoryId": 1,
+    "isFeatured": true,
+    "variants": [
+      {
+        "sku": "IPHONE-13-128GB-BLACK",
+        "title": "128GB - Đen",
+        "price": 12090000,
+        "costPrice": 11000000,
+        "msrp": 13990000,
+        "stockQuantity": 40,
+        "isDefault": true,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "128GB" },
+          { "attributeName": "Màu sắc", "value": "Đen" }
+        ]
+      },
+      {
+        "sku": "IPHONE-13-128GB-WHITE",
+        "title": "128GB - Trắng",
+        "price": 12090000,
+        "costPrice": 11000000,
+        "msrp": 13990000,
+        "stockQuantity": 38,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "128GB" },
+          { "attributeName": "Màu sắc", "value": "Trắng" }
+        ]
+      },
+      {
+        "sku": "IPHONE-13-128GB-RED",
+        "title": "128GB - Đỏ",
+        "price": 11990000,
+        "costPrice": 11000000,
+        "msrp": 13990000,
+        "stockQuantity": 35,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "128GB" },
+          { "attributeName": "Màu sắc", "value": "Đỏ" }
+        ]
+      },
+      {
+        "sku": "IPHONE-13-128GB-GREEN",
+        "title": "128GB - Xanh lá",
+        "price": 11990000,
+        "costPrice": 11000000,
+        "msrp": 13990000,
+        "stockQuantity": 32,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "128GB" },
+          { "attributeName": "Màu sắc", "value": "Xanh lá" }
+        ]
+      },
+      {
+        "sku": "IPHONE-13-128GB-PINK",
+        "title": "128GB - Hồng",
+        "price": 12290000,
+        "costPrice": 11000000,
+        "msrp": 13990000,
+        "stockQuantity": 30,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "128GB" },
+          { "attributeName": "Màu sắc", "value": "Hồng" }
+        ]
+      },
+      {
+        "sku": "IPHONE-13-256GB-BLACK",
+        "title": "256GB - Đen",
+        "price": 14090000,
+        "costPrice": 12500000,
+        "msrp": 15990000,
+        "stockQuantity": 25,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "256GB" },
+          { "attributeName": "Màu sắc", "value": "Đen" }
+        ]
+      },
+      {
+        "sku": "IPHONE-13-256GB-WHITE",
+        "title": "256GB - Trắng",
+        "price": 14090000,
+        "costPrice": 12500000,
+        "msrp": 15990000,
+        "stockQuantity": 23,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "256GB" },
+          { "attributeName": "Màu sắc", "value": "Trắng" }
+        ]
+      },
+      {
+        "sku": "IPHONE-13-256GB-RED",
+        "title": "256GB - Đỏ",
+        "price": 13990000,
+        "costPrice": 12500000,
+        "msrp": 15990000,
+        "stockQuantity": 20,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "256GB" },
+          { "attributeName": "Màu sắc", "value": "Đỏ" }
+        ]
+      },
+      {
+        "sku": "IPHONE-13-256GB-GREEN",
+        "title": "256GB - Xanh lá",
+        "price": 13990000,
+        "costPrice": 12500000,
+        "msrp": 15990000,
+        "stockQuantity": 18,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "256GB" },
+          { "attributeName": "Màu sắc", "value": "Xanh lá" }
+        ]
+      },
+      {
+        "sku": "IPHONE-13-256GB-PINK",
+        "title": "256GB - Hồng",
+        "price": 14290000,
+        "costPrice": 12500000,
+        "msrp": 15990000,
+        "stockQuantity": 22,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "256GB" },
+          { "attributeName": "Màu sắc", "value": "Hồng" }
+        ]
+      }
+    ],
+    "images": [
+      {
+        "url": "https://cdn2.cellphones.com.vn/358x/media/catalog/product/_/e/_en_2_5.jpg",
+        "altText": "iPhone 13",
+        "isPrimary": true
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/358x/media/catalog/product/t/r/tr_ng_5.jpg",
+        "altText": "iPhone 13 - Trắng",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/358x/media/catalog/product/f/i/file_3_10.jpg",
+        "altText": "iPhone 13 - View 3",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/358x/media/catalog/product/x/n/xnnah_kas_3.png",
+        "altText": "iPhone 13 - Xanh lá",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/358x/media/catalog/product/h/_/h_ng_4.jpg",
+        "altText": "iPhone 13 - Hồng",
+        "isPrimary": false
+      }
+    ]
+  },
+  {
+    "name": "Samsung Galaxy A36 5G 8GB 128GB",
+    "sku": "SAMSUNG-GALAXY-A36-5G",
+    "description": "Samsung Galaxy A36 5G với hiệu năng mạnh mẽ, camera AI thông minh",
+    "status": "active",
+    "brandId": 2,
+    "categoryId": 1,
+    "isFeatured": true,
+    "variants": [
+      {
+        "sku": "SAMSUNG-A36-A36-BLUE",
+        "title": "A36 - Xanh",
+        "price": 7440000,
+        "costPrice": 6500000,
+        "msrp": 8140000,
+        "stockQuantity": 28,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "A36" },
+          { "attributeName": "Màu sắc", "value": "Xanh" }
+        ]
+      },
+      {
+        "sku": "SAMSUNG-A36-A36-BLACK",
+        "title": "A36 - Đen",
+        "price": 7440000,
+        "costPrice": 6500000,
+        "msrp": 8140000,
+        "stockQuantity": 30,
+        "isDefault": true,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "A36" },
+          { "attributeName": "Màu sắc", "value": "Đen" }
+        ]
+      },
+      {
+        "sku": "SAMSUNG-A36-A36-PURPLE",
+        "title": "A36 - Tím",
+        "price": 7440000,
+        "costPrice": 6500000,
+        "msrp": 8140000,
+        "stockQuantity": 25,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "A36" },
+          { "attributeName": "Màu sắc", "value": "Tím" }
+        ]
+      },
+      {
+        "sku": "SAMSUNG-A36-A56-BLUE",
+        "title": "A56 - Xanh",
+        "price": 8440000,
+        "costPrice": 7500000,
+        "msrp": 9140000,
+        "stockQuantity": 20,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "A56" },
+          { "attributeName": "Màu sắc", "value": "Xanh" }
+        ]
+      },
+      {
+        "sku": "SAMSUNG-A36-A56-BLACK",
+        "title": "A56 - Đen",
+        "price": 8440000,
+        "costPrice": 7500000,
+        "msrp": 9140000,
+        "stockQuantity": 22,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "A56" },
+          { "attributeName": "Màu sắc", "value": "Đen" }
+        ]
+      },
+      {
+        "sku": "SAMSUNG-A36-A56-PURPLE",
+        "title": "A56 - Tím",
+        "price": 8440000,
+        "costPrice": 7500000,
+        "msrp": 9140000,
+        "stockQuantity": 18,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "A56" },
+          { "attributeName": "Màu sắc", "value": "Tím" }
+        ]
+      }
+    ],
+    "images": [
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/a/samsung_galaxy_a36_5g_8gb_128gb_-_1.png",
+        "altText": "Samsung Galaxy A36 5G",
+        "isPrimary": true
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/a/samsung_galaxy_a36_5g_8gb_128gb_-_4.png",
+        "altText": "Samsung Galaxy A36 5G - View 2",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/d/i/dien-thoai-samsung-galaxy-a36.2.png",
+        "altText": "Samsung Galaxy A36 5G - View 3",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/d/i/dien-thoai-samsung-galaxy-a36_2__1_2.png",
+        "altText": "Samsung Galaxy A36 5G - View 4",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/d/i/dien-thoai-samsung-galaxy-a36_1__1_1.png",
+        "altText": "Samsung Galaxy A36 5G - View 5",
+        "isPrimary": false
+      }
+    ]
+  },
+  {
+    "name": "Xiaomi Redmi Note 14 6GB 128GB",
+    "sku": "XIAOMI-REDMI-NOTE-14",
+    "description": "Xiaomi Redmi Note 14 với hiệu năng tốt, giá cả phải chăng",
+    "status": "active",
+    "brandId": 5,
+    "categoryId": 1,
+    "isFeatured": true,
+    "variants": [
+      {
+        "sku": "REDMI-NOTE-14-6GB-128GB-PURPLE",
+        "title": "Note 14 6GB 128GB - Tím",
+        "price": 4390000,
+        "costPrice": 3900000,
+        "msrp": 4900000,
+        "stockQuantity": 32,
+        "isDefault": true,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "Note 14 6GB 128GB" },
+          { "attributeName": "Màu sắc", "value": "Tím" }
+        ]
+      },
+      {
+        "sku": "REDMI-NOTE-14-6GB-128GB-BLACK",
+        "title": "Note 14 6GB 128GB - Đen",
+        "price": 4390000,
+        "costPrice": 3900000,
+        "msrp": 4900000,
+        "stockQuantity": 30,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "Note 14 6GB 128GB" },
+          { "attributeName": "Màu sắc", "value": "Đen" }
+        ]
+      },
+      {
+        "sku": "REDMI-NOTE-14-5G-8GB-256GB-PURPLE",
+        "title": "Note 14 5G 8GB 256GB - Tím",
+        "price": 5390000,
+        "costPrice": 4800000,
+        "msrp": 5900000,
+        "stockQuantity": 25,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "Note 14 5G 8GB 256GB" },
+          { "attributeName": "Màu sắc", "value": "Tím" }
+        ]
+      },
+      {
+        "sku": "REDMI-NOTE-14-5G-8GB-256GB-BLACK",
+        "title": "Note 14 5G 8GB 256GB - Đen",
+        "price": 5390000,
+        "costPrice": 4800000,
+        "msrp": 5900000,
+        "stockQuantity": 28,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "Note 14 5G 8GB 256GB" },
+          { "attributeName": "Màu sắc", "value": "Đen" }
+        ]
+      },
+      {
+        "sku": "REDMI-NOTE-14-PRO-PLUS-8GB-256GB-PURPLE",
+        "title": "Note14 Pro Plus 5G 8GB 256GB - Tím",
+        "price": 6890000,
+        "costPrice": 6200000,
+        "msrp": 7400000,
+        "stockQuantity": 20,
+        "attributes": [
+          {
+            "attributeName": "Phiên bản",
+            "value": "Note14 Pro Plus 5G 8GB 256GB"
+          },
+          { "attributeName": "Màu sắc", "value": "Tím" }
+        ]
+      },
+      {
+        "sku": "REDMI-NOTE-14-PRO-PLUS-8GB-256GB-BLACK",
+        "title": "Note14 Pro Plus 5G 8GB 256GB - Đen",
+        "price": 6890000,
+        "costPrice": 6200000,
+        "msrp": 7400000,
+        "stockQuantity": 22,
+        "attributes": [
+          {
+            "attributeName": "Phiên bản",
+            "value": "Note14 Pro Plus 5G 8GB 256GB"
+          },
+          { "attributeName": "Màu sắc", "value": "Đen" }
+        ]
+      }
+    ],
+    "images": [
+      {
+        "url": "https://cdn2.cellphones.com.vn/358x/media/catalog/product/d/i/dien-thoai-xiaomi-redmi-note-14.1.png",
+        "altText": "Xiaomi Redmi Note 14",
+        "isPrimary": true
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/358x/media/catalog/product/d/i/dien-thoai-xiaomi-redmi-note-14_1.png",
+        "altText": "Xiaomi Redmi Note 14 - View 2",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/x/i/xiaomi_redmi_note_14_6gb_128gb_-_2.png",
+        "altText": "Xiaomi Redmi Note 14 - View 3",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/x/i/xiaomi_redmi_note_14_6gb_128gb_-_3.png",
+        "altText": "Xiaomi Redmi Note 14 - View 4",
+        "isPrimary": false
+      }
+    ]
+  },
+  {
+    "name": "Samsung Galaxy S24 Ultra 12GB 256GB",
+    "sku": "SAMSUNG-GALAXY-S24-ULTRA",
+    "description": "Samsung Galaxy S24 Ultra với RAM 12GB, bộ nhớ 256GB, thiết kế cao cấp và hiệu năng mạnh mẽ",
+    "status": "active",
+    "brandId": 2,
+    "categoryId": 1,
+    "isFeatured": true,
+
+    "variants": [
+      {
+        "sku": "S24-ULTRA-12GB-256GB-GRAY",
+        "title": "12GB 256GB - Xám",
+        "price": 22590000,
+        "costPrice": 20500000,
+        "msrp": 25990000,
+        "stockQuantity": 20,
+        "isDefault": true,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "12GB 256GB" },
+          { "attributeName": "Màu sắc", "value": "Xám" }
+        ]
+      },
+      {
+        "sku": "S24-ULTRA-12GB-256GB-BLACK",
+        "title": "12GB 256GB - Đen",
+        "price": 22590000,
+        "costPrice": 20500000,
+        "msrp": 25990000,
+        "stockQuantity": 18,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "12GB 256GB" },
+          { "attributeName": "Màu sắc", "value": "Đen" }
+        ]
+      },
+      {
+        "sku": "S24-ULTRA-12GB-256GB-PURPLE",
+        "title": "12GB 256GB - Tím",
+        "price": 22590000,
+        "costPrice": 20500000,
+        "msrp": 25990000,
+        "stockQuantity": 15,
+        "attributes": [
+          { "attributeName": "Phiên bản", "value": "12GB 256GB" },
+          { "attributeName": "Màu sắc", "value": "Tím" }
+        ]
+      }
+    ],
+
+    "images": [
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/a/samsung_galaxy_s24_ultra_256gb_-_1.png",
+        "altText": "Samsung Galaxy S24 Ultra 256GB",
+        "isPrimary": true
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/a/samsung_galaxy_s24_ultra_256gb_-_4.png",
+        "altText": "Samsung Galaxy S24 Ultra - View 2",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/s/ss-s24-timultra-22.png",
+        "altText": "Samsung Galaxy S24 Ultra - Tím",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/s/ss-s24-ultra-xam-222.png",
+        "altText": "Samsung Galaxy S24 Ultra - Xám",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/s/ss-s24-ultra-den-600.png",
+        "altText": "Samsung Galaxy S24 Ultra - Đen",
+        "isPrimary": false
+      }
+    ]
+  },
+  {
+    "name": "MacBook Pro 14 M5 10CPU 10GPU 16GB 512GB",
+    "sku": "MACBOOK-PRO-14-M5",
+    "description": "MacBook Pro 14 inch chip M5 với CPU 10 nhân, GPU 10 nhân, RAM 16GB, SSD 512GB, chính hãng Apple Việt Nam",
+    "status": "active",
+    "brandId": 1,
+    "categoryId": 2,
+    "isFeatured": true,
+
+    "variants": [
+      {
+        "sku": "MBP-14-M5-10CPU-10GPU-16GB-512GB-SPACE-BLACK",
+        "title": "10CPU 10GPU - 16GB - 512GB - Đen Không Gian",
+        "price": 41990000,
+        "costPrice": 39500000,
+        "msrp": 44990000,
+        "stockQuantity": 12,
+        "isDefault": true,
+        "attributes": [
+          { "attributeName": "CPU / GPU", "value": "10CPU 10GPU" },
+          { "attributeName": "RAM", "value": "16GB" },
+          { "attributeName": "SSD", "value": "512GB" },
+          { "attributeName": "Màu sắc", "value": "Đen Không Gian" }
+        ]
+      },
+      {
+        "sku": "MBP-14-M5-10CPU-10GPU-16GB-512GB-SILVER",
+        "title": "10CPU 10GPU - 16GB - 512GB - Bạc",
+        "price": 41990000,
+        "costPrice": 39500000,
+        "msrp": 44990000,
+        "stockQuantity": 10,
+        "attributes": [
+          { "attributeName": "CPU / GPU", "value": "10CPU 10GPU" },
+          { "attributeName": "RAM", "value": "16GB" },
+          { "attributeName": "SSD", "value": "512GB" },
+          { "attributeName": "Màu sắc", "value": "Bạc" }
+        ]
+      }
+    ],
+
+    "images": [
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/t/e/text_ng_n_2__11.png",
+        "altText": "MacBook Pro 14 M5",
+        "isPrimary": true
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/t/e/text_ng_n_3__9.png",
+        "altText": "MacBook Pro 14 M5 - View 2",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/t/e/text_ng_n_4__9.png",
+        "altText": "MacBook Pro 14 M5 - View 3",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/t/e/text_ng_n_5__11_2.png",
+        "altText": "MacBook Pro 14 M5 - View 4",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/t/e/text_ng_n_6__6_5.png",
+        "altText": "MacBook Pro 14 M5 - View 5",
+        "isPrimary": false
+      }
+    ]
+  },
+  {
+    "name": "MacBook Pro 14 M5 10CPU 10GPU 16GB 512GB Nano",
+    "sku": "MACBOOK-PRO-14-M5-NANO",
+    "description": "MacBook Pro 14 inch chip M5 Nano với CPU 10 nhân, GPU 10 nhân, RAM 16GB, SSD 512GB, chính hãng Apple Việt Nam",
+    "status": "active",
+    "brandId": 1,
+    "categoryId": 2,
+    "isFeatured": true,
+
+    "variants": [
+      {
+        "sku": "MBP-14-M5-NANO-10CPU-10GPU-16GB-512GB-SPACE-BLACK",
+        "title": "10CPU 10GPU - 16GB - 512GB - Nano - Đen Không Gian",
+        "price": 45660000,
+        "costPrice": 43000000,
+        "msrp": 48990000,
+        "stockQuantity": 10,
+        "isDefault": true,
+        "attributes": [
+          { "attributeName": "CPU / GPU", "value": "10CPU 10GPU" },
+          { "attributeName": "RAM", "value": "16GB" },
+          { "attributeName": "SSD", "value": "512GB" },
+          { "attributeName": "Phiên bản", "value": "Nano" },
+          { "attributeName": "Màu sắc", "value": "Đen Không Gian" }
+        ]
+      },
+      {
+        "sku": "MBP-14-M5-NANO-10CPU-10GPU-16GB-512GB-SILVER",
+        "title": "10CPU 10GPU - 16GB - 512GB - Nano - Bạc",
+        "price": 45660000,
+        "costPrice": 43000000,
+        "msrp": 48990000,
+        "stockQuantity": 8,
+        "attributes": [
+          { "attributeName": "CPU / GPU", "value": "10CPU 10GPU" },
+          { "attributeName": "RAM", "value": "16GB" },
+          { "attributeName": "SSD", "value": "512GB" },
+          { "attributeName": "Phiên bản", "value": "Nano" },
+          { "attributeName": "Màu sắc", "value": "Bạc" }
+        ]
+      }
+    ],
+
+    "images": [
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/t/e/text_ng_n_2__11_21.png",
+        "altText": "MacBook Pro 14 M5 Nano",
+        "isPrimary": true
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/t/e/text_ng_n_3__9_13.png",
+        "altText": "MacBook Pro 14 M5 Nano - View 2",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/t/e/text_ng_n_4__9_16.png",
+        "altText": "MacBook Pro 14 M5 Nano - View 3",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/t/e/text_ng_n_5__11_2_2.png",
+        "altText": "MacBook Pro 14 M5 Nano - View 4",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/t/e/text_ng_n_9__10_12.png",
+        "altText": "MacBook Pro 14 M5 Nano - View 5",
+        "isPrimary": false
+      }
+    ]
+  },
+  {
+    "name": "Laptop ASUS Vivobook 15 X1502VA-BQ885W",
+    "sku": "ASUS-VIVOBOOK-15-X1502VA-BQ885W",
+    "description": "Laptop ASUS Vivobook 15 với CPU Intel Core i5-13420H, RAM 16GB, SSD 512GB, màn hình 15.6 inch, phù hợp học tập và làm việc",
+    "status": "active",
+    "brandId": 3,
+    "categoryId": 2,
+    "isFeatured": false,
+
+    "variants": [
+      {
+        "sku": "VIVOBOOK-15-X1502VA-I5-13420H-16GB-512GB-SILVER",
+        "title": "i5-13420H - 16GB - 512GB - 15.6\" - Bạc",
+        "price": 16990000,
+        "costPrice": 15500000,
+        "msrp": 18990000,
+        "stockQuantity": 20,
+        "isDefault": true,
+        "attributes": [
+          { "attributeName": "CPU", "value": "Intel Core i5-13420H" },
+          { "attributeName": "RAM", "value": "16GB" },
+          { "attributeName": "SSD", "value": "512GB" },
+          { "attributeName": "Màn hình", "value": "15.6 inch" },
+          { "attributeName": "Màu sắc", "value": "Bạc" }
+        ]
+      },
+      {
+        "sku": "VIVOBOOK-15-X1502VA-I5-13420H-16GB-512GB-BLUE",
+        "title": "i5-13420H - 16GB - 512GB - 15.6\" - Xanh",
+        "price": 16990000,
+        "costPrice": 15500000,
+        "msrp": 18990000,
+        "stockQuantity": 15,
+        "attributes": [
+          { "attributeName": "CPU", "value": "Intel Core i5-13420H" },
+          { "attributeName": "RAM", "value": "16GB" },
+          { "attributeName": "SSD", "value": "512GB" },
+          { "attributeName": "Màn hình", "value": "15.6 inch" },
+          { "attributeName": "Màu sắc", "value": "Xanh" }
+        ]
+      }
+    ],
+
+    "images": [
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/g/r/group_902.png",
+        "altText": "ASUS Vivobook 15 X1502VA",
+        "isPrimary": true
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/l/a/laptop_asus_vivobook_15_x1502va-bq885w_-_3.png",
+        "altText": "ASUS Vivobook 15 - View 2",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/s/ssss_2__69.png",
+        "altText": "ASUS Vivobook 15 - View 3",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/s/ssss_10__22.png",
+        "altText": "ASUS Vivobook 15 - View 4",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/s/ssss_9__25.png",
+        "altText": "ASUS Vivobook 15 - View 5",
+        "isPrimary": false
+      }
+    ]
+  },
+  {
+    "name": "Laptop Lenovo V15 G4 IRU 83A100PMVN",
+    "sku": "LENOVO-V15-G4-IRU-83A100PMVN",
+    "description": "Laptop Lenovo V15 G4 IRU với thiết kế tối giản, CPU Intel Core thế hệ 13, RAM 16GB, SSD PCIe, màn hình FHD IPS, phù hợp học tập và làm việc",
+    "status": "active",
+    "brandId": 4,
+    "categoryId": 2,
+    "isFeatured": false,
+
+    "variants": [
+      {
+        "sku": "V15-G4-I5-13420H-16GB-512GB-15-6-WIN11-GRAY",
+        "title": "i5-13420H | 16GB | 512GB | 15.6\" | Windows 11 | Xám",
+        "price": 14990000,
+        "costPrice": 13800000,
+        "msrp": 16990000,
+        "stockQuantity": 20,
+        "isDefault": true,
+        "attributes": [
+          { "attributeName": "CPU", "value": "Intel Core i5-13420H" },
+          { "attributeName": "RAM", "value": "16GB" },
+          { "attributeName": "SSD", "value": "512GB PCIe" },
+          { "attributeName": "Màn hình", "value": "15.6 inch FHD IPS" },
+          { "attributeName": "Hệ điều hành", "value": "Windows 11 Home" },
+          { "attributeName": "Màu sắc", "value": "Xám" }
+        ]
+      },
+
+      {
+        "sku": "V15-G4-I5-1235U-16GB-256GB-14-FREEDOS-GRAY",
+        "title": "i5-1235U | 16GB | 256GB | 14\" | Free OS | Xám",
+        "price": 12990000,
+        "costPrice": 12000000,
+        "msrp": 14990000,
+        "stockQuantity": 15,
+        "attributes": [
+          { "attributeName": "CPU", "value": "Intel Core i5-1235U" },
+          { "attributeName": "RAM", "value": "16GB" },
+          { "attributeName": "SSD", "value": "256GB PCIe" },
+          { "attributeName": "Màn hình", "value": "14 inch FHD" },
+          { "attributeName": "Hệ điều hành", "value": "Free OS" },
+          { "attributeName": "Màu sắc", "value": "Xám" }
+        ]
+      },
+
+      {
+        "sku": "V15-G4-I7-1355U-16GB-512GB-15-6-WIN11-GRAY",
+        "title": "i7-1355U | 16GB | 512GB | 15.6\" | Windows 11 | Xám",
+        "price": 17990000,
+        "costPrice": 16500000,
+        "msrp": 19990000,
+        "stockQuantity": 10,
+        "attributes": [
+          { "attributeName": "CPU", "value": "Intel Core i7-1355U" },
+          { "attributeName": "RAM", "value": "16GB" },
+          { "attributeName": "SSD", "value": "512GB PCIe" },
+          { "attributeName": "Màn hình", "value": "15.6 inch FHD IPS" },
+          { "attributeName": "Hệ điều hành", "value": "Windows 11 Home" },
+          { "attributeName": "Màu sắc", "value": "Xám" }
+        ]
+      }
+    ],
+
+    "images": [
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/l/a/laptop_lenovo_v15_g4_iru_83a100pmvn_-_1.png",
+        "altText": "Lenovo V15 G4 IRU - Xám",
+        "isPrimary": true
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/l/a/laptop_lenovo_v15_g4_iru_83a100pmvn_-_2.png",
+        "altText": "Lenovo V15 G4 IRU - View 2",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/l/a/laptop_lenovo_v15_g4_iru_83a100pmvn_-_3.png",
+        "altText": "Lenovo V15 G4 IRU - View 3",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/t/e/text_ng_n_4__8_57.png",
+        "altText": "Lenovo V15 G4 IRU - Thông số",
+        "isPrimary": false
+      },
+      {
+        "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/t/e/text_ng_n_2__10_68.png",
+        "altText": "Lenovo V15 G4 IRU - Tổng quan",
+        "isPrimary": false
+      }
+    ]
+  }
+]

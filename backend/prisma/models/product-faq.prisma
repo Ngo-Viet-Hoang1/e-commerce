@@ -1,0 +1,20 @@
+model ProductFaq {
+  id         Int       @id @default(autoincrement())
+  productId  Int
+  userId     Int?
+  question   String    @db.Text
+  answer     String?   @db.Text
+  answeredBy Int?
+  isPublic   Boolean   @default(false)
+  status     String    @db.VarChar(50)
+  createdAt  DateTime  @default(now()) @db.Timestamptz
+  updatedAt  DateTime  @updatedAt @db.Timestamptz
+  answeredAt DateTime? @db.Timestamptz
+  deletedAt  DateTime? @db.Timestamptz
+
+  product        Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user           User?   @relation(fields: [userId], references: [id])
+  answeredByUser User?   @relation("AnsweredByUser", fields: [answeredBy], references: [id])
+
+  @@index([productId])
+}

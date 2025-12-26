@@ -28,13 +28,19 @@ model User {
   updatedAt       DateTime  @updatedAt @db.Timestamptz
   deletedAt       DateTime? @db.Timestamptz
 
+  orders Order[]
+  payments Payment[]
   userRoles UserRole[]
-
+  productBadges ProductBadge[]
+  
   @@index([createdAt])
   @@index([email])
   @@index([googleId])
   @@index([isActive, emailVerified])
   @@index([deletedAt])
+
+  productFaqs ProductFaq[]
+  productFaqsAnswered ProductFaq[] @relation("AnsweredByUser")
 }
 
 model Role {

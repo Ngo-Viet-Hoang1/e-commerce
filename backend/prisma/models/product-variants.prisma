@@ -1,0 +1,32 @@
+model ProductVariant {
+    id        Int @id @default(autoincrement())
+    productId Int
+
+    sku     String
+    title   String?
+    barcode String?
+
+    price     Decimal  @db.Decimal(12, 2)
+    costPrice Decimal? @db.Decimal(12, 2)
+    msrp      Decimal? @db.Decimal(12, 2)
+
+    stockQuantity Int     @default(0)
+    backorderable Boolean @default(false)
+    isDefault     Boolean @default(false)
+
+    metadata Json?
+
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+    deletedAt DateTime?
+
+    product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+    attributeValues AttributeValue[]
+    orderItems OrderItem[]
+    productImages   ProductImage[]
+    productVideos   ProductVideo[]
+
+    @@index([productId])
+    @@index([deletedAt])
+}

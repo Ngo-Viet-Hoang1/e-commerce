@@ -1,37 +1,73 @@
-import RootLayout from '@/components/layouts/RootLayout'
+import App from '@/App'
+import AdminLayout from '@/components/layouts/admin/AdminLayout'
+import RootLayout from '@/components/layouts/user/RootLayout'
+import AdminLogin from '@/pages/admin/AdminLogin'
+import Login from '@/pages/user/auth/Login'
+import Register from '@/pages/user/auth/Register'
 import { lazy } from 'react'
 import { createBrowserRouter } from 'react-router'
-import ProtectedRoute from './ProtectedRoute'
+import { adminRoutes } from './adminRoutes'
+import GuestRoute from './GuestRoute'
+import { userRoutes } from './userRoutes'
 
-const Home = lazy(() => import('@/pages/common/Home'))
-const About = lazy(() => import('@/pages/common/About'))
-const DashBoard = lazy(() => import('@/pages/user/Dashboard'))
+const Forbidden = lazy(() => import('@/pages/common/Forbidden'))
 const NotFound = lazy(() => import('@/pages/common/NotFound'))
 const ErrorPage = lazy(() => import('@/pages/common/ErrorPage'))
 
 const router = createBrowserRouter([
   {
     path: '/',
-    Component: RootLayout,
-    errorElement: <ErrorPage />,
+    element: <App />,
     children: [
       {
-        index: true,
-        element: <Home />,
+        path: '/',
+        Component: RootLayout,
+        errorElement: <ErrorPage />,
+        children: userRoutes,
       },
       {
-        path: 'about',
-        element: <About />,
+        path: '/auth',
+        element: <GuestRoute redirectPath="/" authType="user" />,
+        errorElement: <ErrorPage />,
+        children: [
+          {
+            path: 'login',
+            element: <Login />,
+          },
+          {
+            path: 'register',
+            element: <Register />,
+          },
+        ],
       },
       {
-        element: <ProtectedRoute isAllowed />,
-        children: [{ path: 'dashboard', element: <DashBoard /> }],
+        path: '/admin',
+        Component: AdminLayout,
+        errorElement: <ErrorPage />,
+        children: adminRoutes,
+      },
+      {
+        path: '/admin/auth',
+        element: (
+          <GuestRoute authType="admin" redirectPath="/admin/dashboard" />
+        ),
+        errorElement: <ErrorPage />,
+        children: [
+          {
+            path: 'login',
+            element: <AdminLogin />,
+          },
+        ],
+      },
+      {
+        path: 'forbidden',
+        element: <Forbidden />,
+      },
+      {
+        path: '*',
+        element: <NotFound />,
       },
     ],
-  },
-  {
-    path: '*',
-    element: <NotFound />,
   },
 ])
 
