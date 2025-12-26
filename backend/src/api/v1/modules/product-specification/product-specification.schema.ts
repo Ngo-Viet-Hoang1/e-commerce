@@ -59,7 +59,7 @@ export const createMultipleByProductIdBodySchema = z
 
 export type ProductSpecification = z.infer<
   typeof productSpecificationSchema
->[number]
+>
 
 export type ListProductSpecificationsQuery = z.infer<
   typeof listProductSpecificationsQuerySchema
