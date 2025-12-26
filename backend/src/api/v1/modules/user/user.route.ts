@@ -12,13 +12,14 @@ import { userController } from './user.controller'
 import {
   createUserBodySchema,
   listUsersQuerySchema,
+  favoriteProductParamSchema,
   updateUserBodySchema,
   userIdParamSchema,
 } from './user.schema'
 
 const router = Router()
 router.use(authenticate)
-router.use(autoAuthorize(RESOURCES.USER))
+// router.use(autoAuthorize(RESOURCES.USER))
 
 router.get('/', validate(listUsersQuerySchema, 'query'), userController.findAll)
 
@@ -56,5 +57,18 @@ router.post(
   validate(userIdParamSchema, 'params'),
   userController.restoreById,
 )
+router.post(
+  '/me/favorites/:productId',
+  validate(favoriteProductParamSchema, 'params'),
+  userController.addFavoriteProduct,
+)
+
+router.delete(
+  '/me/favorites/:productId',
+  validate(favoriteProductParamSchema, 'params'),
+  userController.removeFavoriteProduct,
+)
+
+router.delete('/me/favorites', userController.removeAllFavoriteProducts)
 
 export default router

@@ -41,6 +41,7 @@ model User {
 
   productFaqs ProductFaq[]
   productFaqsAnswered ProductFaq[] @relation("AnsweredByUser")
+  favoriteProducts Product[]
 }
 
 model Role {
