@@ -1,0 +1,20 @@
+model ProductSpecification {
+  id            Int      @id @default(autoincrement())
+  productId     Int     
+ 
+  key           String   @db.VarChar(255)   
+  value         String   @db.Text
+  displayOrder  Int      @default(0)
+
+  createdAt     DateTime @default(now()) @db.Timestamptz
+  updatedAt     DateTime @updatedAt @db.Timestamptz
+  deletedAt     DateTime? @db.Timestamptz
+
+
+  product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+
+  @@unique([productId, key])  
+  @@index([productId])
+  @@map("product_specifications")
+}
