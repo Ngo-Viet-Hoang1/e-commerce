@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { validate } from '../../shared/middlewares/validate.middleware'
-import { districtController } from './distric.controller'
+import { districtController } from './district.controller'
 import {
   getDistrictByCodeParamSchema,
   getDistrictsByProvinceCodeParamSchema,
