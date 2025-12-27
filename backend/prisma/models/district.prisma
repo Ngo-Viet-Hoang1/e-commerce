@@ -1,0 +1,25 @@
+model District {
+  id           Int      @id @default(autoincrement())
+  code         String   @unique @db.VarChar(20)
+  name         String   @db.VarChar(150)
+  nameEn       String?  @map("name_en") @db.VarChar(150)
+  fullName     String?  @map("full_name") @db.VarChar(200)
+  fullNameEn   String?  @map("full_name_en") @db.VarChar(200)
+  codeName     String?  @map("code_name") @db.VarChar(150)
+  provinceCode String   @map("province_code") @db.VarChar(10)
+  province     Province @relation(fields: [provinceCode], references: [code], onDelete: Cascade)
+
+  administrativeUnitId          Int?    @map("administrative_unit_id")
+  administrativeUnitShortName   String? @map("administrative_unit_short_name") @db.VarChar(50)
+  administrativeUnitFullName    String? @map("administrative_unit_full_name") @db.VarChar(100)
+  administrativeUnitShortNameEn String? @map("administrative_unit_short_name_en") @db.VarChar(50)
+  administrativeUnitFullNameEn  String? @map("administrative_unit_full_name_en") @db.VarChar(100)
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@index([provinceCode])
+  @@index([code])
+  @@index([name])
+  @@index([codeName])
+}

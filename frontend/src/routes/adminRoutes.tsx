@@ -24,7 +24,6 @@ const ProductManagement = lazy(
 // const EditProductPage = lazy(
 //   () => import('@/pages/admin/ProductManagement/EditProductPage'),
 // )
-
 export const adminRoutes: RouteObject[] = [
   {
     index: true,
