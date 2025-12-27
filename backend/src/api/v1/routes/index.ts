@@ -21,6 +21,7 @@ import { productVideoRouter } from '../modules/product-video/product-video.route
 import paymentRoute from '../modules/payment/payment.route.js'
 import provinceRoute from '../modules/province/province.route.js'
 import districtRoute from '../modules/district/district.route.js'
+import addressRoute from '../modules/address/address.route.js'
 
 const router = Router()
 
@@ -46,6 +47,7 @@ router.use('/product-videos', productVideoRouter)
 router.use('/payments', paymentRoute)
 router.use('/provinces', provinceRoute)
 router.use('/districts', districtRoute)
+router.use('/address', addressRoute)
 
 router.use('/admin', adminRoute)
 

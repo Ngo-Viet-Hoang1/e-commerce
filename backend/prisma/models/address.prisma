@@ -1,0 +1,21 @@
+model Address {
+  id Int @id @default(autoincrement())
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  provinceCode String
+  province     Province @relation(fields: [provinceCode], references: [code])
+
+  districtCode String
+  district     District @relation(fields: [districtCode], references: [code])
+
+  detail String?
+
+  isDefault Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
