@@ -19,6 +19,7 @@ import homeRoute from './home.route.js'
 import productImageRoute from '../modules/product-image/product-image.route.js'
 import { productVideoRouter } from '../modules/product-video/product-video.route.js'
 import paymentRoute from '../modules/payment/payment.route.js'
+import chatRoute from './chat.route.js'
 
 const router = Router()
 
@@ -42,6 +43,8 @@ router.use('/order-items', orderItemRoute)
 router.use('/product-images', productImageRoute)
 router.use('/product-videos', productVideoRouter)
 router.use('/payments', paymentRoute)
+
+router.use('/chat', chatRoute)
 
 router.use('/admin', adminRoute)
 
