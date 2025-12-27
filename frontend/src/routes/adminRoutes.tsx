@@ -15,15 +15,20 @@ const CategoryManagement = lazy(
 const BrandManagement = lazy(
   () => import('@/pages/admin/BrandManagement/BrandManagement'),
 )
+const BadgeManagement = lazy(
+  () => import('@/pages/admin/BadgeManagement/BadgeManagement'),
+)
 const ProductManagement = lazy(
   () => import('@/pages/admin/ProductManagement/ProductManagement'),
 )
-// // const CreateProductPage = lazy(
-// //   () => import('@/pages/admin/ProductManagement/CreateProductPage'),
-// // )
+const CreateProductPage = lazy(
+  () => import('@/pages/admin/ProductManagement/CreateProductPage'),
+)
 // // const EditProductPage = lazy(
 // //   () => import('@/pages/admin/ProductManagement/EditProductPage'),
 // )
+const AdminChat = lazy(() => import('@/components/common/chat/AdminChat'))
+
 export const adminRoutes: RouteObject[] = [
   {
     index: true,
@@ -53,17 +58,25 @@ export const adminRoutes: RouteObject[] = [
         element: <BrandManagement />,
       },
       {
+        path: 'badge-management',
+        element: <BadgeManagement />,
+      },
+      {
         path: '/admin/products',
         element: <ProductManagement />,
       },
-      // {
-      //   path: '/admin/products/create',
-      //   element: <CreateProductPage />,
-      // },
+      {
+        path: '/admin/products/create',
+        element: <CreateProductPage />,
+      },
       // {
       //   path: '/admin/products/edit/:id',
       //   element: <EditProductPage />,
       // },
+      {
+        path: '/admin/chats',
+        element: <AdminChat />,
+      },
     ],
   },
 ]

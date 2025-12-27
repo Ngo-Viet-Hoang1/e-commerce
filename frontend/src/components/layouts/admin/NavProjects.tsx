@@ -1,8 +1,7 @@
 import {
   Folder,
   Forward,
-  Frame,
-  Map,
+  MessageCircle,
   MoreHorizontal,
   PieChart,
   Trash2,
@@ -33,19 +32,14 @@ const projects: {
   icon: LucideIcon
 }[] = [
   {
-    name: 'Design Engineering',
-    url: '#',
-    icon: Frame,
-  },
-  {
-    name: 'Sales & Marketing',
-    url: '#',
+    name: 'Dashboard & Statistic',
+    url: '/admin/dashboard',
     icon: PieChart,
   },
   {
-    name: 'Travel',
-    url: '#',
-    icon: Map,
+    name: 'Customer Support',
+    url: '/admin/chats',
+    icon: MessageCircle,
   },
 ]
 
@@ -54,7 +48,7 @@ export function NavProjects() {
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      <SidebarGroupLabel>Projects</SidebarGroupLabel>
+      <SidebarGroupLabel>Dashboards</SidebarGroupLabel>
       <SidebarMenu>
         {projects.map((item) => (
           <SidebarMenuItem key={item.name}>

@@ -7,6 +7,7 @@ import { ThemeProvider } from './providers/ThemeProvider.tsx'
 
 import 'nprogress/nprogress.css'
 import { RouterProvider } from 'react-router-dom'
+import 'stream-chat-react/dist/css/v2/index.css'
 import './index.css'
 import { QueryProvider } from './providers/QueryProvider.tsx'
 import router from './routes/Routes.tsx'
