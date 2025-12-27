@@ -1,12 +1,19 @@
 import { Suspense } from 'react'
-import { Outlet } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
 import { Spinner } from '../../ui/spinner'
 import Header from './Header'
 import Footer from './Footer'
 import { useAuthStore } from '@/store/zustand/useAuthStore'
 
+const noFooterRoutes = ['/profile']
+
 export default function RootLayout() {
   const { me, isAuthenticated, reset } = useAuthStore()
+  const location = useLocation()
+
+  const showFooter = !noFooterRoutes.some((route) =>
+    location.pathname.startsWith(route)
+  )
 
   return (
     <div className="flex min-h-dvh w-full flex-col">
@@ -30,7 +37,7 @@ export default function RootLayout() {
         </div>
       </main>
 
-      <Footer />
+      {showFooter && <Footer />}
     </div>
   )
 }

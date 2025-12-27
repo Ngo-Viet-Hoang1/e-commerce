@@ -18,12 +18,13 @@ const BrandManagement = lazy(
 const ProductManagement = lazy(
   () => import('@/pages/admin/ProductManagement/ProductManagement'),
 )
-// // const CreateProductPage = lazy(
-// //   () => import('@/pages/admin/ProductManagement/CreateProductPage'),
-// // )
-// // const EditProductPage = lazy(
-// //   () => import('@/pages/admin/ProductManagement/EditProductPage'),
+// const CreateProductPage = lazy(
+//   () => import('@/pages/admin/ProductManagement/CreateProductPage'),
 // )
+// const EditProductPage = lazy(
+//   () => import('@/pages/admin/ProductManagement/EditProductPage'),
+// )
+
 export const adminRoutes: RouteObject[] = [
   {
     index: true,
