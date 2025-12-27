@@ -67,6 +67,10 @@ export const updateUserBodySchema = z.object({
   isMfaActive: z.boolean().optional(),
 })
 
+export const favoriteProductParamSchema = z.object({
+  productId: z.coerce.number().int().positive(),
+})
+
 export type User = z.infer<typeof userSchema>
 export type UserDto = z.infer<typeof userDtoSchema>
 
@@ -76,3 +80,5 @@ export type UserIdParam = z.infer<typeof userIdParamSchema>
 
 export type CreateUserBody = z.infer<typeof createUserBodySchema>
 export type UpdateUserBody = z.infer<typeof updateUserBodySchema>
+
+export type favoriteProductParam = z.infer<typeof favoriteProductParamSchema>

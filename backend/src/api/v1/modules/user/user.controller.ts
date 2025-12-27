@@ -6,6 +6,7 @@ import {
   type ListUsersQuery,
   type UpdateUserBody,
   type UserIdParam,
+  type favoriteProductParam,
 } from './user.schema'
 import { userService } from './user.service'
 
@@ -72,6 +73,37 @@ class UserController {
     const restoredUser = await userService.restoreById(id)
 
     SuccessResponse.send(res, restoredUser, 'User restored successfully')
+  }
+  addFavoriteProduct = async (req: Request, res: Response) => {
+    const userId = req.user!.id
+
+    const { productId } = req.validatedData?.params as favoriteProductParam
+
+    await userService.addFavoriteProduct(userId, productId)
+
+    SuccessResponse.send(res, null, 'Product favorite added successfully')
+  }
+
+  removeFavoriteProduct = async (req: Request, res: Response) => {
+    const userId = req.user!.id
+
+    const { productId } = req.validatedData?.params as favoriteProductParam
+
+    await userService.removeFavoriteProduct(userId, productId)
+
+    SuccessResponse.send(res, null, 'Product favorite deleted successfully')
+  }
+
+  removeAllFavoriteProducts = async (req: Request, res: Response) => {
+    const userId = req.user!.id
+
+    await userService.removeAllFavoriteProducts(userId)
+
+    SuccessResponse.send(
+      res,
+      null,
+      'All favorite products deleted successfully',
+    )
   }
 }
 

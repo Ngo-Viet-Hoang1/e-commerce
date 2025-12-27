@@ -127,6 +127,35 @@ class UserService {
 
     return user
   }
+  addFavoriteProduct = async (userId: number, productId: number) => {
+    await this.findById(userId)
+
+    return userRepository.update(userId, {
+      favoriteProducts: {
+        connect: { id: productId },
+      },
+    })
+  }
+
+  removeFavoriteProduct = async (userId: number, productId: number) => {
+    await this.findById(userId)
+
+    return userRepository.update(userId, {
+      favoriteProducts: {
+        disconnect: { id: productId },
+      },
+    })
+  }
+
+  removeAllFavoriteProducts = async (userId: number) => {
+    await this.findById(userId)
+
+    return userRepository.update(userId, {
+      favoriteProducts: {
+        set: [],
+      },
+    })
+  }
 }
 
 export const userService = new UserService()
