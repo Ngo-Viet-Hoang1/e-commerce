@@ -1,14 +1,21 @@
 import StreamChatProvider from '@/providers/StreamChatProvider'
 import { useAuthStore } from '@/store/zustand/useAuthStore'
 import { Suspense } from 'react'
-import { Outlet } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
 import { Spinner } from '../../ui/spinner'
 import Footer from './Footer'
 import Header from './Header'
 import { ChatWidget } from '@/components/common/chat/ChatWidget'
 
+const noFooterRoutes = ['/profile']
+
 export default function RootLayout() {
   const { me, isAuthenticated, reset } = useAuthStore()
+  const location = useLocation()
+
+  const showFooter = !noFooterRoutes.some((route) =>
+    location.pathname.startsWith(route),
+  )
 
   return (
     <StreamChatProvider role="user">
@@ -30,7 +37,7 @@ export default function RootLayout() {
           </div>
         </main>
 
-        <Footer />
+        {showFooter && <Footer />}
       </div>
     </StreamChatProvider>
   )

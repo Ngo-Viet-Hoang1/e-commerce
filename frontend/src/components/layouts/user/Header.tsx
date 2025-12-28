@@ -6,7 +6,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import type { Me } from '@/interfaces/auth.interface'
-import { LogOut, Search, Settings, ShoppingCart, User } from 'lucide-react'
+import { LogOut, Search, ShoppingCart, User } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
@@ -97,8 +97,8 @@ export default function Header({
                                 <DropdownMenuContent align="end" className="w-48">
                                     <DropdownMenuItem asChild>
                                         <Link to="/profile" className="flex items-center gap-2 cursor-pointer">
-                                            <Settings className="h-4 w-4" />
-                                            Chỉnh sửa hồ sơ
+                                            <User className="h-4 w-4" />
+                                            Thông tin cá nhân
                                         </Link>
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
