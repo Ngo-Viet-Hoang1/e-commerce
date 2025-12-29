@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/carousel'
 import { ArrowRight, Flame, ShoppingBag, Star, TrendingUp } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 interface Product {
   id: number
@@ -77,6 +78,7 @@ const storeData = {
 }
 
 export default function StorefrontHero() {
+  const navigate = useNavigate()
   const [api, setApi] = useState<{
     selectedScrollSnap: () => number
     scrollTo: (index: number) => void
@@ -116,18 +118,13 @@ export default function StorefrontHero() {
           <div className="flex gap-4">
             <Button
               size="lg"
-              className="cursor-pointer gap-2 rounded-full px-8"
-            >
-              Shop Now
-              <ArrowRight className="size-4" />
-            </Button>
-            <Button
-              size="lg"
               variant="outline"
-              className="cursor-pointer gap-2 rounded-full px-8"
+              className="cursor-pointer gap-2 rounded-full bg-emerald-500 px-8 text-white"
+              onClick={() => navigate('/product-catalog')}
             >
               <ShoppingBag className="size-4" />
               View Catalog
+              <ArrowRight className="size-4" />
             </Button>
           </div>
         </header>
@@ -179,6 +176,7 @@ export default function StorefrontHero() {
                             <div className="flex items-center gap-4 pt-2">
                               <Button
                                 size="lg"
+                                onClick={() => navigate('/product-detail/1')}
                                 className="cursor-pointer rounded-full"
                               >
                                 Shop Now

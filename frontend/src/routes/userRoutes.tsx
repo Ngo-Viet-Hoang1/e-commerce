@@ -1,8 +1,6 @@
 import { lazy } from 'react'
 import { type RouteObject } from 'react-router-dom'
 import ProtectedRoute from './ProtectedRoute'
-import ShoppingCart from '@/pages/user/cart/ShoppingCart'
-import Checkout from '@/pages/user/checkout/Checkout'
 
 const Home = lazy(() => import('@/pages/user/home/Home'))
 const About = lazy(() => import('@/pages/common/About'))
@@ -13,6 +11,14 @@ const Orders = lazy(() => import('@/pages/user/profile/Orders'))
 const FavoriteProducts = lazy(
   () => import('@/pages/user/profile/FavoriteProducts'),
 )
+const ProductCatalog = lazy(
+  () => import('@/pages/user/product-catalog/ProductCatalog'),
+)
+const ProductDetail = lazy(
+  () => import('@/pages/user/product-detail/ProductDetail'),
+)
+const ShoppingCart = lazy(() => import('@/pages/user/cart/ShoppingCart'))
+const Checkout = lazy(() => import('@/pages/user/checkout/Checkout'))
 
 export const userRoutes: RouteObject[] = [
   {
@@ -27,6 +33,8 @@ export const userRoutes: RouteObject[] = [
     element: <ProtectedRoute type="user" redirectPath="/auth/login" />,
     children: [
       { path: 'dashboard', element: <DashBoard /> },
+      { path: 'product-catalog', element: <ProductCatalog /> },
+      { path: 'product-detail/:slug', element: <ProductDetail /> },
       { path: 'cart', element: <ShoppingCart /> },
       { path: 'checkout', element: <Checkout /> },
       {
