@@ -12,6 +12,7 @@ model Province {
   administrativeUnitFullNameEn String? @map("administrative_unit_full_name_en") @db.VarChar(100)
 
   districts District[]
+  addresses Address[]
 
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
