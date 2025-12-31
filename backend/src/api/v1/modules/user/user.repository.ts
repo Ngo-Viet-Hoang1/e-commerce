@@ -6,6 +6,7 @@ export const USER_SELECT_FIELDS = {
   id: true,
   email: true,
   name: true,
+  phoneNumber: true,
   googleId: true,
   isActive: true,
   isMfaActive: true,
