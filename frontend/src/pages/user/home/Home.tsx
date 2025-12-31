@@ -1,19 +1,21 @@
 import { TrustStrip } from '@/components/common/TrustStrip'
+import Banner from './Banner'
 import Category from './Category'
 import Hero from './Hero'
 import PopularProducts from './PopularProducts'
 import TodayBestDeal from './TodayBestDeal'
-import CtaSection from './CTASection'
 
 const Home = () => {
   return (
     <>
       <Hero />
-      <TrustStrip />
+      <div className="py-8">
+        <TrustStrip />
+      </div>
       <PopularProducts />
       <Category />
       <TodayBestDeal />
-      <CtaSection />
+      <Banner />
     </>
   )
 }

@@ -9,8 +9,8 @@ import type { Me } from '@/interfaces/auth.interface'
 import { LogOut, Search, ShoppingCart, User } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { PromoBanner } from './PromoBanner'
 import { Input } from '@/components/ui/input'
+import PromoBanner from './PromoBanner'
 
 interface HeaderProps {
   logo?: string
