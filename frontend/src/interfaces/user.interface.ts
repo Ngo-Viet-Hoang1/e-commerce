@@ -4,7 +4,6 @@ export interface User {
   password: string
   googleId: string | null
   name: string | null
-  phoneNumber: string | null
   emailVerified: boolean
   lastLoginAt: Date | null
   isActive: boolean
@@ -13,9 +12,4 @@ export interface User {
   createdAt: Date
   updatedAt: Date
   deletedAt: Date | null
-}
-
-export interface UpdateUserDto {
-  name?: string
-  phoneNumber?: string
 }
