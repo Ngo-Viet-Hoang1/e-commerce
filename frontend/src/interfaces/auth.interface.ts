@@ -5,7 +5,6 @@ export interface Me {
   id: number
   email: string
   googleId: string | null
-  phoneNumber: string | null
   emailVerified: boolean
   lastLoginAt: Date | null
   isActive: boolean
