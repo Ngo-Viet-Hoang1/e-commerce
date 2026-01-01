@@ -32,6 +32,9 @@ export const listProductsQuerySchema = createPaginationSchema(
 })
 
 export const productIdParamSchema = numericIdParamSchema
+export const productSlugParamSchema = z.object({
+  slug: z.string().min(1, 'Slug is required'),
+})
 
 export const createProductBodySchema = z.object({
   name: z
@@ -152,6 +155,7 @@ export type Product = z.infer<typeof productSchema>
 
 export type ListProductsQuery = z.infer<typeof listProductsQuerySchema>
 export type ProductIdParam = z.infer<typeof productIdParamSchema>
+export type ProductSlugParam = z.infer<typeof productSlugParamSchema>
 export type CreateProductBody = z.infer<typeof createProductBodySchema>
 export type UpdateProductBody = z.infer<typeof updateProductBodySchema>
 export type CreateSimpleProductBody = z.infer<

@@ -9,6 +9,7 @@ import {
   createSimpleProductBodySchema,
   listProductsQuerySchema,
   productIdParamSchema,
+  productSlugParamSchema,
   updateProductBodySchema,
 } from './product.schema'
 
@@ -24,6 +25,12 @@ router.get(
   '/:id',
   validate(productIdParamSchema, 'params'),
   productController.findById,
+)
+
+router.get(
+  '/slug/:slug',
+  validate(productSlugParamSchema, 'params'),
+  productController.findBySlug,
 )
 
 router.post(
