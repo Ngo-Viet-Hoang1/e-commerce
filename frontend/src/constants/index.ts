@@ -22,3 +22,5 @@ export const SORT_ORDER = {
   ASC: 'asc',
   DEST: 'desc',
 } as const
+
+export const DEFAULT_IMAGE_URL = 'https://ui.shadcn.com/placeholder.svg'

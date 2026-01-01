@@ -99,7 +99,7 @@ export default function StorefrontHero() {
   }, [api, currentSlide])
 
   return (
-    <section className="from-background to-accent/20 relative bg-linear-to-b py-6">
+    <section className="relative py-6">
       <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
         <header className="space-y-8">
           <Badge variant="outline" className="rounded-full px-4 py-2">

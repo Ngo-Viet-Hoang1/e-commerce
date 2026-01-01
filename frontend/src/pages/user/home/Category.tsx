@@ -1,7 +1,7 @@
-import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { ArrowRight, ShoppingBag } from 'lucide-react'
+import { Card } from '@/components/ui/card'
+import { ArrowRight } from 'lucide-react'
 
 const categories = [
   {
@@ -116,14 +116,6 @@ export default function ProductCategory() {
             </div>
           </Card>
         ))}
-      </div>
-
-      {/* Call to Action */}
-      <div className="mt-12 text-center">
-        <Button size="lg" className="cursor-pointer gap-2">
-          <ShoppingBag className="size-5" />
-          View All Categories
-        </Button>
       </div>
     </section>
   )
