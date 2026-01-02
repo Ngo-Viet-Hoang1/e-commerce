@@ -12,7 +12,12 @@ export const orderSchema = z.object({
   totalAmount: z.number(),
   currency: z.string().optional(),
 
-  shippingAddress: z.record(z.string(), z.any()).optional(),
+  shippingProvinceId: z.number().optional(),
+  shippingDistrictId: z.number().optional(),
+  shippingAddressDetail: z.string().optional(),
+  shippingRecipientName: z.string().optional(),
+  shippingPhone: z.string().optional(),
+
   billingAddress: z.record(z.string(), z.any()).optional(),
 
   shippingMethod: z.string().optional(),
@@ -39,8 +44,14 @@ export const createOrderBodySchema = z.object({
   totalAmount: z.number(),
   currency: z.string().default('USD'),
 
-  shippingAddress: z.record(z.string(), z.any()).optional(),
-  billingAddress: z.record(z.string(), z.any()).optional(),
+  shippingProvinceId: z.number().optional(),
+  shippingDistrictId: z.number().optional(),
+  shippingAddressDetail: z.string().optional(),
+  shippingRecipientName: z.string().optional(),
+  shippingPhone: z.string().optional(),
+  shippingAddress: z.record(z.string(), z.any()).optional().nullable(),
+
+  billingAddress: z.record(z.string(), z.any()).optional().nullable(),
 
   shippingMethod: z.string().optional(),
   shippingFee: z.number().optional(),
@@ -57,7 +68,13 @@ export const updateOrderBodySchema = z.object({
   totalAmount: z.number().optional(),
   currency: z.string().optional(),
 
+  shippingProvinceId: z.number().optional(),
+  shippingDistrictId: z.number().optional(),
+  shippingAddressDetail: z.string().optional(),
+  shippingRecipientName: z.string().optional(),
+  shippingPhone: z.string().optional(),
   shippingAddress: z.record(z.string(), z.any()).optional(),
+
   billingAddress: z.record(z.string(), z.any()).optional(),
 
   shippingMethod: z.string().optional(),
@@ -78,8 +95,8 @@ export const updateOrderStatusBodySchema = z.object({
     'shipped',
     'delivered',
     'cancelled',
-    'refunded',
   ]),
+  paymentStatus: z.enum(['pending', 'paid', 'failed']),
 })
 
 const ORDER_SORT_FIELDS = [

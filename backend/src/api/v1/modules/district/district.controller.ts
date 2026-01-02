@@ -5,7 +5,7 @@ import type {
   GetDistrictsByProvinceCodeParam,
   ListDistrictsQuery,
 } from './district.schema'
-import { districtService } from './distric.service'
+import { districtService } from './district.service'
 
 class DistrictController {
   findAll = async (req: Request, res: Response) => {
