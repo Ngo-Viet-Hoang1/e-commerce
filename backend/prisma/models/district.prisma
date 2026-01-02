@@ -19,7 +19,9 @@ model District {
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
 
   addresses Address[]
-  
+
+  orders Order[]
+
   @@index([provinceCode])
   @@index([code])
   @@index([name])

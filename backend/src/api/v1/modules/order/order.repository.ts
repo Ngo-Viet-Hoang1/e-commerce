@@ -8,6 +8,11 @@ export const ORDER_SELECT_FIELDS = {
   status: true,
   totalAmount: true,
   currency: true,
+  shippingProvinceId: true,
+  shippingDistrictId: true,
+  shippingAddressDetail: true,
+  shippingRecipientName: true,
+  shippingPhone: true,
   shippingAddress: true,
   billingAddress: true,
   shippingMethod: true,
@@ -19,6 +24,40 @@ export const ORDER_SELECT_FIELDS = {
   placedAt: true,
   deliveredAt: true,
   deletedAt: true,
+  user: {
+    select: {
+      id: true,
+      email: true,
+      name: true,
+    },
+  },
+  province: {
+    select: {
+      id: true,
+      name: true,
+    },
+  },
+  district: {
+    select: {
+      id: true,
+      name: true,
+    },
+  },
+  orderItems: {
+    select: {
+      id: true,
+      orderId: true,
+      productId: true,
+      variantId: true,
+      quantity: true,
+      unitPrice: true,
+      totalPrice: true,
+      discount: true,
+      metadata: true,
+      createdAt: true,
+      updatedAt: true,
+    },
+  },
 } as const
 
 class OrderRepository {

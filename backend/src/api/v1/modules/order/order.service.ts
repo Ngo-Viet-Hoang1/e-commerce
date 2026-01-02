@@ -15,8 +15,20 @@ class OrderService {
       deletedAt: null,
       ...(search && {
         OR: [
-          { status: { contains: search, mode: 'insensitive' } },
-          { currency: { contains: search, mode: 'insensitive' } },
+          ...(Number.isInteger(Number(search))
+            ? [{ orderId: Number(search) }]
+            : []),
+          {
+            user: {
+              email: { contains: search, mode: 'insensitive' },
+            },
+          },
+          {
+            user: {
+              name: { contains: search, mode: 'insensitive' },
+            },
+          },
+          { shippingRecipientName: { contains: search, mode: 'insensitive' } },
         ],
       }),
     }
@@ -45,8 +57,13 @@ class OrderService {
   }
 
   create = async (data: CreateOrderBody) => {
+    const { shippingAddress, billingAddress, metadata, ...rest } = data
+
     const order = await orderRepository.create({
-      ...data,
+      ...rest,
+      shippingAddress: shippingAddress ?? undefined,
+      billingAddress: billingAddress ?? undefined,
+      metadata: metadata ?? undefined,
     })
 
     return order
@@ -55,10 +72,15 @@ class OrderService {
   updateById = async (id: number, data: UpdateOrderBody) => {
     await this.findById(id)
 
-    const updatedOrder = await orderRepository.update(id, {
+    const updateData: Prisma.OrderUpdateInput = {
       ...data,
-      status: data.status !== undefined ? String(data.status) : undefined,
-    })
+    }
+
+    if (data.status === 'delivered') {
+      updateData.deliveredAt = new Date()
+    }
+
+    const updatedOrder = await orderRepository.update(id, updateData)
 
     return updatedOrder
   }
