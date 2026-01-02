@@ -33,6 +33,14 @@ class AdminOrderService {
     })
     return data
   }
+
+  static updateById = async (id: number, updates: Partial<Order>) => {
+    const { data } = await adminApi.put<IApiResponse<Order>>(
+      `/orders/${id}`,
+      updates,
+    )
+    return data
+  }
 }
 
 export default AdminOrderService

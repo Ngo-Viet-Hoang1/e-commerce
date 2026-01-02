@@ -19,6 +19,11 @@ export interface Order {
   status: string
   totalAmount: number
   currency: string | null
+  shippingProvinceId: number | null
+  shippingDistrictId: number | null
+  shippingAddressDetail: string | null
+  shippingRecipientName: string | null
+  shippingPhone: string | null
   shippingAddress: Record<string, unknown> | null
   billingAddress: Record<string, unknown> | null
   shippingMethod: string | null
@@ -35,6 +40,14 @@ export interface Order {
     id: number
     email: string
     name: string | null
+  }
+  province?: {
+    id: number
+    name: string
+  }
+  district?: {
+    id: number
+    name: string
   }
 }
 
