@@ -1,9 +1,5 @@
-import { Badge } from '@/components/ui/badge'
-import {
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu'
-import { formatDate, formatDateTime } from '@/lib/format'
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
+import { formatCurrency, formatDate } from '@/lib/format'
 import type { ColumnDef } from '@tanstack/react-table'
 import { Package } from 'lucide-react'
 
@@ -15,42 +11,23 @@ import {
   TableIconCell,
   TableTextCell,
 } from '@/components/common/table/TableCellWrapper'
+import type { OrderStatus, PaymentStatus } from '@/constants/order.constants'
 import type { Order } from '@/interfaces/order.interface'
+import { OrderStatusDropdown, PaymentStatusDropdown } from './StatusDropdown'
 
 interface CreateOrderColumnsProps {
   onView?: (order: Order) => void
-  onUpdateStatus?: (order: Order) => void
-}
-
-const getStatusColor = (status: string) => {
-  const colors: Record<string, string> = {
-    pending:
-      'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
-    processing: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
-    shipped:
-      'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300',
-    delivered:
-      'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
-    cancelled: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
-    refunded: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300',
-  }
-  return colors[status] || 'bg-gray-100 text-gray-800'
-}
-
-const getPaymentStatusColor = (status: string) => {
-  const colors: Record<string, string> = {
-    pending:
-      'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
-    paid: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
-    failed: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
-    refunded: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300',
-  }
-  return colors[status] || 'bg-gray-100 text-gray-800'
+  onStatusChange?: (orderId: number, status: OrderStatus) => void
+  onPaymentStatusChange?: (
+    orderId: number,
+    paymentStatus: PaymentStatus,
+  ) => void
 }
 
 const createOrderColumns = ({
   onView,
-  onUpdateStatus,
+  onStatusChange,
+  onPaymentStatusChange,
 }: CreateOrderColumnsProps): ColumnDef<Order>[] => {
   return [
     rowSelectionColumn<Order>(),
@@ -77,19 +54,10 @@ const createOrderColumns = ({
       id: 'customer',
       header: 'Customer',
       cell: ({ row }) => {
-        const user = row.original.user
+        const recipientName = row.original.shippingRecipientName
         return (
-          <TableTextCell muted={!user}>
-            {user ? (
-              <div>
-                <div className="font-medium">{user.name ?? 'N/A'}</div>
-                <div className="text-muted-foreground text-xs">
-                  {user.email}
-                </div>
-              </div>
-            ) : (
-              '—'
-            )}
+          <TableTextCell muted={!recipientName}>
+            {recipientName ?? '—'}
           </TableTextCell>
         )
       },
@@ -102,12 +70,17 @@ const createOrderColumns = ({
         <DataTableColumnHeader column={column} title="Status" />
       ),
       cell: ({ row }) => {
-        const status = row.getValue<string>('status')
+        const order = row.original
+        const status = row.getValue<string>('status') || 'pending'
         return (
           <TableIconCell>
-            <Badge className={getStatusColor(status)} variant="secondary">
-              {status}
-            </Badge>
+            <OrderStatusDropdown
+              currentStatus={status}
+              onStatusChange={(newStatus) =>
+                onStatusChange?.(order.orderId, newStatus)
+              }
+              disabled={!onStatusChange}
+            />
           </TableIconCell>
         )
       },
@@ -118,19 +91,18 @@ const createOrderColumns = ({
       accessorKey: 'paymentStatus',
       header: 'Payment',
       cell: ({ row }) => {
-        const paymentStatus = row.getValue<string | null>('paymentStatus')
+        const order = row.original
+        const paymentStatus =
+          row.getValue<string | null>('paymentStatus') ?? 'pending'
         return (
           <TableIconCell>
-            {paymentStatus ? (
-              <Badge
-                className={getPaymentStatusColor(paymentStatus)}
-                variant="secondary"
-              >
-                {paymentStatus}
-              </Badge>
-            ) : (
-              <span className="text-muted-foreground">—</span>
-            )}
+            <PaymentStatusDropdown
+              currentStatus={paymentStatus}
+              onStatusChange={(newStatus) =>
+                onPaymentStatusChange?.(order.orderId, newStatus)
+              }
+              disabled={!onPaymentStatusChange}
+            />
           </TableIconCell>
         )
       },
@@ -143,15 +115,9 @@ const createOrderColumns = ({
       ),
       cell: ({ row }) => {
         const amount = row.getValue<number>('totalAmount')
-        const currency = row.original.currency ?? 'USD'
         return (
           <TableTextCell>
-            <span className="font-medium">
-              {new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: currency,
-              }).format(amount)}
-            </span>
+            <span>{formatCurrency(amount)}</span>
           </TableTextCell>
         )
       },
@@ -161,22 +127,10 @@ const createOrderColumns = ({
       accessorKey: 'shippingMethod',
       header: 'Shipping',
       cell: ({ row }) => {
-        const shippingMethod = row.getValue<string | null>('shippingMethod')
-        const shippingFee = row.original.shippingFee
+        const province = row.original.province
         return (
-          <TableTextCell small muted={!shippingMethod}>
-            {shippingMethod ? (
-              <div>
-                <div>{shippingMethod}</div>
-                {shippingFee && (
-                  <div className="text-muted-foreground text-xs">
-                    ${Number(shippingFee).toFixed(2)}
-                  </div>
-                )}
-              </div>
-            ) : (
-              '—'
-            )}
+          <TableTextCell small muted={!province}>
+            {province ? province.name : '—'}
           </TableTextCell>
         )
       },
@@ -191,7 +145,7 @@ const createOrderColumns = ({
         const value = row.getValue<Date | null>('placedAt')
         return (
           <TableTextCell small muted={!value}>
-            {formatDateTime(value)}
+            {formatDate(value)}
           </TableTextCell>
         )
       },
@@ -204,20 +158,10 @@ const createOrderColumns = ({
         const value = row.getValue<Date | null>('deliveredAt')
         return (
           <TableTextCell small muted={!value}>
-            {value ? formatDateTime(value) : '—'}
+            {formatDate(value)}
           </TableTextCell>
         )
       },
-    },
-
-    {
-      accessorKey: 'createdAt',
-      header: 'Created',
-      cell: ({ row }) => (
-        <TableTextCell muted small>
-          {formatDate(row.getValue('createdAt'))}
-        </TableTextCell>
-      ),
     },
 
     {
@@ -229,20 +173,14 @@ const createOrderColumns = ({
         return (
           <TableActions
             onView={onView ? () => onView(order) : undefined}
-            onEdit={onUpdateStatus ? () => onUpdateStatus(order) : undefined}
             extraActions={
-              <>
-                <DropdownMenuItem>View Details</DropdownMenuItem>
-                <DropdownMenuItem>Print Invoice</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={() =>
-                    navigator.clipboard.writeText(String(order.orderId))
-                  }
-                >
-                  Copy Order ID
-                </DropdownMenuItem>
-              </>
+              <DropdownMenuItem
+                onClick={() =>
+                  navigator.clipboard.writeText(String(order.orderId))
+                }
+              >
+                Copy Order ID
+              </DropdownMenuItem>
             }
           />
         )
