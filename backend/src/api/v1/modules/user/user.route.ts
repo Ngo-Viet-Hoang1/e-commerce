@@ -1,18 +1,18 @@
 import { Router } from 'express'
-import { RESOURCES } from '../../shared/constants/rbac'
-import {
-  authenticate,
-  autoAuthorize,
-} from '../../shared/middlewares/auth.middleware'
+import { authenticate } from '../../shared/middlewares/auth.middleware'
 import {
   validate,
   validateMultiple,
 } from '../../shared/middlewares/validate.middleware'
+import { orderController } from '../order/order.controller'
+import {
+  listOrdersQuerySchema,
+  userOrderIdParamSchema,
+} from '../order/order.schema'
 import { userController } from './user.controller'
 import {
   createUserBodySchema,
   listUsersQuerySchema,
-  favoriteProductParamSchema,
   updateUserBodySchema,
   userIdParamSchema,
 } from './user.schema'
@@ -20,6 +20,24 @@ import {
 const router = Router()
 router.use(authenticate)
 // router.use(autoAuthorize(RESOURCES.USER))
+
+router.get(
+  '/orders',
+  validate(listOrdersQuerySchema, 'query'),
+  orderController.findUserOrders,
+)
+
+router.get(
+  '/orders/:orderId',
+  validate(userOrderIdParamSchema, 'params'),
+  orderController.findUserOrderById,
+)
+
+router.put(
+  '/orders/:orderId/cancel',
+  validate(userOrderIdParamSchema, 'params'),
+  orderController.cancelUserOrder,
+)
 
 router.get('/', validate(listUsersQuerySchema, 'query'), userController.findAll)
 
@@ -57,18 +75,5 @@ router.post(
   validate(userIdParamSchema, 'params'),
   userController.restoreById,
 )
-router.post(
-  '/me/favorites/:productId',
-  validate(favoriteProductParamSchema, 'params'),
-  userController.addFavoriteProduct,
-)
-
-router.delete(
-  '/me/favorites/:productId',
-  validate(favoriteProductParamSchema, 'params'),
-  userController.removeFavoriteProduct,
-)
-
-router.delete('/me/favorites', userController.removeAllFavoriteProducts)
 
 export default router
