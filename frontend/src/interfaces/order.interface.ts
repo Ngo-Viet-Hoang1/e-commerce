@@ -1,3 +1,25 @@
+export interface ProductImage {
+  imageId: number
+  url: string
+  altText: string | null
+  isPrimary: boolean
+}
+
+export interface OrderItemProduct {
+  id: number
+  name: string
+  sku: string
+  productImages?: ProductImage[]
+}
+
+export interface OrderItemVariant {
+  id: number
+  title: string | null
+  sku: string | null
+  price: number
+  productImages?: ProductImage[]
+}
+
 export interface OrderItem {
   id: number
   orderId: number
@@ -11,6 +33,8 @@ export interface OrderItem {
   createdAt: Date
   updatedAt: Date
   deletedAt: Date | null
+  product?: OrderItemProduct
+  variant?: OrderItemVariant | null
 }
 
 export interface Order {

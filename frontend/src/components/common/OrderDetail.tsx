@@ -2,7 +2,9 @@ import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import {
   getOrderStatusColor,
+  getOrderStatusLabel,
   getPaymentStatusColor,
+  getPaymentStatusLabel,
 } from '@/constants/order.constants'
 import type { Order } from '@/interfaces/order.interface'
 import { formatCurrency, formatDate } from '@/lib/format'
@@ -34,38 +36,59 @@ export function OrderDetail({
   order,
   showCustomerEmail = false,
 }: OrderDetailProps) {
+  const calculatedSubtotal =
+    order.orderItems?.reduce((sum, item) => sum + item.totalPrice, 0) ?? 0
+  const shippingFee = order.shippingFee ?? 0
+  const calculatedTotal = calculatedSubtotal + shippingFee
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Order #{order.orderId}</h2>
+        <h2 className="text-xl font-semibold">Đơn hàng #{order.orderId}</h2>
         <Badge
           variant="secondary"
           className={getOrderStatusColor(order.status)}
         >
-          {order.status}
+          {getOrderStatusLabel(order.status)}
         </Badge>
       </div>
 
       <section className="space-y-4">
-        <h3 className="text-lg font-semibold">Order Information</h3>
+        <h3 className="text-lg font-semibold">Thông tin đơn hàng</h3>
 
         <div className="grid grid-cols-2 gap-x-8 gap-y-4 text-sm">
           {showCustomerEmail && (
-            <InfoItem label="Customer" value={order.user?.email ?? 'N/A'} />
+            <InfoItem label="Khách hàng" value={order.user?.email ?? 'N/A'} />
           )}
           <InfoItem
-            label="Total Amount"
-            value={formatCurrency(order.totalAmount, order.currency ?? 'USD')}
+            label="Tạm tính (Sản phẩm)"
+            value={
+              <div className="space-y-1">
+                <div>
+                  {formatCurrency(calculatedSubtotal, order.currency ?? 'VND')}
+                </div>
+                {shippingFee > 0 && (
+                  <div className="text-muted-foreground text-xs">
+                    + Phí vận chuyển:{' '}
+                    {formatCurrency(shippingFee, order.currency ?? 'VND')}
+                  </div>
+                )}
+                <div className="font-semibold">
+                  Tổng:{' '}
+                  {formatCurrency(calculatedTotal, order.currency ?? 'VND')}
+                </div>
+              </div>
+            }
           />
           <InfoItem
-            label="Payment Status"
+            label="Trạng thái thanh toán"
             value={
               order.paymentStatus ? (
                 <Badge
                   variant="secondary"
                   className={getPaymentStatusColor(order.paymentStatus)}
                 >
-                  {order.paymentStatus}
+                  {getPaymentStatusLabel(order.paymentStatus)}
                 </Badge>
               ) : (
                 'N/A'
@@ -73,32 +96,15 @@ export function OrderDetail({
             }
           />
           <InfoItem
-            label="Shipping Method"
-            value={
-              order.shippingMethod ? (
-                <div>
-                  <div>{order.shippingMethod}</div>
-                  {order.shippingFee && (
-                    <div className="text-muted-foreground text-xs">
-                      Fee:{' '}
-                      {formatCurrency(
-                        order.shippingFee,
-                        order.currency ?? 'USD',
-                      )}
-                    </div>
-                  )}
-                </div>
-              ) : (
-                'N/A'
-              )
-            }
+            label="Phương thức vận chuyển"
+            value={order.shippingMethod ?? 'N/A'}
           />
           <InfoItem
-            label="Placed At"
+            label="Ngày đặt"
             value={order.placedAt ? formatDate(order.placedAt) : '—'}
           />
           <InfoItem
-            label="Delivered At"
+            label="Ngày giao"
             value={order.deliveredAt ? formatDate(order.deliveredAt) : '—'}
           />
         </div>
@@ -107,17 +113,14 @@ export function OrderDetail({
       <Separator />
 
       <section className="space-y-4">
-        <h3 className="text-lg font-semibold">Shipping Address</h3>
+        <h3 className="text-lg font-semibold">Địa chỉ giao hàng</h3>
 
         <div className="space-y-3 rounded-lg border p-4">
           {order.shippingRecipientName && (
-            <InfoItem
-              label="Recipient Name"
-              value={order.shippingRecipientName}
-            />
+            <InfoItem label="Người nhận" value={order.shippingRecipientName} />
           )}
           {order.shippingPhone && (
-            <InfoItem label="Phone" value={order.shippingPhone} />
+            <InfoItem label="Số điện thoại" value={order.shippingPhone} />
           )}
           {(order.province ?? order.district) && (
             <InfoItem
@@ -163,7 +166,7 @@ export function OrderDetail({
         <>
           <Separator />
           <section className="space-y-4">
-            <h3 className="text-lg font-semibold">Billing Address</h3>
+            <h3 className="text-lg font-semibold">Địa chỉ thanh toán</h3>
 
             <div className="rounded-lg border p-4">
               <pre className="text-sm wrap-break-word whitespace-pre-wrap">
@@ -178,28 +181,58 @@ export function OrderDetail({
         <>
           <Separator />
           <section className="space-y-4">
-            <h3 className="text-lg font-semibold">Order Items</h3>
+            <h3 className="text-lg font-semibold">Sản phẩm</h3>
 
             <div className="space-y-2">
-              {order.orderItems.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex items-center justify-between rounded-lg border p-3"
-                >
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">
-                      Product #{item.productId}
-                    </p>
-                    <p className="text-muted-foreground text-xs">
-                      Qty: {item.quantity} ×{' '}
-                      {formatCurrency(item.unitPrice, order.currency ?? 'USD')}
+              {order.orderItems.map((item) => {
+                const productName =
+                  item.product?.name ?? `Sản phẩm #${item.productId}`
+                const productSku = item.product?.sku
+                const variantName = item.variant?.title
+
+                return (
+                  <div
+                    key={item.id}
+                    className="flex items-center justify-between rounded-lg border p-3"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium">{productName}</p>
+                      {productSku && (
+                        <p className="text-muted-foreground text-xs">
+                          SKU: {productSku}
+                        </p>
+                      )}
+                      {variantName && (
+                        <p className="text-muted-foreground text-xs">
+                          Phân loại: {variantName}
+                          {item.variant?.sku && ` (${item.variant.sku})`}
+                        </p>
+                      )}
+                      <p className="text-muted-foreground mt-1 text-xs">
+                        SL: {item.quantity} ×{' '}
+                        {formatCurrency(
+                          item.unitPrice,
+                          order.currency ?? 'VND',
+                        )}
+                        {item.discount > 0 && (
+                          <span className="ml-2 text-green-600">
+                            (-
+                            {formatCurrency(
+                              item.discount,
+                              order.currency ?? 'VND',
+                            )}
+                            )
+                          </span>
+                        )}
+                      </p>
+                    </div>
+
+                    <p className="text-right font-semibold">
+                      {formatCurrency(item.totalPrice, order.currency ?? 'VND')}
                     </p>
                   </div>
-                  <p className="font-semibold">
-                    {formatCurrency(item.totalPrice, order.currency ?? 'USD')}
-                  </p>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </section>
         </>
