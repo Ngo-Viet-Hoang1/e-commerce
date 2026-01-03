@@ -105,6 +105,45 @@ class OrderService {
 
     return restoredOrder
   }
+
+  findUserOrders = async (userId: number, query: listOrdersQuerySchema) => {
+    const { page, limit } = query
+
+    const [orders, total] = await Promise.all([
+      orderRepository.findManyForUser(userId, {
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      orderRepository.countForUser(userId),
+    ])
+
+    return { orders, total, page, limit }
+  }
+
+  findUserOrderById = async (userId: number, orderId: number) => {
+    const order = await orderRepository.findByIdForUser(orderId, userId)
+
+    if (!order) {
+      throw new NotFoundException('Order', orderId.toString())
+    }
+
+    return order
+  }
+
+  cancelUserOrder = async (userId: number, orderId: number) => {
+    const order = await this.findUserOrderById(userId, orderId)
+
+    // Only allow cancellation if order is pending or processing
+    if (!['pending', 'processing'].includes(order.status)) {
+      throw new NotFoundException('Order', orderId.toString())
+    }
+
+    const cancelledOrder = await orderRepository.update(orderId, {
+      status: 'cancelled',
+    })
+
+    return cancelledOrder
+  }
 }
 
 export const orderService = new OrderService()

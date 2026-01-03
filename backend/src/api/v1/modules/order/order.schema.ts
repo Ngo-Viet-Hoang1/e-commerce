@@ -37,6 +37,10 @@ export const orderDtoSchema = orderSchema
 
 export const orderIdParamSchema = numericIdParamSchema
 
+export const userOrderIdParamSchema = z.object({
+  orderId: z.string().regex(/^\d+$/).transform(Number),
+})
+
 export const createOrderBodySchema = z.object({
   userId: z.number().optional(),
 
