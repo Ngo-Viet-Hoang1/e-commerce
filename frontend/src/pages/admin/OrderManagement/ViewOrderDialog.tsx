@@ -21,7 +21,7 @@ export function ViewOrderDialog({
 
         <div className="flex justify-end pt-4">
           <Button variant="outline" onClick={onClose}>
-            Close
+            Đóng
           </Button>
         </div>
       </DialogContent>

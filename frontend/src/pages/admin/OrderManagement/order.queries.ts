@@ -45,7 +45,7 @@ export const useUpdateOrderStatus = () => {
     }) => AdminOrderService.updateById(id, { status, paymentStatus }),
 
     onSuccess: (_, { id }) => {
-      toast.success('Order updated successfully')
+      toast.success('Cập nhật đơn hàng thành công')
 
       queryClient.invalidateQueries({
         queryKey: queryKeys.orders.detail(id),
@@ -57,7 +57,7 @@ export const useUpdateOrderStatus = () => {
     },
 
     onError: () => {
-      toast.error('Failed to update order')
+      toast.error('Cập nhật đơn hàng thất bại')
     },
   })
 }

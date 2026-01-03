@@ -45,7 +45,7 @@ const OrderManagement = () => {
         columns={columns}
         query={ordersQuery}
         onParamsChange={setParams}
-        searchPlaceholder="Search by order ID, email, or name..."
+        searchPlaceholder="Tìm kiếm đơn hàng..."
       />
 
       {isViewMode(modalState) && (

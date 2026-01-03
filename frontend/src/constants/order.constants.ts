@@ -9,11 +9,11 @@ export const ORDER_STATUS = {
 export type OrderStatus = (typeof ORDER_STATUS)[keyof typeof ORDER_STATUS]
 
 export const ORDER_STATUS_OPTIONS: { value: OrderStatus; label: string }[] = [
-  { value: 'pending', label: 'Pending' },
-  { value: 'processing', label: 'Processing' },
-  { value: 'shipped', label: 'Shipped' },
-  { value: 'delivered', label: 'Delivered' },
-  { value: 'cancelled', label: 'Cancelled' },
+  { value: 'pending', label: 'Chờ xử lý' },
+  { value: 'processing', label: 'Đang xử lý' },
+  { value: 'shipped', label: 'Đang giao' },
+  { value: 'delivered', label: 'Đã giao' },
+  { value: 'cancelled', label: 'Đã hủy' },
 ]
 
 export const ORDER_STATUS_ORDER: OrderStatus[] = [
@@ -28,20 +28,6 @@ export const getAvailableOrderStatuses = (
 ): { value: OrderStatus; label: string; disabled: boolean }[] => {
   const current = currentStatus.toLowerCase() as OrderStatus
   const currentIndex = ORDER_STATUS_ORDER.indexOf(current)
-
-  if (current === 'delivered') {
-    return ORDER_STATUS_OPTIONS.map((opt) => ({
-      ...opt,
-      disabled: true,
-    }))
-  }
-
-  if (current === 'cancelled') {
-    return ORDER_STATUS_OPTIONS.map((opt) => ({
-      ...opt,
-      disabled: true,
-    }))
-  }
 
   return ORDER_STATUS_OPTIONS.map((opt) => {
     const optIndex = ORDER_STATUS_ORDER.indexOf(opt.value)
@@ -66,9 +52,9 @@ export type PaymentStatus = (typeof PAYMENT_STATUS)[keyof typeof PAYMENT_STATUS]
 
 export const PAYMENT_STATUS_OPTIONS: { value: PaymentStatus; label: string }[] =
   [
-    { value: 'pending', label: 'Pending' },
-    { value: 'paid', label: 'Paid' },
-    { value: 'failed', label: 'Failed' },
+    { value: 'pending', label: 'Chờ thanh toán' },
+    { value: 'paid', label: 'Đã thanh toán' },
+    { value: 'failed', label: 'Thất bại' },
   ]
 
 export const getAvailablePaymentStatuses = (
@@ -128,6 +114,16 @@ export const getPaymentStatusColor = (status: string) => {
   )
 }
 
+export const getOrderStatusLabel = (status: string) => {
+  const option = ORDER_STATUS_OPTIONS.find(
+    (opt) => opt.value === status.toLowerCase(),
+  )
+  return option?.label ?? status
+}
+
 export const getPaymentStatusLabel = (status: string) => {
-  return status === 'paid' ? 'Paid' : 'Unpaid'
+  const option = PAYMENT_STATUS_OPTIONS.find(
+    (opt) => opt.value === status.toLowerCase(),
+  )
+  return option?.label ?? status
 }

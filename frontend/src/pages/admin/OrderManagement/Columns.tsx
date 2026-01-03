@@ -11,9 +11,21 @@ import {
   TableIconCell,
   TableTextCell,
 } from '@/components/common/table/TableCellWrapper'
-import type { OrderStatus, PaymentStatus } from '@/constants/order.constants'
+import {
+  StatusDropdown,
+  type StatusOption,
+} from '@/components/common/StatusDropdown'
+import {
+  getAvailableOrderStatuses,
+  getAvailablePaymentStatuses,
+  getOrderStatusColor,
+  getOrderStatusLabel,
+  getPaymentStatusColor,
+  getPaymentStatusLabel,
+  type OrderStatus,
+  type PaymentStatus,
+} from '@/constants/order.constants'
 import type { Order } from '@/interfaces/order.interface'
-import { OrderStatusDropdown, PaymentStatusDropdown } from './StatusDropdown'
 
 interface CreateOrderColumnsProps {
   onView?: (order: Order) => void
@@ -35,7 +47,7 @@ const createOrderColumns = ({
     {
       accessorKey: 'orderId',
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Order ID" />
+        <DataTableColumnHeader column={column} title="Mã đơn hàng" />
       ),
       cell: ({ row }) => {
         const orderId = row.getValue<number>('orderId')
@@ -52,7 +64,7 @@ const createOrderColumns = ({
 
     {
       id: 'customer',
-      header: 'Customer',
+      header: 'Khách hàng',
       cell: ({ row }) => {
         const recipientName = row.original.shippingRecipientName
         return (
@@ -67,18 +79,25 @@ const createOrderColumns = ({
       id: 'status',
       accessorKey: 'status',
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Status" />
+        <DataTableColumnHeader column={column} title="Trạng thái" />
       ),
       cell: ({ row }) => {
         const order = row.original
         const status = row.getValue<string>('status') || 'pending'
+        const options = getAvailableOrderStatuses(
+          status,
+        ) as StatusOption<OrderStatus>[]
+
         return (
           <TableIconCell>
-            <OrderStatusDropdown
-              currentStatus={status}
+            <StatusDropdown<OrderStatus>
+              currentStatus={status.toLowerCase() as OrderStatus}
+              options={options}
               onStatusChange={(newStatus) =>
                 onStatusChange?.(order.orderId, newStatus)
               }
+              getStatusColor={getOrderStatusColor}
+              getStatusLabel={getOrderStatusLabel}
               disabled={!onStatusChange}
             />
           </TableIconCell>
@@ -89,18 +108,25 @@ const createOrderColumns = ({
     {
       id: 'paymentStatus',
       accessorKey: 'paymentStatus',
-      header: 'Payment',
+      header: 'Thanh toán',
       cell: ({ row }) => {
         const order = row.original
         const paymentStatus =
           row.getValue<string | null>('paymentStatus') ?? 'pending'
+        const options = getAvailablePaymentStatuses(
+          paymentStatus,
+        ) as StatusOption<PaymentStatus>[]
+
         return (
           <TableIconCell>
-            <PaymentStatusDropdown
-              currentStatus={paymentStatus}
+            <StatusDropdown<PaymentStatus>
+              currentStatus={paymentStatus.toLowerCase() as PaymentStatus}
+              options={options}
               onStatusChange={(newStatus) =>
                 onPaymentStatusChange?.(order.orderId, newStatus)
               }
+              getStatusColor={getPaymentStatusColor}
+              getStatusLabel={getPaymentStatusLabel}
               disabled={!onPaymentStatusChange}
             />
           </TableIconCell>
@@ -111,13 +137,21 @@ const createOrderColumns = ({
     {
       accessorKey: 'totalAmount',
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Total Amount" />
+        <DataTableColumnHeader column={column} title="Tổng tiền" />
       ),
       cell: ({ row }) => {
-        const amount = row.getValue<number>('totalAmount')
+        const order = row.original
+        const subtotal =
+          order.orderItems?.reduce(
+            (sum, item) => sum + Number(item.totalPrice),
+            0,
+          ) ?? 0
+        const shippingFee = Number(order.shippingFee ?? 0)
+        const total = subtotal + shippingFee
+
         return (
           <TableTextCell>
-            <span>{formatCurrency(amount)}</span>
+            <span>{formatCurrency(total)}</span>
           </TableTextCell>
         )
       },
@@ -125,7 +159,7 @@ const createOrderColumns = ({
 
     {
       accessorKey: 'shippingMethod',
-      header: 'Shipping',
+      header: 'Giao hàng',
       cell: ({ row }) => {
         const province = row.original.province
         return (
@@ -139,7 +173,7 @@ const createOrderColumns = ({
     {
       accessorKey: 'placedAt',
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Placed At" />
+        <DataTableColumnHeader column={column} title="Ngày đặt" />
       ),
       cell: ({ row }) => {
         const value = row.getValue<Date | null>('placedAt')
@@ -153,7 +187,7 @@ const createOrderColumns = ({
 
     {
       accessorKey: 'deliveredAt',
-      header: 'Delivered At',
+      header: 'Ngày giao',
       cell: ({ row }) => {
         const value = row.getValue<Date | null>('deliveredAt')
         return (
@@ -166,7 +200,7 @@ const createOrderColumns = ({
 
     {
       id: 'actions',
-      header: () => <TableCellAlign align="right">Actions</TableCellAlign>,
+      header: () => <TableCellAlign align="right">Hành động</TableCellAlign>,
       cell: ({ row }) => {
         const order = row.original
 
@@ -179,7 +213,7 @@ const createOrderColumns = ({
                   navigator.clipboard.writeText(String(order.orderId))
                 }
               >
-                Copy Order ID
+                Sao chép mã đơn
               </DropdownMenuItem>
             }
           />
