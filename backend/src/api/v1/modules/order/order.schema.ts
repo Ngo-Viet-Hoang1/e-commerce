@@ -37,12 +37,24 @@ export const orderDtoSchema = orderSchema
 
 export const orderIdParamSchema = numericIdParamSchema
 
+export const userOrderIdParamSchema = z.object({
+  orderId: z.string().regex(/^\d+$/).transform(Number),
+})
+
+const orderItemInputSchema = z.object({
+  productId: z.number().int().positive(),
+  variantId: z.number().int().positive(),
+  quantity: z.number().int().positive(),
+  discount: z.number().min(0).optional().default(0),
+})
+
 export const createOrderBodySchema = z.object({
   userId: z.number().optional(),
 
-  status: z.string(),
-  totalAmount: z.number(),
-  currency: z.string().default('USD'),
+  status: z.string().default('pending'),
+  currency: z.string().default('VND'),
+
+  items: z.array(orderItemInputSchema).min(1),
 
   shippingProvinceId: z.number().optional(),
   shippingDistrictId: z.number().optional(),
@@ -54,13 +66,10 @@ export const createOrderBodySchema = z.object({
   billingAddress: z.record(z.string(), z.any()).optional().nullable(),
 
   shippingMethod: z.string().optional(),
-  shippingFee: z.number().optional(),
+  shippingFee: z.number().min(0).optional().default(0),
 
-  paymentStatus: z.string().optional(),
+  paymentStatus: z.string().default('pending'),
   metadata: z.record(z.string(), z.any()).optional(),
-
-  placedAt: z.string().optional(),
-  deliveredAt: z.string().optional(),
 })
 
 export const updateOrderBodySchema = z.object({
