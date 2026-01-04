@@ -13,17 +13,14 @@ export interface Product {
   createdAt: Date
   updatedAt: Date
   deletedAt: Date | null
-
   brand?: {
     id: number
     name: string
   }
-
   category?: {
     id: number
     name: string
   }
-
   variants?: ProductVariant[]
   productImages?: ProductImage[]
 }
@@ -41,7 +38,6 @@ export interface ProductVariant {
   createdAt: Date
   updatedAt: Date
   deletedAt: Date | null
-
   attributeValues?: AttributeValue[]
   productImages?: ProductImage[]
 }
@@ -59,7 +55,7 @@ export interface AttributeValue {
 export interface ProductImage {
   imageId: number
   productId: number
-  variantId: number
+  variantId: number | null
   url: string
   altText?: string | null
   isPrimary: boolean
@@ -105,3 +101,10 @@ export interface CreateProduct {
 }
 
 export type UpdateProduct = CreateProduct
+
+export type SelectedAttributes = Record<string, string>
+
+export interface Attribute {
+  name: string
+  values: string[]
+}

@@ -3,11 +3,13 @@ import { Button } from '@/components/ui/button'
 import { DEFAULT_IMAGE_URL } from '@/constants'
 import { CreditCard, Heart, ShoppingCart, Truck } from 'lucide-react'
 import ProductPrice from './ProductPrice'
+import { Link } from 'react-router-dom'
 
 interface ProductCardProps {
   imageUrl: string
   tagText?: string
-  productName?: string
+  productName: string
+  sku: string
   minPrice: number
   maxPrice?: number
   minSalePrice?: number
@@ -20,7 +22,8 @@ interface ProductCardProps {
 }
 
 function ProductCard({
-  productName = 'Smart Watch Pro',
+  productName,
+  sku,
   imageUrl = DEFAULT_IMAGE_URL,
   minPrice,
   maxPrice,
@@ -110,8 +113,8 @@ function ProductCard({
       {/* Product details */}
       <div className="flex flex-1 flex-col gap-3 p-4">
         <div>
-          <h3 className="line-clamp-2 text-base font-semibold tracking-tight text-gray-900 dark:text-gray-100">
-            {productName}
+          <h3 className="line-clamp-2 text-base font-semibold tracking-tight text-gray-900 hover:underline dark:text-gray-100">
+            <Link to={`/product-detail/${sku}`}>{productName}</Link>
           </h3>
           {/* <div className="mb-2 flex items-center">
             <StarRating_Fractions

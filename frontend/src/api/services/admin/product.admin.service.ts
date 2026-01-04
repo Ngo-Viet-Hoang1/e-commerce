@@ -28,6 +28,13 @@ class AdminProductService {
     return data
   }
 
+  static getBySlug = async (slug: string) => {
+    const { data } = await adminApi.get<IApiResponse<Product>>(
+      `/products/slug/${slug}`,
+    )
+    return data
+  }
+
   static create = async (productData: CreateProduct) => {
     const { data } = await adminApi.post<IApiResponse<Product>>(
       '/products/simple',
