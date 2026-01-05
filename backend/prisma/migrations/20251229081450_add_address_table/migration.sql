@@ -1,18 +1,3 @@
-/*
-  Warnings:
-
-  - You are about to drop the column `shippingAddressDetail` on the `Order` table. All the data in the column will be lost.
-  - You are about to drop the column `shippingPhone` on the `Order` table. All the data in the column will be lost.
-  - You are about to drop the column `shippingProvinceId` on the `Order` table. All the data in the column will be lost.
-  - You are about to drop the column `shippingRecipientName` on the `Order` table. All the data in the column will be lost.
-
-*/
--- AlterTable
-ALTER TABLE "Order" DROP COLUMN "shippingAddressDetail",
-DROP COLUMN "shippingPhone",
-DROP COLUMN "shippingProvinceId",
-DROP COLUMN "shippingRecipientName";
-
 -- AlterTable
 ALTER TABLE "User" ADD COLUMN     "phoneNumber" VARCHAR(14);
 
