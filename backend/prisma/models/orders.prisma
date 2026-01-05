@@ -4,22 +4,12 @@ model Order {
   userId Int?
   user   User? @relation(fields: [userId], references: [id])
 
-  shippingProvinceId Int?
-  province           Province? @relation(fields: [shippingProvinceId], references: [id])
-
-  shippingDistrictId Int?
-  district           District? @relation(fields: [shippingDistrictId], references: [id])
-
   status      String  @db.VarChar(50)
   totalAmount Decimal @db.Decimal(12, 2)
   currency    String? @default("USD") @db.VarChar(10)
 
-  shippingAddressDetail String? @db.VarChar(500)
-  shippingRecipientName String? @db.VarChar(255)
-  shippingPhone         String? @db.VarChar(20)
-  shippingAddress       Json?
-
-  billingAddress Json?
+  shippingAddress Json?
+  billingAddress  Json?
 
   shippingMethod String?  @db.VarChar(255)
   shippingFee    Decimal? @db.Decimal(12, 2)
@@ -34,7 +24,7 @@ model Order {
   deletedAt   DateTime? @db.Timestamptz
 
   orderItems OrderItem[]
-  payment    Payment[]
+  payment Payment[]
 
   @@index([createdAt])
   @@index([status])

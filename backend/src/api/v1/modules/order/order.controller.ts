@@ -70,41 +70,6 @@ class OrderController {
 
     SuccessResponse.send(res, restored, 'Order restored successfully')
   }
-
-  findUserOrders = async (req: Request, res: Response) => {
-    const userId = req.user!.id
-    const query = req.validatedData?.query as listOrdersQuerySchema
-
-    const { orders, total, page, limit } = await orderService.findUserOrders(
-      userId,
-      query,
-    )
-
-    SuccessResponse.paginated(
-      res,
-      orders,
-      { page, limit, total },
-      'Orders retrieved successfully',
-    )
-  }
-
-  findUserOrderById = async (req: Request, res: Response) => {
-    const userId = req.user!.id
-    const { orderId } = req.validatedData?.params as { orderId: number }
-
-    const order = await orderService.findUserOrderById(userId, orderId)
-
-    SuccessResponse.send(res, order, 'Order retrieved successfully')
-  }
-
-  cancelUserOrder = async (req: Request, res: Response) => {
-    const userId = req.user!.id
-    const { orderId } = req.validatedData?.params as { orderId: number }
-
-    const cancelled = await orderService.cancelUserOrder(userId, orderId)
-
-    SuccessResponse.send(res, cancelled, 'Order cancelled successfully')
-  }
 }
 
 export const orderController = new OrderController()
