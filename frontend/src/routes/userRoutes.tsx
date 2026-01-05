@@ -6,7 +6,9 @@ const Home = lazy(() => import('@/pages/user/home/Home'))
 const About = lazy(() => import('@/pages/common/About'))
 const DashBoard = lazy(() => import('@/pages/user/Dashboard'))
 const ProfileLayout = lazy(() => import('@/pages/user/profile/Profile'))
-const ProfileInfo = lazy(() => import('@/pages/user/profile/ProfileInfo/ProfileInfo'))
+const ProfileInfo = lazy(
+  () => import('@/pages/user/profile/ProfileInfo/ProfileInfo'),
+)
 const Orders = lazy(() => import('@/pages/user/profile/Orders'))
 const FavoriteProducts = lazy(
   () => import('@/pages/user/profile/Favorite/FavoriteProducts'),
@@ -34,6 +36,27 @@ export const userRoutes: RouteObject[] = [
     },
   },
   {
+    path: 'product-catalog',
+    element: <ProductCatalog />,
+    handle: {
+      breadcrumb: 'Danh mục sản phẩm',
+    },
+  },
+  {
+    path: 'product-detail/:slug',
+    element: <ProductDetail />,
+    handle: {
+      breadcrumb: 'Chi tiết sản phẩm',
+    },
+  },
+  {
+    path: 'cart',
+    element: <ShoppingCart />,
+    handle: {
+      breadcrumb: 'Giỏ hàng',
+    },
+  },
+  {
     element: <ProtectedRoute type="user" redirectPath="/auth/login" />,
     children: [
       {
@@ -41,27 +64,6 @@ export const userRoutes: RouteObject[] = [
         element: <DashBoard />,
         handle: {
           breadcrumb: 'Bảng điều khiển',
-        },
-      },
-      {
-        path: 'product-catalog',
-        element: <ProductCatalog />,
-        handle: {
-          breadcrumb: 'Danh mục sản phẩm',
-        },
-      },
-      {
-        path: 'product-detail/:slug',
-        element: <ProductDetail />,
-        handle: {
-          breadcrumb: 'Chi tiết sản phẩm',
-        },
-      },
-      {
-        path: 'cart',
-        element: <ShoppingCart />,
-        handle: {
-          breadcrumb: 'Giỏ hàng',
         },
       },
       {

@@ -28,6 +28,7 @@ interface ProductInfoProps {
   isOptionDisabled: (attributeName: string, value: string) => boolean
   onAddToCart?: (variant: ProductVariant, quantity: number) => void
   onBuyNow?: (variant: ProductVariant, quantity: number) => void
+  isAddingToCart?: boolean
 }
 
 export function ProductInfo({
@@ -39,6 +40,7 @@ export function ProductInfo({
   isOptionDisabled,
   onAddToCart,
   onBuyNow,
+  isAddingToCart = false,
 }: ProductInfoProps) {
   const [quantity, setQuantity] = useState(1)
   const [addedToCart, setAddedToCart] = useState(false)
@@ -247,9 +249,14 @@ export function ProductInfo({
           size="lg"
           className="flex-1"
           onClick={handleAddToCart}
-          disabled={!selectedVariant || isOutOfStock}
+          disabled={!selectedVariant || isOutOfStock || isAddingToCart}
         >
-          {addedToCart ? (
+          {isAddingToCart ? (
+            <>
+              <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+              Đang thêm...
+            </>
+          ) : addedToCart ? (
             <>
               <Check className="mr-2 h-5 w-5" />
               Đã thêm vào giỏ
@@ -265,7 +272,7 @@ export function ProductInfo({
           size="lg"
           variant="outline"
           onClick={handleBuyNow}
-          disabled={!selectedVariant || isOutOfStock}
+          disabled={!selectedVariant || isOutOfStock || isAddingToCart}
         >
           <CreditCard />
           Mua ngay

@@ -10,24 +10,25 @@ import { LogOut, Search, ShoppingCart, User } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Input } from '@/components/ui/input'
+import { useCart } from '@/hooks/useCart'
 import PromoBanner from './PromoBanner'
 import ProductSearch from '@/components/layouts/product/search/ProductSearch'
 
 interface HeaderProps {
   logo?: string
-  cartCount?: number
   isAuthenticated?: boolean
   user?: Me | null
   onLogout?: () => void
 }
 
 export default function Header({
-  cartCount = 0,
   isAuthenticated = false,
   user,
   onLogout,
 }: HeaderProps) {
   const [searchQuery, setSearchQuery] = useState('')
+  const { data: cart } = useCart()
+  const cartCount = cart?.summary?.itemCount ?? 0
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -65,7 +66,7 @@ export default function Header({
             >
               <div className="relative">
                 <ShoppingCart className="h-5 w-5 transition-transform group-hover:rotate-12" />
-                <span className="absolute -top-2 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full border px-1 text-[10px] font-bold">
+                <span className="text-primary border-primary absolute -top-2 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full border bg-emerald-100 px-1 text-[9px] leading-none font-bold">
                   {cartCount > 99 ? '99+' : cartCount}
                 </span>
               </div>
@@ -121,7 +122,7 @@ export default function Header({
             <div className="flex items-center gap-3">
               <Link to="/cart" className="relative">
                 <ShoppingCart className="h-5 w-5" />
-                <span className="absolute -top-2 -right-2 min-w-4 rounded-full border px-1 text-[10px]">
+                <span className="text-primary border-primary absolute -top-2 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full border bg-emerald-100 px-1 text-[9px] leading-none font-bold">
                   {cartCount > 99 ? '99+' : cartCount}
                 </span>
               </Link>

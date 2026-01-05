@@ -15,7 +15,7 @@ import { loginSchema, type LoginInputs } from '@/schema/auth.schema'
 import { useAuthStore } from '@/store/zustand/useAuthStore'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, type SubmitHandler } from 'react-hook-form'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { toast } from 'sonner'
 import { Spinner } from '../ui/spinner'
 import FormField from './FormField'
@@ -23,6 +23,8 @@ import FormField from './FormField'
 const LoginForm = ({ className, ...props }: React.ComponentProps<'div'>) => {
   const { setAccessToken, setMe } = useAuthStore()
   const navigate = useNavigate()
+  const location = useLocation()
+  const from = (location.state as { from?: string })?.from || '/'
   const {
     register,
     handleSubmit,
@@ -51,7 +53,7 @@ const LoginForm = ({ className, ...props }: React.ComponentProps<'div'>) => {
         }
 
         toast.success(message ?? 'Login successful!')
-        navigate('/')
+        navigate(from, { replace: true })
       }
     } catch {
       toast.error('Login failed. Please check your credentials and try again.')
