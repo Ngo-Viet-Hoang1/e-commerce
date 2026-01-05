@@ -23,6 +23,7 @@ export interface Product {
   }
   variants?: ProductVariant[]
   productImages?: ProductImage[]
+  minPrice?: number | null
 }
 
 export interface ProductVariant {

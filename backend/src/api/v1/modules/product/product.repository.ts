@@ -188,6 +188,52 @@ class ProductRepository {
     const count = await this.count({ id })
     return count > 0
   }
+
+  getMinPrice = async (productId: number) => {
+    const result = await executePrismaQuery(() =>
+      prisma.productVariant.aggregate({
+        where: {
+          productId,
+          deletedAt: null,
+        },
+        _min: {
+          price: true,
+        },
+      }),
+    )
+
+    return result._min.price
+  }
+
+  findManyWithPrimaryImage = async (productIds: number[]) => {
+    return executePrismaQuery(() =>
+      prisma.product.findMany({
+        where: {
+          id: { in: productIds },
+          deletedAt: null,
+        },
+        select: {
+          ...PRODUCT_SELECT_FIELDS,
+          productImages: {
+            select: {
+              imageId: true,
+              url: true,
+              altText: true,
+              isPrimary: true,
+              sortOrder: true,
+            },
+            where: {
+              deletedAt: null,
+            },
+            orderBy: [
+              { isPrimary: 'desc' as const },
+              { sortOrder: 'asc' as const },
+            ],
+          },
+        },
+      }),
+    )
+  }
 }
 
 export const productRepository = new ProductRepository()

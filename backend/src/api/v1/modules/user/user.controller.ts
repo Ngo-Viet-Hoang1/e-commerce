@@ -74,6 +74,7 @@ class UserController {
 
     SuccessResponse.send(res, restoredUser, 'User restored successfully')
   }
+
   addFavoriteProduct = async (req: Request, res: Response) => {
     const userId = req.user!.id
 
@@ -103,6 +104,18 @@ class UserController {
       res,
       null,
       'All favorite products deleted successfully',
+    )
+  }
+
+  getFavoriteProducts = async (req: Request, res: Response) => {
+    const userId = req.user!.id
+
+    const favoriteProducts = await userService.getFavoriteProducts(userId)
+
+    SuccessResponse.send(
+      res,
+      favoriteProducts,
+      'Favorite products retrieved successfully',
     )
   }
 }
