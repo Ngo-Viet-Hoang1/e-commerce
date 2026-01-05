@@ -1,5 +1,5 @@
 import { useAuthStore } from "@/store/zustand/useAuthStore";
-import { Heart, LogOut, Package, User } from "lucide-react";
+import { Heart, LogOut, Mail, Package, User } from "lucide-react";
 import { NavLink, Outlet } from "react-router-dom";
 
 const Profile = () => {
@@ -13,10 +13,10 @@ const Profile = () => {
 
     return (
         <div className="min-h-screen bg-white flex justify-center pt-3">
-            <div className="flex items-start gap-8 w-[100%] h-[85vh]">
+            <div className="flex items-start gap-8 w-full">
                 {/* Left frame */}
                 <div
-                    className="w-[22%] rounded-xl border border-gray-300 shadow-lg shadow-gray-300
+                    className="w-[22%] self-start rounded-xl border border-gray-300 shadow-lg shadow-gray-300
                flex flex-col items-center pt-8 gap-4"
                 >
                     {/* icon user */}
@@ -30,6 +30,7 @@ const Profile = () => {
                             {me?.name}
                         </p>
                         <p className="text-sm text-gray-500">
+                            <Mail className="inline w-4 h-4 mr-1 mb-0.5" />
                             {me?.email}
                         </p>
                     </div>
@@ -55,7 +56,7 @@ const Profile = () => {
                             `flex items-center gap-2 px-2 py-2 rounded-lg transition
                             ${isActive ? 'bg-gray-200 font-medium text-gray-900' : 'text-gray-700 hover:bg-gray-100'}`
                         }>
-                            <Heart className="w-4 h-4" />
+                            <Heart className="w-4 h-4 text-red-500" />
                             <span>Sản phẩm yêu thích</span>
                         </NavLink>
 
@@ -70,7 +71,7 @@ const Profile = () => {
                 </div>
 
                 {/* Right frame */}
-                <div className="flex-1 h-full rounded-xl border border-gray-300 shadow-lg shadow-gray-300 p-6">
+                <div className="flex-1 self-start rounded-xl border border-gray-300 shadow-lg shadow-gray-300 p-6">
                     <Outlet />
                 </div>
             </div>
