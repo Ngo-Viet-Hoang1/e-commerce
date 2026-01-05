@@ -24,9 +24,9 @@ const ProductManagement = lazy(
 const CreateProductPage = lazy(
   () => import('@/pages/admin/ProductManagement/CreateProductPage'),
 )
-// // const EditProductPage = lazy(
-// //   () => import('@/pages/admin/ProductManagement/EditProductPage'),
-// )
+const EditProductPage = lazy(
+  () => import('@/pages/admin/ProductManagement/EditProductPage'),
+)
 const AdminChat = lazy(() => import('@/components/common/chat/AdminChat'))
 
 export const adminRoutes: RouteObject[] = [
@@ -69,10 +69,10 @@ export const adminRoutes: RouteObject[] = [
         path: '/admin/products/create',
         element: <CreateProductPage />,
       },
-      // {
-      //   path: '/admin/products/edit/:id',
-      //   element: <EditProductPage />,
-      // },
+      {
+        path: '/admin/products/edit/:id',
+        element: <EditProductPage />,
+      },
       {
         path: '/admin/chats',
         element: <AdminChat />,
