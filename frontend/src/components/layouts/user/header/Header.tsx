@@ -11,6 +11,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Input } from '@/components/ui/input'
 import PromoBanner from './PromoBanner'
+import ProductSearch from '@/components/layouts/product/search/ProductSearch'
 
 interface HeaderProps {
   logo?: string
@@ -43,6 +44,7 @@ export default function Header({
   return (
     <header className="bg-background/80 supports-backdrop-filter:bg-background/60 sticky top-0 z-50 border-b shadow-sm backdrop-blur">
       <PromoBanner />
+
       <div className="mx-auto max-w-7xl px-6">
         <div className="hidden h-18 items-center justify-between gap-4 sm:flex">
           <Link
@@ -52,18 +54,9 @@ export default function Header({
             TechStore
           </Link>
 
-          <form onSubmit={handleSearch} className="max-w-xl flex-1">
-            <div className="relative flex items-center transition-all">
-              <Search className="absolute left-3 h-4 w-4 opacity-60" />
-              <Input
-                type="text"
-                placeholder="What do you want to buy today?..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-transparent py-2 pr-4 pl-10 text-sm focus:outline-none"
-              />
-            </div>
-          </form>
+          <div className="max-w-xl flex-1">
+            <ProductSearch />
+          </div>
 
           <div className="flex shrink-0 items-center gap-3">
             <Link
@@ -142,12 +135,12 @@ export default function Header({
           <form onSubmit={handleSearch}>
             <div className="relative rounded-lg border">
               <Search className="absolute top-2.5 left-3 h-4 w-4 opacity-60" />
-              <input
+              <Input
                 type="text"
                 placeholder="Bạn muốn tìm gì?"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-transparent py-2 pr-4 pl-10 text-sm focus:outline-none"
+                className="pl-10"
               />
             </div>
           </form>
