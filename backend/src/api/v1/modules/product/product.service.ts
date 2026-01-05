@@ -15,7 +15,7 @@ import type {
 
 class ProductService {
   findAll = async (query: ListProductsQuery) => {
-    const { page, limit, sort, order, search, sku } = query
+    const { page, limit, sort, order, search, sku, isFeatured } = query
 
     if (sku) {
       const where: Prisma.ProductWhereInput = {
@@ -35,6 +35,7 @@ class ProductService {
 
     const where: Prisma.ProductWhereInput = {
       deletedAt: null,
+      ...(isFeatured !== undefined && { isFeatured }),
       ...(search && {
         OR: [
           { name: { contains: search, mode: 'insensitive' } },

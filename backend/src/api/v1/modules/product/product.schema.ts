@@ -29,6 +29,12 @@ export const listProductsQuerySchema = createPaginationSchema(
   PRODUCT_SORT_FIELDS as unknown as string[],
 ).extend({
   sku: z.string().optional(),
+  isFeatured: z
+    .string()
+    .optional()
+    .transform((v) =>
+      v === 'true' ? true : v === 'false' ? false : undefined,
+    ),
 })
 
 export const productIdParamSchema = numericIdParamSchema
