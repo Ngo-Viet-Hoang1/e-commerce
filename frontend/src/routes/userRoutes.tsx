@@ -29,30 +29,75 @@ export const userRoutes: RouteObject[] = [
   {
     path: 'about',
     element: <About />,
+    handle: {
+      breadcrumb: 'Giới thiệu',
+    },
   },
   {
     element: <ProtectedRoute type="user" redirectPath="/auth/login" />,
     children: [
-      { path: 'dashboard', element: <DashBoard /> },
-      { path: 'product-catalog', element: <ProductCatalog /> },
-      { path: 'product-detail/:slug', element: <ProductDetail /> },
-      { path: 'cart', element: <ShoppingCart /> },
-      { path: 'checkout', element: <Checkout /> },
+      {
+        path: 'dashboard',
+        element: <DashBoard />,
+        handle: {
+          breadcrumb: 'Bảng điều khiển',
+        },
+      },
+      {
+        path: 'product-catalog',
+        element: <ProductCatalog />,
+        handle: {
+          breadcrumb: 'Danh mục sản phẩm',
+        },
+      },
+      {
+        path: 'product-detail/:slug',
+        element: <ProductDetail />,
+        handle: {
+          breadcrumb: 'Chi tiết sản phẩm',
+        },
+      },
+      {
+        path: 'cart',
+        element: <ShoppingCart />,
+        handle: {
+          breadcrumb: 'Giỏ hàng',
+        },
+      },
+      {
+        path: 'checkout',
+        element: <Checkout />,
+        handle: {
+          breadcrumb: 'Thanh toán',
+        },
+      },
       {
         path: 'profile',
         element: <ProfileLayout />,
+        handle: {
+          breadcrumb: 'Tài khoản',
+        },
         children: [
           {
             index: true,
             element: <ProfileInfo />,
+            handle: {
+              breadcrumb: 'Thông tin cá nhân',
+            },
           },
           {
             path: 'orders',
             element: <Orders />,
+            handle: {
+              breadcrumb: 'Đơn hàng của tôi',
+            },
           },
           {
             path: 'favorites',
             element: <FavoriteProducts />,
+            handle: {
+              breadcrumb: 'Sản phẩm yêu thích',
+            },
           },
         ],
       },
