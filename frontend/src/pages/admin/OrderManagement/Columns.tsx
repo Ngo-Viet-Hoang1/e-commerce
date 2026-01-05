@@ -1,5 +1,9 @@
-import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
-import { formatCurrency, formatDate } from '@/lib/format'
+import { Badge } from '@/components/ui/badge'
+import {
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu'
+import { formatDate, formatDateTime } from '@/lib/format'
 import type { ColumnDef } from '@tanstack/react-table'
 import { Package } from 'lucide-react'
 
@@ -11,35 +15,42 @@ import {
   TableIconCell,
   TableTextCell,
 } from '@/components/common/table/TableCellWrapper'
-import {
-  StatusDropdown,
-  type StatusOption,
-} from '@/components/common/StatusDropdown'
-import {
-  getAvailableOrderStatuses,
-  getAvailablePaymentStatuses,
-  getOrderStatusColor,
-  getOrderStatusLabel,
-  getPaymentStatusColor,
-  getPaymentStatusLabel,
-  type OrderStatus,
-  type PaymentStatus,
-} from '@/constants/order.constants'
 import type { Order } from '@/interfaces/order.interface'
 
 interface CreateOrderColumnsProps {
   onView?: (order: Order) => void
-  onStatusChange?: (orderId: number, status: OrderStatus) => void
-  onPaymentStatusChange?: (
-    orderId: number,
-    paymentStatus: PaymentStatus,
-  ) => void
+  onUpdateStatus?: (order: Order) => void
+}
+
+const getStatusColor = (status: string) => {
+  const colors: Record<string, string> = {
+    pending:
+      'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+    processing: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
+    shipped:
+      'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300',
+    delivered:
+      'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+    cancelled: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
+    refunded: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300',
+  }
+  return colors[status] || 'bg-gray-100 text-gray-800'
+}
+
+const getPaymentStatusColor = (status: string) => {
+  const colors: Record<string, string> = {
+    pending:
+      'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+    paid: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+    failed: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300',
+    refunded: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300',
+  }
+  return colors[status] || 'bg-gray-100 text-gray-800'
 }
 
 const createOrderColumns = ({
   onView,
-  onStatusChange,
-  onPaymentStatusChange,
+  onUpdateStatus,
 }: CreateOrderColumnsProps): ColumnDef<Order>[] => {
   return [
     rowSelectionColumn<Order>(),
@@ -47,7 +58,7 @@ const createOrderColumns = ({
     {
       accessorKey: 'orderId',
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Mã đơn hàng" />
+        <DataTableColumnHeader column={column} title="Order ID" />
       ),
       cell: ({ row }) => {
         const orderId = row.getValue<number>('orderId')
@@ -64,12 +75,21 @@ const createOrderColumns = ({
 
     {
       id: 'customer',
-      header: 'Khách hàng',
+      header: 'Customer',
       cell: ({ row }) => {
-        const recipientName = row.original.shippingRecipientName
+        const user = row.original.user
         return (
-          <TableTextCell muted={!recipientName}>
-            {recipientName ?? '—'}
+          <TableTextCell muted={!user}>
+            {user ? (
+              <div>
+                <div className="font-medium">{user.name ?? 'N/A'}</div>
+                <div className="text-muted-foreground text-xs">
+                  {user.email}
+                </div>
+              </div>
+            ) : (
+              '—'
+            )}
           </TableTextCell>
         )
       },
@@ -79,28 +99,15 @@ const createOrderColumns = ({
       id: 'status',
       accessorKey: 'status',
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Trạng thái" />
+        <DataTableColumnHeader column={column} title="Status" />
       ),
       cell: ({ row }) => {
-        const order = row.original
-        const status = row.getValue<string>('status') || 'pending'
-        const options = getAvailableOrderStatuses(
-          status,
-        ) as StatusOption<OrderStatus>[]
-        const isCancelled = status.toLowerCase() === 'cancelled'
-
+        const status = row.getValue<string>('status')
         return (
           <TableIconCell>
-            <StatusDropdown<OrderStatus>
-              currentStatus={status.toLowerCase() as OrderStatus}
-              options={options}
-              onStatusChange={(newStatus) =>
-                onStatusChange?.(order.orderId, newStatus)
-              }
-              getStatusColor={getOrderStatusColor}
-              getStatusLabel={getOrderStatusLabel}
-              disabled={!onStatusChange || isCancelled}
-            />
+            <Badge className={getStatusColor(status)} variant="secondary">
+              {status}
+            </Badge>
           </TableIconCell>
         )
       },
@@ -109,29 +116,21 @@ const createOrderColumns = ({
     {
       id: 'paymentStatus',
       accessorKey: 'paymentStatus',
-      header: 'Thanh toán',
+      header: 'Payment',
       cell: ({ row }) => {
-        const order = row.original
-        const status = order.status?.toLowerCase() ?? ''
-        const paymentStatus =
-          row.getValue<string | null>('paymentStatus') ?? 'pending'
-        const options = getAvailablePaymentStatuses(
-          paymentStatus,
-        ) as StatusOption<PaymentStatus>[]
-        const isCancelled = status === 'cancelled'
-
+        const paymentStatus = row.getValue<string | null>('paymentStatus')
         return (
           <TableIconCell>
-            <StatusDropdown<PaymentStatus>
-              currentStatus={paymentStatus.toLowerCase() as PaymentStatus}
-              options={options}
-              onStatusChange={(newStatus) =>
-                onPaymentStatusChange?.(order.orderId, newStatus)
-              }
-              getStatusColor={getPaymentStatusColor}
-              getStatusLabel={getPaymentStatusLabel}
-              disabled={!onPaymentStatusChange || isCancelled}
-            />
+            {paymentStatus ? (
+              <Badge
+                className={getPaymentStatusColor(paymentStatus)}
+                variant="secondary"
+              >
+                {paymentStatus}
+              </Badge>
+            ) : (
+              <span className="text-muted-foreground">—</span>
+            )}
           </TableIconCell>
         )
       },
@@ -140,21 +139,19 @@ const createOrderColumns = ({
     {
       accessorKey: 'totalAmount',
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Tổng tiền" />
+        <DataTableColumnHeader column={column} title="Total Amount" />
       ),
       cell: ({ row }) => {
-        const order = row.original
-        const subtotal =
-          order.orderItems?.reduce(
-            (sum, item) => sum + Number(item.totalPrice),
-            0,
-          ) ?? 0
-        const shippingFee = Number(order.shippingFee ?? 0)
-        const total = subtotal + shippingFee
-
+        const amount = row.getValue<number>('totalAmount')
+        const currency = row.original.currency ?? 'USD'
         return (
           <TableTextCell>
-            <span>{formatCurrency(total)}</span>
+            <span className="font-medium">
+              {new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: currency,
+              }).format(amount)}
+            </span>
           </TableTextCell>
         )
       },
@@ -162,12 +159,24 @@ const createOrderColumns = ({
 
     {
       accessorKey: 'shippingMethod',
-      header: 'Giao hàng',
+      header: 'Shipping',
       cell: ({ row }) => {
-        const province = row.original.province
+        const shippingMethod = row.getValue<string | null>('shippingMethod')
+        const shippingFee = row.original.shippingFee
         return (
-          <TableTextCell small muted={!province}>
-            {province ? province.name : '—'}
+          <TableTextCell small muted={!shippingMethod}>
+            {shippingMethod ? (
+              <div>
+                <div>{shippingMethod}</div>
+                {shippingFee && (
+                  <div className="text-muted-foreground text-xs">
+                    ${Number(shippingFee).toFixed(2)}
+                  </div>
+                )}
+              </div>
+            ) : (
+              '—'
+            )}
           </TableTextCell>
         )
       },
@@ -176,13 +185,13 @@ const createOrderColumns = ({
     {
       accessorKey: 'placedAt',
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Ngày đặt" />
+        <DataTableColumnHeader column={column} title="Placed At" />
       ),
       cell: ({ row }) => {
         const value = row.getValue<Date | null>('placedAt')
         return (
           <TableTextCell small muted={!value}>
-            {formatDate(value)}
+            {formatDateTime(value)}
           </TableTextCell>
         )
       },
@@ -190,34 +199,50 @@ const createOrderColumns = ({
 
     {
       accessorKey: 'deliveredAt',
-      header: 'Ngày giao',
+      header: 'Delivered At',
       cell: ({ row }) => {
         const value = row.getValue<Date | null>('deliveredAt')
         return (
           <TableTextCell small muted={!value}>
-            {formatDate(value)}
+            {value ? formatDateTime(value) : '—'}
           </TableTextCell>
         )
       },
     },
 
     {
+      accessorKey: 'createdAt',
+      header: 'Created',
+      cell: ({ row }) => (
+        <TableTextCell muted small>
+          {formatDate(row.getValue('createdAt'))}
+        </TableTextCell>
+      ),
+    },
+
+    {
       id: 'actions',
-      header: () => <TableCellAlign align="right">Hành động</TableCellAlign>,
+      header: () => <TableCellAlign align="right">Actions</TableCellAlign>,
       cell: ({ row }) => {
         const order = row.original
 
         return (
           <TableActions
             onView={onView ? () => onView(order) : undefined}
+            onEdit={onUpdateStatus ? () => onUpdateStatus(order) : undefined}
             extraActions={
-              <DropdownMenuItem
-                onClick={() =>
-                  navigator.clipboard.writeText(String(order.orderId))
-                }
-              >
-                Sao chép mã đơn
-              </DropdownMenuItem>
+              <>
+                <DropdownMenuItem>View Details</DropdownMenuItem>
+                <DropdownMenuItem>Print Invoice</DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() =>
+                    navigator.clipboard.writeText(String(order.orderId))
+                  }
+                >
+                  Copy Order ID
+                </DropdownMenuItem>
+              </>
             }
           />
         )

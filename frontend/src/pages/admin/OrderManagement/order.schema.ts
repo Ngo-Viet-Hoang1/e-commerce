@@ -7,8 +7,8 @@ export const updateOrderStatusSchema = z.object({
     'shipped',
     'delivered',
     'cancelled',
+    'refunded',
   ]),
-  paymentStatus: z.enum(['pending', 'paid', 'failed']),
 })
 
 export type UpdateOrderStatusInputs = z.infer<typeof updateOrderStatusSchema>

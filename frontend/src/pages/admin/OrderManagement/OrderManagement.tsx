@@ -1,16 +1,16 @@
 import { DataTable } from '@/components/common/table/DataTable'
-import type { OrderStatus, PaymentStatus } from '@/constants/order.constants'
 import {
   createModalState,
-  isViewMode,
+  isEditMode,
   type ModalState,
 } from '@/interfaces/modal.interface'
 import type { Order } from '@/interfaces/order.interface'
 import type { PaginationParams } from '@/interfaces/pagination.interface'
 import { useState } from 'react'
 import createOrderColumns from './Columns'
-import { useOrders, useUpdateOrderStatus } from './order.queries'
-import { ViewOrderDialog } from './ViewOrderDialog'
+import { useOrders } from './order.queries'
+import OrderTableToolbar from './OrderTableToolbar'
+import { UpdateOrderStatusForm } from './UpdateOrderStatusForm'
 
 const OrderManagement = () => {
   const [modalState, setModalState] = useState<ModalState<Order>>(null)
@@ -20,23 +20,9 @@ const OrderManagement = () => {
   })
 
   const ordersQuery = useOrders(params)
-  const updateStatus = useUpdateOrderStatus()
-
-  const handleStatusChange = (orderId: number, status: OrderStatus) => {
-    updateStatus.mutate({ id: orderId, status })
-  }
-
-  const handlePaymentStatusChange = (
-    orderId: number,
-    paymentStatus: PaymentStatus,
-  ) => {
-    updateStatus.mutate({ id: orderId, paymentStatus })
-  }
 
   const columns = createOrderColumns({
-    onView: (order) => setModalState(createModalState.view(order)),
-    onStatusChange: handleStatusChange,
-    onPaymentStatusChange: handlePaymentStatusChange,
+    onUpdateStatus: (order) => setModalState(createModalState.edit(order)),
   })
 
   return (
@@ -45,13 +31,14 @@ const OrderManagement = () => {
         columns={columns}
         query={ordersQuery}
         onParamsChange={setParams}
-        searchPlaceholder="Tìm kiếm đơn hàng..."
+        searchPlaceholder="Search by order ID or customer..."
+        renderToolbar={() => <OrderTableToolbar />}
       />
 
-      {isViewMode(modalState) && (
-        <ViewOrderDialog
+      {isEditMode(modalState) && (
+        <UpdateOrderStatusForm
           open
-          order={modalState.data}
+          orderId={modalState.data.orderId}
           onClose={() => setModalState(null)}
         />
       )}

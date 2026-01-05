@@ -30,22 +30,18 @@ export function TableIconCell({
   children,
   muted,
   className,
-  onClick,
 }: {
   children: React.ReactNode
   muted?: boolean
   className?: string
-  onClick?: () => void
 }) {
   return (
     <span
       className={cn(
         'flex items-center justify-center gap-2',
         muted && 'text-muted-foreground',
-        onClick && 'cursor-pointer',
         className,
       )}
-      onClick={onClick}
     >
       {children}
     </span>
