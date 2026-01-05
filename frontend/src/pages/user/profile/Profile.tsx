@@ -28,13 +28,18 @@ const Profile = () => {
               {me?.email}
             </p>
           </div>
+
           {/* menu */}
           <div className="mt-6 flex w-full flex-col gap-2 px-2 pb-4 text-sm">
             <NavLink
               to="/profile"
               end
               className={({ isActive }) =>
-                `flex items-center gap-2 rounded-lg px-2 py-2 transition ${isActive ? 'bg-gray-200 font-medium text-gray-900' : 'text-gray-700 hover:bg-gray-100'}`
+                `flex items-center gap-2 rounded-lg px-2 py-2 transition ${
+                  isActive
+                    ? 'bg-gray-200 font-medium text-gray-900'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`
               }
             >
               <User className="h-4 w-4" />
@@ -44,7 +49,11 @@ const Profile = () => {
             <NavLink
               to="/profile/orders"
               className={({ isActive }) =>
-                `flex items-center gap-2 rounded-lg px-2 py-2 transition ${isActive ? 'bg-gray-200 font-medium text-gray-900' : 'text-gray-700 hover:bg-gray-100'}`
+                `flex items-center gap-2 rounded-lg px-2 py-2 transition ${
+                  isActive
+                    ? 'bg-gray-200 font-medium text-gray-900'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`
               }
             >
               <Package className="h-4 w-4" />
@@ -54,7 +63,11 @@ const Profile = () => {
             <NavLink
               to="/profile/favorites"
               className={({ isActive }) =>
-                `flex items-center gap-2 rounded-lg px-2 py-2 transition ${isActive ? 'bg-gray-200 font-medium text-gray-900' : 'text-gray-700 hover:bg-gray-100'}`
+                `flex items-center gap-2 rounded-lg px-2 py-2 transition ${
+                  isActive
+                    ? 'bg-gray-200 font-medium text-gray-900'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`
               }
             >
               <Heart className="h-4 w-4 text-red-500" />

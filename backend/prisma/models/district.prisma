@@ -20,6 +20,8 @@ model District {
 
   orders Order[]
 
+  addresses Address[]
+  
   @@index([provinceCode])
   @@index([code])
   @@index([name])

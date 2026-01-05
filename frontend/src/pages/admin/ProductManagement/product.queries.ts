@@ -12,6 +12,8 @@ export const queryKeys = {
       [...queryKeys.products.lists(), params] as const,
     details: () => [...queryKeys.products.all, 'detail'] as const,
     detail: (id: number) => [...queryKeys.products.details(), id] as const,
+    detailBySlug: (slug: string) =>
+      [...queryKeys.products.details(), 'slug', slug] as const,
   },
 }
 
@@ -28,6 +30,14 @@ export const useProduct = (id: number) => {
     queryKey: queryKeys.products.detail(id),
     queryFn: () => AdminProductService.getById(id),
     enabled: !!id,
+  })
+}
+
+export const useProductBySlug = (slug: string) => {
+  return useQuery({
+    queryKey: queryKeys.products.detailBySlug(slug),
+    queryFn: () => AdminProductService.getBySlug(slug),
+    enabled: !!slug,
   })
 }
 

@@ -12,6 +12,7 @@ import {
 import { userController } from './user.controller'
 import {
   createUserBodySchema,
+  favoriteProductParamSchema,
   listUsersQuerySchema,
   updateUserBodySchema,
   userIdParamSchema,
@@ -40,6 +41,22 @@ router.put(
 )
 
 router.get('/', validate(listUsersQuerySchema, 'query'), userController.findAll)
+
+router.get('/favorites', userController.getFavoriteProducts)
+
+router.post(
+  '/favorites/:productId',
+  validate(favoriteProductParamSchema, 'params'),
+  userController.addFavoriteProduct,
+)
+
+router.delete(
+  '/favorites/:productId',
+  validate(favoriteProductParamSchema, 'params'),
+  userController.removeFavoriteProduct,
+)
+
+router.delete('/favorites', userController.removeAllFavoriteProducts)
 
 router.get(
   '/:id',

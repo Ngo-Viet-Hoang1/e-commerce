@@ -32,6 +32,9 @@ export const listProductsQuerySchema = createPaginationSchema(
 })
 
 export const productIdParamSchema = numericIdParamSchema
+export const productSlugParamSchema = z.object({
+  slug: z.string().min(1, 'Slug is required'),
+})
 
 export const createProductBodySchema = z.object({
   name: z
@@ -69,11 +72,7 @@ export const updateProductBodySchema = z.object({
     .optional(),
   sku: z.string().min(1, 'SKU must be at least 1 character').trim().optional(),
   shortDescription: z.string().trim().optional(),
-  description: z
-    .string()
-    .max(5000, 'Description must be at most 5000 characters')
-    .trim()
-    .optional(),
+  description: z.string().trim().optional(),
   status: z.enum(['active', 'inactive', 'out_of_stock', 'draft']).optional(),
   brandId: z.number().int().optional(),
   categoryId: z.number().int().optional(),
@@ -102,6 +101,7 @@ export const createSimpleVariantSchema = z.object({
   title: z.string().optional(),
   price: z.number().positive('Price must be positive'),
   costPrice: z.number().positive().optional(),
+  msrp: z.number().positive().optional(),
   stockQuantity: z.number().int().min(0).default(0),
   isDefault: z.boolean().default(false),
   attributes: z
@@ -131,6 +131,10 @@ export const createSimpleProductBodySchema = z.object({
 
   description: z.string().trim().optional(),
   status: z.enum(['active', 'inactive', 'draft']).default('draft'),
+  isFeatured: z
+    .boolean()
+    .optional()
+    .transform((v) => v ?? false),
 
   variants: z
     .array(createSimpleVariantSchema)
@@ -151,6 +155,7 @@ export type Product = z.infer<typeof productSchema>
 
 export type ListProductsQuery = z.infer<typeof listProductsQuerySchema>
 export type ProductIdParam = z.infer<typeof productIdParamSchema>
+export type ProductSlugParam = z.infer<typeof productSlugParamSchema>
 export type CreateProductBody = z.infer<typeof createProductBodySchema>
 export type UpdateProductBody = z.infer<typeof updateProductBodySchema>
 export type CreateSimpleProductBody = z.infer<

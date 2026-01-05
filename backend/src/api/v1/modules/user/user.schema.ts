@@ -12,6 +12,7 @@ export const userSchema = z.object({
   password: z.string(),
   googleId: z.string().nullable(),
   name: z.string().nullable(),
+  phoneNumber: z.string().nullable(),
   emailVerified: z.boolean(),
   lastLoginAt: z.date().nullable(),
   isActive: z.boolean(),
@@ -53,6 +54,11 @@ export const createUserBodySchema = z.object({
     .max(100, 'Name must be at most 100 characters')
     .trim()
     .optional(),
+  phoneNumber: z
+    .string()
+    .min(8, 'Phone number must be at least 8 characters')
+    .max(14, 'Phone number must be at most 14 characters')
+    .optional(),
 })
 
 export const updateUserBodySchema = z.object({
@@ -60,6 +66,12 @@ export const updateUserBodySchema = z.object({
     .string()
     .min(2, 'Name must be at least 2 characters')
     .max(100, 'Name must be at most 100 characters')
+    .trim()
+    .optional(),
+  phoneNumber: z
+    .string()
+    .min(8, 'Phone number must be at least 8 characters')
+    .max(14, 'Phone number must be at most 14 characters')
     .trim()
     .optional(),
   emailVerified: z.boolean().optional(),

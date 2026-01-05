@@ -5,6 +5,7 @@ import {
   NotFoundException,
 } from '../../shared/models/app-error.model'
 import { PasswordUtils } from '../../shared/utils/password.util'
+import { productRepository } from '../product/product.repository'
 import { userRepository } from './user.repository'
 import {
   type CreateUserBody,
@@ -155,6 +156,37 @@ class UserService {
         set: [],
       },
     })
+  }
+
+  getFavoriteProducts = async (userId: number) => {
+    const user = await userRepository.findById(userId)
+
+    if (!user) {
+      throw new NotFoundException('User', userId.toString())
+    }
+
+    const userWithFavorites = await userRepository.findByIdWithFavorites(userId)
+    const favoriteProductIds =
+      userWithFavorites?.favoriteProducts?.map((p) => p.id) || []
+
+    if (favoriteProductIds.length === 0) {
+      return []
+    }
+
+    const favoriteProducts =
+      await productRepository.findManyWithPrimaryImage(favoriteProductIds)
+
+    const productsWithMinPrice = await Promise.all(
+      favoriteProducts.map(async (product) => {
+        const minPrice = await productRepository.getMinPrice(product.id)
+        return {
+          ...product,
+          minPrice,
+        }
+      }),
+    )
+
+    return productsWithMinPrice
   }
 }
 
