@@ -1,6 +1,6 @@
 import type { Prisma } from '@generated/prisma/client'
-import { prisma } from '../../shared/config/database/postgres'
 import sanitizeHtml from 'sanitize-html'
+import { prisma } from '../../shared/config/database/postgres'
 import {
   ConflictException,
   NotFoundException,
@@ -53,7 +53,17 @@ class ProductService {
       productRepository.count(where),
     ])
 
-    return { products, total, page, limit }
+    const productsWithMinPrice = await Promise.all(
+      products.map(async (product) => {
+        const minPrice = await productRepository.getMinPrice(product.id)
+        return {
+          ...product,
+          minPrice,
+        }
+      }),
+    )
+
+    return { products: productsWithMinPrice, total, page, limit }
   }
 
   async findById(id: number, includeDeleted = false) {
@@ -61,7 +71,12 @@ class ProductService {
 
     if (!product) throw new NotFoundException(`Product with ID ${id} not found`)
 
-    return product
+    const minPrice = await productRepository.getMinPrice(id)
+
+    return {
+      ...product,
+      minPrice,
+    }
   }
 
   async findBySku(sku: string) {
