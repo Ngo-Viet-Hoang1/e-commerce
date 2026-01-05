@@ -107,7 +107,9 @@ class CartService {
       subtotal: populatedItems.reduce((sum, item) => sum + item.subtotal, 0),
       hasPriceChanges: populatedItems.some((item) => item.priceChanged),
       hasOutOfStock: populatedItems.some(
-        (item) => item.quantity > item.variant.stockQuantity,
+        (item) =>
+          item.variant.stockQuantity === 0 ||
+          item.quantity > item.variant.stockQuantity,
       ),
     }
 
