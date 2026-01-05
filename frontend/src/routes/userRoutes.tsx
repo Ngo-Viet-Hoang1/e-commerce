@@ -6,11 +6,12 @@ const Home = lazy(() => import('@/pages/user/home/Home'))
 const About = lazy(() => import('@/pages/common/About'))
 const DashBoard = lazy(() => import('@/pages/user/Dashboard'))
 const ProfileLayout = lazy(() => import('@/pages/user/profile/Profile'))
-const ProfileInfo = lazy(() => import('@/pages/user/profile/ProfileInfo'))
+const ProfileInfo = lazy(() => import('@/pages/user/profile/ProfileInfo/ProfileInfo'))
 const Orders = lazy(() => import('@/pages/user/profile/Orders'))
 const FavoriteProducts = lazy(
-  () => import('@/pages/user/profile/FavoriteProducts'),
+  () => import('@/pages/user/profile/Favorite/FavoriteProducts'),
 )
+
 const ProductCatalog = lazy(
   () => import('@/pages/user/product-catalog/ProductCatalog'),
 )

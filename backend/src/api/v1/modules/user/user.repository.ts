@@ -36,6 +36,20 @@ class UserRepository {
     )
   }
 
+  findByIdWithFavorites = async (id: number) => {
+    return executePrismaQuery(() =>
+      prisma.user.findUnique({
+        where: {
+          id,
+          deletedAt: null,
+        },
+        include: {
+          favoriteProducts: true,
+        },
+      }),
+    )
+  }
+
   findRolesByUserId = async (id: number) => {
     return executePrismaQuery(() =>
       prisma.user.findUnique({
