@@ -4,6 +4,11 @@ import {
   validate,
   validateMultiple,
 } from '../../shared/middlewares/validate.middleware'
+import { orderController } from '../order/order.controller'
+import {
+  listOrdersQuerySchema,
+  userOrderIdParamSchema,
+} from '../order/order.schema'
 import { userController } from './user.controller'
 import {
   createUserBodySchema,
@@ -16,6 +21,24 @@ import {
 const router = Router()
 router.use(authenticate)
 // router.use(autoAuthorize(RESOURCES.USER))
+
+router.get(
+  '/orders',
+  validate(listOrdersQuerySchema, 'query'),
+  orderController.findUserOrders,
+)
+
+router.get(
+  '/orders/:orderId',
+  validate(userOrderIdParamSchema, 'params'),
+  orderController.findUserOrderById,
+)
+
+router.put(
+  '/orders/:orderId/cancel',
+  validate(userOrderIdParamSchema, 'params'),
+  orderController.cancelUserOrder,
+)
 
 router.get('/', validate(listUsersQuerySchema, 'query'), userController.findAll)
 
