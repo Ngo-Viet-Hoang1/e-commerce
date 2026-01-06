@@ -10,7 +10,10 @@
     "lint:fix": "eslint . --ext .ts,.js --fix",
     "format": "prettier --write \"src/**/*.{ts,js,json}\"",
     "format:check": "prettier --check \"src/**/*.{ts,js,json}\"",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "seed": "bun run prisma/seed/seed.ts",
+    "db:reset": "prisma migrate reset",
+    "db:seed": "bun run prisma/seed/seed.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
@@ -72,5 +75,8 @@
     "winston": "^3.18.3",
     "winston-daily-rotate-file": "^5.0.0",
     "zod": "^4.1.13"
+  },
+  "prisma": {
+    "seed": "bun run prisma/seed/seed.ts"
   }
 }

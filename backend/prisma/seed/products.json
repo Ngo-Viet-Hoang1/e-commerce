@@ -545,7 +545,7 @@
     "sku": "XIAOMI-15T-5G",
     "description": "Xiaomi 15T 5G với RAM 12GB, bộ nhớ 512GB, hiệu năng mạnh mẽ",
     "status": "active",
-    "brandId": 5,
+    "brandId": 3,
     "categoryId": 1,
     "isFeatured": true,
     "variants": [
@@ -637,7 +637,7 @@
     "sku": "XIAOMI-15-ULTRA-5G",
     "description": "Xiaomi 15 Ultra 5G với ống kính Leica, màn hình AMOLED 6.73 inches, camera ấn tượng",
     "status": "active",
-    "brandId": 5,
+    "brandId": 3,
     "categoryId": 1,
     "isFeatured": true,
     "variants": [
@@ -1113,7 +1113,7 @@
     "sku": "XIAOMI-PAD-MINI",
     "description": "Xiaomi Pad Mini với chip MediaTek Dimensity 9400+, màn hình 8.8 inch",
     "status": "active",
-    "brandId": 5,
+    "brandId": 3,
     "categoryId": 3,
     "isFeatured": true,
     "variants": [
@@ -1435,7 +1435,7 @@
     "sku": "XIAOMI-REDMI-NOTE-14",
     "description": "Xiaomi Redmi Note 14 với hiệu năng tốt, giá cả phải chăng",
     "status": "active",
-    "brandId": 5,
+    "brandId": 3,
     "categoryId": 1,
     "isFeatured": true,
     "variants": [
@@ -1550,7 +1550,6 @@
     "brandId": 2,
     "categoryId": 1,
     "isFeatured": true,
-
     "variants": [
       {
         "sku": "S24-ULTRA-12GB-256GB-GRAY",
@@ -1590,7 +1589,6 @@
         ]
       }
     ],
-
     "images": [
       {
         "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/s/a/samsung_galaxy_s24_ultra_256gb_-_1.png",
@@ -1627,7 +1625,6 @@
     "brandId": 1,
     "categoryId": 2,
     "isFeatured": true,
-
     "variants": [
       {
         "sku": "MBP-14-M5-10CPU-10GPU-16GB-512GB-SPACE-BLACK",
@@ -1659,7 +1656,6 @@
         ]
       }
     ],
-
     "images": [
       {
         "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/t/e/text_ng_n_2__11.png",
@@ -1696,7 +1692,6 @@
     "brandId": 1,
     "categoryId": 2,
     "isFeatured": true,
-
     "variants": [
       {
         "sku": "MBP-14-M5-NANO-10CPU-10GPU-16GB-512GB-SPACE-BLACK",
@@ -1730,7 +1725,6 @@
         ]
       }
     ],
-
     "images": [
       {
         "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/t/e/text_ng_n_2__11_21.png",
@@ -1764,10 +1758,9 @@
     "sku": "ASUS-VIVOBOOK-15-X1502VA-BQ885W",
     "description": "Laptop ASUS Vivobook 15 với CPU Intel Core i5-13420H, RAM 16GB, SSD 512GB, màn hình 15.6 inch, phù hợp học tập và làm việc",
     "status": "active",
-    "brandId": 3,
+    "brandId": 8,
     "categoryId": 2,
     "isFeatured": false,
-
     "variants": [
       {
         "sku": "VIVOBOOK-15-X1502VA-I5-13420H-16GB-512GB-SILVER",
@@ -1801,7 +1794,6 @@
         ]
       }
     ],
-
     "images": [
       {
         "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/g/r/group_902.png",
@@ -1835,10 +1827,9 @@
     "sku": "LENOVO-V15-G4-IRU-83A100PMVN",
     "description": "Laptop Lenovo V15 G4 IRU với thiết kế tối giản, CPU Intel Core thế hệ 13, RAM 16GB, SSD PCIe, màn hình FHD IPS, phù hợp học tập và làm việc",
     "status": "active",
-    "brandId": 4,
+    "brandId": 9,
     "categoryId": 2,
     "isFeatured": false,
-
     "variants": [
       {
         "sku": "V15-G4-I5-13420H-16GB-512GB-15-6-WIN11-GRAY",
@@ -1857,7 +1848,6 @@
           { "attributeName": "Màu sắc", "value": "Xám" }
         ]
       },
-
       {
         "sku": "V15-G4-I5-1235U-16GB-256GB-14-FREEDOS-GRAY",
         "title": "i5-1235U | 16GB | 256GB | 14\" | Free OS | Xám",
@@ -1874,7 +1864,6 @@
           { "attributeName": "Màu sắc", "value": "Xám" }
         ]
       },
-
       {
         "sku": "V15-G4-I7-1355U-16GB-512GB-15-6-WIN11-GRAY",
         "title": "i7-1355U | 16GB | 512GB | 15.6\" | Windows 11 | Xám",
@@ -1892,7 +1881,6 @@
         ]
       }
     ],
-
     "images": [
       {
         "url": "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/l/a/laptop_lenovo_v15_g4_iru_83a100pmvn_-_1.png",
