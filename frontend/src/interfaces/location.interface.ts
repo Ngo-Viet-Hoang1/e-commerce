@@ -10,11 +10,13 @@ export interface Address {
   updatedAt: Date
 
   district: {
+    id: number
     code: string
     name: string
   }
 
   province: {
+    id: number
     code: string
     name: string
   }

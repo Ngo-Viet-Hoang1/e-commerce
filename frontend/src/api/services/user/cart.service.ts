@@ -37,6 +37,15 @@ class CartService {
     return data
   }
 
+  static removeCartItems = async (
+    items: { productId: number; variantId: number }[],
+  ) => {
+    const { data } = await api.delete<IApiResponse<Cart>>('/cart/items/bulk', {
+      data: { items },
+    })
+    return data
+  }
+
   static clearCart = async () => {
     const { data } = await api.delete<IApiResponse<null>>('/cart')
     return data

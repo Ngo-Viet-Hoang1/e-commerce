@@ -6,7 +6,10 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { useRemoveCartItems } from '@/hooks/useCart'
+import { useCreateOrder } from '@/hooks/useOrder'
 import type { CartItem } from '@/interfaces/cart.interface'
+import type { CreateOrderPayload } from '@/interfaces/order.interface'
 import { ArrowLeft, Lock, ShoppingBag } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
@@ -30,6 +33,8 @@ export default function Checkout() {
   const location = useLocation()
   const { me } = useAuthStore()
   const { data: addresses = [] } = useAddresses(!!me?.id)
+  const createOrder = useCreateOrder()
+  const removeCartItems = useRemoveCartItems()
 
   const [step, setStep] = useState(1)
 
@@ -79,7 +84,7 @@ export default function Checkout() {
   const orderSummary = useMemo<OrderSummaryData>(() => {
     const subtotal = selectedItems.reduce((sum, item) => sum + item.subtotal, 0)
     const shipping = 0
-    const tax = subtotal * 0.1
+    const tax = 0
 
     return {
       items: selectedItems.map((item) => ({
@@ -164,6 +169,46 @@ export default function Checkout() {
   }
   const prevStep = () => setStep((prev) => Math.max(prev - 1, 1))
 
+  const handlePlaceOrder = async () => {
+    if (!me) {
+      toast.error('Vui lòng đăng nhập để tiếp tục')
+      navigate('/auth/login', { state: { from: location.pathname } })
+      return
+    }
+
+    if (!effectiveSelectedAddress) {
+      toast.error('Vui lòng chọn địa chỉ giao hàng')
+      return
+    }
+
+    const orderData: CreateOrderPayload = {
+      items: selectedItems.map((item) => ({
+        productId: item.productId,
+        variantId: item.variantId,
+        quantity: item.quantity,
+        discount: 0,
+      })),
+      shippingRecipientName: `${contactData.firstName} ${contactData.lastName}`,
+      shippingPhone: contactData.phone,
+      shippingProvinceId: effectiveSelectedAddress.province.id,
+      shippingDistrictId: effectiveSelectedAddress.district.id,
+      shippingAddressDetail: effectiveSelectedAddress.detail ?? '',
+      paymentMethod: paymentData.paymentMethod as 'cod' | 'vnpay' | 'paypal',
+      shippingFee: orderSummary.shipping,
+    }
+
+    const order = await createOrder.mutateAsync(orderData)
+
+    await removeCartItems.mutateAsync(
+      selectedItems.map((item) => ({
+        productId: item.productId,
+        variantId: item.variantId,
+      })),
+    )
+
+    navigate(`/checkout/complete/${order.orderId}`)
+  }
+
   return (
     <>
       {/* Header */}
@@ -240,9 +285,15 @@ export default function Checkout() {
                     Tiếp tục
                   </Button>
                 ) : (
-                  <Button className="flex cursor-pointer items-center gap-2">
+                  <Button
+                    onClick={handlePlaceOrder}
+                    disabled={createOrder.isPending}
+                    className="flex cursor-pointer items-center gap-2"
+                  >
                     <Lock className="size-4" />
-                    Hoàn tất đơn hàng
+                    {createOrder.isPending
+                      ? 'Đang xử lý...'
+                      : 'Hoàn tất đơn hàng'}
                   </Button>
                 )}
               </div>

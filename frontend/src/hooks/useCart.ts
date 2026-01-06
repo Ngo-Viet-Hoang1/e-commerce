@@ -110,6 +110,28 @@ export const useRemoveCartItem = (): UseMutationResult<
   })
 }
 
+export const useRemoveCartItems = (): UseMutationResult<
+  Cart,
+  Error,
+  { productId: number; variantId: number }[]
+> => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (items: { productId: number; variantId: number }[]) => {
+      const response = await CartService.removeCartItems(items)
+      return response.data!
+    },
+    onSuccess: (data, variables) => {
+      queryClient.setQueryData(CART_QUERY_KEY, data)
+      toast.success(`Đã xóa ${variables.length} sản phẩm khỏi giỏ hàng`)
+    },
+    onError: (error) => {
+      toast.error(error.message || 'Không thể xóa sản phẩm')
+    },
+  })
+}
+
 export const useClearCart = (): UseMutationResult<void, Error, void> => {
   const queryClient = useQueryClient()
 
