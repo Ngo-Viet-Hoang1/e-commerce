@@ -13,10 +13,13 @@ import {
   type UseQueryResult,
 } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { useAuthStore } from '@/store/zustand/useAuthStore'
 
 export const CART_QUERY_KEY = ['cart'] as const
 
 export const useCart = (): UseQueryResult<Cart, Error> => {
+  const { isAuthenticated } = useAuthStore()
+
   return useQuery({
     queryKey: CART_QUERY_KEY,
     queryFn: async () => {
@@ -25,6 +28,7 @@ export const useCart = (): UseQueryResult<Cart, Error> => {
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
     retry: 1,
+    enabled: isAuthenticated, // Only fetch when authenticated
   })
 }
 

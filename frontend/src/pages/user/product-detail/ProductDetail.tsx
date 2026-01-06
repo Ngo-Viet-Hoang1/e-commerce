@@ -3,11 +3,14 @@ import ImageCarousel_Basic, {
 } from '@/components/commerce-ui/image-carousel-basic'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useProductVariants } from '@/hooks/useProductVariants'
+import { useAddToCart } from '@/hooks/useCart'
 import type { Product, ProductVariant } from '@/interfaces/product.interface'
 import { useProductBySlug } from '@/pages/admin/ProductManagement/product.queries'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { ProductInfo } from './ProductInfo'
 import { ProductTabs } from './ProductTabs'
+import { useAuthStore } from '@/store/zustand/useAuthStore'
+import { toast } from 'sonner'
 
 export default function ProductDetail() {
   const { slug } = useParams<{ slug: string }>()
@@ -21,6 +24,10 @@ export default function ProductDetail() {
 }
 
 function ProductDetailContent({ product }: { product: Product }) {
+  const navigate = useNavigate()
+  const addToCart = useAddToCart()
+  const { isAuthenticated } = useAuthStore()
+
   const {
     attributes,
     selectedAttrs,
@@ -39,13 +46,39 @@ function ProductDetailContent({ product }: { product: Product }) {
   }))
 
   const handleAddToCart = (variant: ProductVariant, quantity: number) => {
-    // TODO: Implement cart logic
-    // Example: addToCart({ variantId: variant.id, quantity })
+    if (!isAuthenticated) {
+      toast.error('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng')
+      navigate('/auth/login', { state: { from: window.location.pathname } })
+      return
+    }
+
+    addToCart.mutate({
+      productId: product.id,
+      variantId: variant.id,
+      quantity,
+    })
   }
 
   const handleBuyNow = (variant: ProductVariant, quantity: number) => {
-    // TODO: Implement buy now logic
-    // Example: router.push('/checkout')
+    if (!isAuthenticated) {
+      toast.error('Vui lòng đăng nhập để mua hàng')
+      navigate('/auth/login', { state: { from: window.location.pathname } })
+      return
+    }
+
+    // Add to cart first, then navigate to checkout
+    addToCart.mutate(
+      {
+        productId: product.id,
+        variantId: variant.id,
+        quantity,
+      },
+      {
+        onSuccess: () => {
+          navigate('/checkout')
+        },
+      },
+    )
   }
 
   return (
@@ -78,6 +111,7 @@ function ProductDetailContent({ product }: { product: Product }) {
             isOptionDisabled={isOptionDisabled}
             onAddToCart={handleAddToCart}
             onBuyNow={handleBuyNow}
+            isAddingToCart={addToCart.isPending}
           />
         </div>
 

@@ -8,6 +8,12 @@ import { api } from '../..'
 
 export interface GetProductsParams extends PaginationParams {
   sku?: string
+  search?: string
+  categoryId?: number
+  brandId?: number
+  minPrice?: number
+  maxPrice?: number
+  isFeatured?: boolean
 }
 
 class ProductService {
@@ -27,6 +33,17 @@ class ProductService {
     const { data } = await api.get<IApiResponse<Product>>(
       `/products/slug/${slug}`,
     )
+    return data
+  }
+
+  static getFeatured = async (limit = 8) => {
+    const { data } = await api.get<IPaginatedResponse<Product>>('/products', {
+      params: {
+        isFeatured: true,
+        limit,
+        page: 1,
+      },
+    })
     return data
   }
 }

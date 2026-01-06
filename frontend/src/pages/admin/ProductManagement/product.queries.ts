@@ -1,4 +1,5 @@
 import AdminProductService from '@/api/services/admin/product.admin.service'
+import ProductService from '@/api/services/user/product.service'
 import type { PaginationParams } from '@/interfaces/pagination.interface'
 import type { CreateProduct } from '@/interfaces/product.interface'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -14,6 +15,7 @@ export const queryKeys = {
     detail: (id: number) => [...queryKeys.products.details(), id] as const,
     detailBySlug: (slug: string) =>
       [...queryKeys.products.details(), 'slug', slug] as const,
+    featured: () => [...queryKeys.products.all, 'featured'] as const,
   },
 }
 
@@ -38,6 +40,14 @@ export const useProductBySlug = (slug: string) => {
     queryKey: queryKeys.products.detailBySlug(slug),
     queryFn: () => AdminProductService.getBySlug(slug),
     enabled: !!slug,
+  })
+}
+
+export const useFeaturedProducts = (limit = 8) => {
+  return useQuery({
+    queryKey: [...queryKeys.products.featured(), limit],
+    queryFn: () => ProductService.getFeatured(limit),
+    staleTime: 1000 * 60 * 5, // 5 minutes
   })
 }
 

@@ -20,10 +20,12 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { useState } from 'react'
+import { useAuthStore } from '@/store/zustand/useAuthStore'
 
 export default function ShoppingCart() {
   const navigate = useNavigate()
   const [showClearDialog, setShowClearDialog] = useState(false)
+  const { isAuthenticated } = useAuthStore()
 
   const { data: cart, isLoading, error } = useCart()
   const updateCartItem = useUpdateCartItem()
@@ -49,6 +51,28 @@ export default function ShoppingCart() {
 
   const handleCheckout = () => {
     navigate('/checkout')
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <Card className="border-dashed">
+        <CardContent className="flex flex-col items-center justify-center py-12 text-center">
+          <ShoppingBag className="text-muted-foreground/50 mb-4 h-12 w-12" />
+          <h3 className="text-lg font-medium">Giỏ hàng trống</h3>
+          <p className="text-muted-foreground mt-1 text-sm">
+            Vui lòng đăng nhập để xem giỏ hàng của bạn
+          </p>
+          <Button
+            className="mt-4"
+            onClick={() =>
+              navigate('/auth/login', { state: { from: '/cart' } })
+            }
+          >
+            Đăng nhập
+          </Button>
+        </CardContent>
+      </Card>
+    )
   }
 
   if (isLoading) {
