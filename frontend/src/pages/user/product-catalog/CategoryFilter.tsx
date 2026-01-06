@@ -12,37 +12,59 @@ import {
 import { ChevronDown, SlidersHorizontal, X } from 'lucide-react'
 import { useState } from 'react'
 
-const categories = [
-  { id: 'all', name: 'All Products', count: 1247 },
-  { id: 'electronics', name: 'Electronics', count: 324 },
-  { id: 'clothing', name: 'Clothing', count: 189 },
-  { id: 'home', name: 'Home & Garden', count: 156 },
-  { id: 'books', name: 'Books', count: 97 },
-  { id: 'sports', name: 'Sports', count: 134 },
-  { id: 'toys', name: 'Toys', count: 78 },
-  { id: 'health', name: 'Health & Beauty', count: 112 },
-]
+export interface CategoryOption {
+  id: number | 'all'
+  name: string
+  count?: number
+}
 
-const priceRanges = [
-  { id: 'all', label: 'All Prices', min: 0, max: null },
-  { id: 'under-25', label: 'Under $25', min: 0, max: 25 },
-  { id: '25-50', label: '$25 - $50', min: 25, max: 50 },
-  { id: '50-100', label: '$50 - $100', min: 50, max: 100 },
-  { id: 'over-100', label: 'Over $100', min: 100, max: null },
-]
+export interface PriceRangeOption {
+  id: string
+  label: string
+  min: number
+  max: number | null
+}
+
+export interface BrandOption {
+  id: number | 'all'
+  name: string
+  count?: number
+}
+
+interface CategoryFilterProps {
+  categories: CategoryOption[]
+  priceRanges: PriceRangeOption[]
+  brands: BrandOption[]
+  selectedCategory: number | 'all'
+  selectedPriceRange: string
+  selectedBrand: number | 'all'
+  selectedSort: string
+  showingCount: number
+  onCategoryChange: (value: number | 'all') => void
+  onPriceRangeChange: (value: string) => void
+  onBrandChange: (value: number | 'all') => void
+  onSortChange: (value: string) => void
+}
 
 const sortOptions = [
-  { id: 'featured', label: 'Featured' },
-  { id: 'newest', label: 'Newest' },
   { id: 'price-low', label: 'Price: Low to High' },
   { id: 'price-high', label: 'Price: High to Low' },
-  { id: 'rating', label: 'Customer Rating' },
 ]
 
-export default function CategoryFilter() {
-  const [selectedCategory, setSelectedCategory] = useState('all')
-  const [selectedPriceRange, setSelectedPriceRange] = useState('all')
-  const [selectedSort, setSelectedSort] = useState('featured')
+export default function CategoryFilter({
+  categories,
+  priceRanges,
+  brands,
+  selectedCategory,
+  selectedPriceRange,
+  selectedBrand,
+  selectedSort,
+  showingCount,
+  onCategoryChange,
+  onPriceRangeChange,
+  onBrandChange,
+  onSortChange,
+}: CategoryFilterProps) {
   const [searchQuery, setSearchQuery] = useState('')
 
   const activeFilters = []
@@ -64,6 +86,15 @@ export default function CategoryFilter() {
         value: selectedPriceRange,
       })
   }
+  if (selectedBrand !== 'all') {
+    const brand = brands.find((b) => b.id === selectedBrand)
+    if (brand)
+      activeFilters.push({
+        type: 'brand',
+        label: brand.name,
+        value: selectedBrand,
+      })
+  }
   if (searchQuery) {
     activeFilters.push({
       type: 'search',
@@ -73,20 +104,21 @@ export default function CategoryFilter() {
   }
 
   const clearFilter = (type: string) => {
-    if (type === 'category') setSelectedCategory('all')
-    if (type === 'price') setSelectedPriceRange('all')
+    if (type === 'category') onCategoryChange('all')
+    if (type === 'price') onPriceRangeChange('all')
+    if (type === 'brand') onBrandChange('all')
     if (type === 'search') setSearchQuery('')
   }
 
   const clearAllFilters = () => {
-    setSelectedCategory('all')
-    setSelectedPriceRange('all')
+    onCategoryChange('all')
+    onPriceRangeChange('all')
+    onBrandChange('all')
     setSearchQuery('')
   }
 
   return (
     <section className="pb-8">
-      {/* Horizontal Filter Bar */}
       <div className="mb-6 space-y-4">
         {/* Search and Sort Row */}
         {/* Category and Price Filter Row */}
@@ -104,16 +136,45 @@ export default function CategoryFilter() {
               {categories.map((category) => (
                 <DropdownMenuItem
                   key={category.id}
-                  onClick={() => setSelectedCategory(category.id)}
+                  onClick={() => onCategoryChange(category.id)}
                   className={
                     selectedCategory === category.id ? 'bg-accent' : ''
                   }
                 >
                   <div className="flex w-full items-center justify-between">
                     <span>{category.name}</span>
-                    <Badge variant="secondary" className="text-xs">
-                      {category.count}
-                    </Badge>
+                    {typeof category.count === 'number' && (
+                      <Badge variant="secondary" className="text-xs">
+                        {category.count}
+                      </Badge>
+                    )}
+                  </div>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="cursor-pointer">
+                Brand: {brands.find((b) => b.id === selectedBrand)?.name}
+                <ChevronDown className="ms-2 size-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56">
+              {brands.map((brand) => (
+                <DropdownMenuItem
+                  key={brand.id}
+                  onClick={() => onBrandChange(brand.id)}
+                  className={selectedBrand === brand.id ? 'bg-accent' : ''}
+                >
+                  <div className="flex w-full items-center justify-between">
+                    <span>{brand.name}</span>
+                    {typeof brand.count === 'number' && (
+                      <Badge variant="secondary" className="text-xs">
+                        {brand.count}
+                      </Badge>
+                    )}
                   </div>
                 </DropdownMenuItem>
               ))}
@@ -133,7 +194,7 @@ export default function CategoryFilter() {
               {priceRanges.map((range) => (
                 <DropdownMenuItem
                   key={range.id}
-                  onClick={() => setSelectedPriceRange(range.id)}
+                  onClick={() => onPriceRangeChange(range.id)}
                   className={selectedPriceRange === range.id ? 'bg-accent' : ''}
                 >
                   {range.label}
@@ -180,9 +241,7 @@ export default function CategoryFilter() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <span className="text-sm font-medium">
-              Showing{' '}
-              {categories.find((c) => c.id === selectedCategory)?.count ?? 1247}{' '}
-              results
+              Showing {showingCount} results
             </span>
             {searchQuery && (
               <span className="text-muted-foreground text-sm">
@@ -207,7 +266,7 @@ export default function CategoryFilter() {
                 {sortOptions.map((option) => (
                   <DropdownMenuItem
                     key={option.id}
-                    onClick={() => setSelectedSort(option.id)}
+                    onClick={() => onSortChange(option.id)}
                     className={selectedSort === option.id ? 'bg-accent' : ''}
                   >
                     {option.label}
