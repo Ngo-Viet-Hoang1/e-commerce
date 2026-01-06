@@ -68,7 +68,7 @@ export default function ProductCategory() {
               className="basis-full pl-2 sm:basis-1/2 md:pl-3 lg:basis-1/3"
             >
               <Card className="group cursor-pointer overflow-hidden py-0 transition-all duration-500 hover:shadow-md">
-                <div className="relative aspect-4/3 overflow-hidden">
+                <div className="relative aspect-[4/3] overflow-hidden">
                   <img
                     src={brand.image}
                     alt={brand.name}
