@@ -84,3 +84,27 @@ export type OrderStatus =
   | 'refunded'
 
 export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'refunded'
+
+export interface OrderItemInput {
+  productId: number
+  variantId: number
+  quantity: number
+  discount?: number
+}
+
+export interface CreateOrderPayload {
+  items: OrderItemInput[]
+
+  shippingRecipientName: string
+  shippingPhone: string
+
+  shippingProvinceId: number
+  shippingDistrictId: number
+  shippingAddressDetail?: string
+
+  paymentMethod: 'card' | 'cod' | 'vnpay' | 'paypal'
+  paymentStatus?: PaymentStatus
+
+  shippingFee?: number
+  currency?: string
+}
