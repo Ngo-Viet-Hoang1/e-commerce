@@ -1,7 +1,7 @@
 import { TrustStrip } from '@/components/common/TrustStrip'
 import Banner from './Banner'
 import BestSeller from './BestSeller'
-import Category from './Category'
+import Brand from './Brand'
 import Hero from './Hero'
 import TodayBestDeal from './TodayBestDeal'
 
@@ -11,7 +11,7 @@ const Home = () => {
       <Hero />
       <TrustStrip />
       <BestSeller />
-      <Category />
+      <Brand />
       <TodayBestDeal />
       <Banner />
     </>

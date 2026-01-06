@@ -79,6 +79,7 @@ const TodayBestDeal = () => {
         {displayedProducts.map((product) => (
           <ProductCard
             key={product.id}
+            sku={`sku-${product.id}`}
             imageUrl={product.image}
             productName={product.title}
             minPrice={product.price}

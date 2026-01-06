@@ -16,29 +16,29 @@ interface TrustStripProps {
 const DEFAULT_ITEMS: TrustItem[] = [
   {
     icon: <Truck className="size-5" />,
-    title: 'Free Shipping',
-    description: 'On orders over $50',
+    title: 'Miễn phí vận chuyển',
+    description: 'Miễn phí giao hàng trên toàn quốc',
     colorClass:
       'bg-blue-50 text-blue-600 ring-blue-100 hover:bg-blue-100 hover:ring-blue-200 dark:bg-blue-950/30 dark:text-blue-400 dark:ring-blue-900/50',
   },
   {
     icon: <RotateCcw className="size-5" />,
-    title: 'Easy Returns',
-    description: '30-day return policy',
+    title: 'Dễ dàng đổi trả',
+    description: 'Đổi trả trong 30 ngày',
     colorClass:
       'bg-green-50 text-green-600 ring-green-100 hover:bg-green-100 hover:ring-green-200 dark:bg-green-950/30 dark:text-green-400 dark:ring-green-900/50',
   },
   {
     icon: <Shield className="size-5" />,
-    title: 'Secure Payment',
-    description: '100% protected',
+    title: 'Bảo mật thanh toán',
+    description: '100% an toàn bảo mật',
     colorClass:
       'bg-purple-50 text-purple-600 ring-purple-100 hover:bg-purple-100 hover:ring-purple-200 dark:bg-purple-950/30 dark:text-purple-400 dark:ring-purple-900/50',
   },
   {
     icon: <Star className="size-5" />,
-    title: '4.9/5 Rating',
-    description: 'From 10,000+ reviews',
+    title: '4.9/5 sao',
+    description: 'Từ 10.000+ người đánh giá',
     colorClass:
       'bg-amber-50 text-amber-600 ring-amber-100 hover:bg-amber-100 hover:ring-amber-200 dark:bg-amber-950/30 dark:text-amber-400 dark:ring-amber-900/50',
   },
@@ -53,11 +53,11 @@ const TrustStrip = ({ items = DEFAULT_ITEMS, className }: TrustStripProps) => {
       )}
     >
       <div className="container">
-        <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
+        <div className="grid grid-cols-2 gap-6 px-3 md:grid-cols-4 md:justify-items-center">
           {items.map((item, index) => (
             <div
               key={index}
-              className="group flex items-center gap-4 transition-transform duration-200 hover:-translate-y-0.5"
+              className="group flex items-center gap-4 transition-transform duration-200 hover:-translate-y-0.5 md:justify-center"
             >
               <div
                 className={cn(
