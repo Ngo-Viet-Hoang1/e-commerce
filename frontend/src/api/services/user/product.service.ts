@@ -2,11 +2,12 @@ import type {
   IApiResponse,
   IPaginatedResponse,
 } from '@/interfaces/base-response.interface'
-import type { Product } from '@/interfaces/product.interface'
 import type { PaginationParams } from '@/interfaces/pagination.interface'
+import type { Product } from '@/interfaces/product.interface'
 import { api } from '../..'
 
 export interface GetProductsParams extends PaginationParams {
+  sku?: string
   search?: string
   categoryId?: number
   brandId?: number
