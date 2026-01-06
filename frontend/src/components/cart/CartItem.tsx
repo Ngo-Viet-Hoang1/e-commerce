@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import type { CartItem as ICartItem } from '@/interfaces/cart.interface'
 import { cn } from '@/lib/utils'
 import { formatCurrency } from '@/lib/format'
@@ -7,6 +8,8 @@ import { useState } from 'react'
 
 interface CartItemProps {
   item: ICartItem
+  isSelected?: boolean
+  onToggleSelect?: () => void
   onUpdateQuantity: (
     productId: number,
     variantId: number,
@@ -19,6 +22,8 @@ interface CartItemProps {
 
 export function CartItem({
   item,
+  isSelected = false,
+  onToggleSelect,
   onUpdateQuantity,
   onRemove,
   isUpdating,
@@ -56,11 +61,23 @@ export function CartItem({
   return (
     <div
       className={cn(
-        'bg-card flex gap-4 rounded-lg border p-4 transition-opacity',
+        'bg-card flex gap-4 rounded-lg border p-4 transition-all',
         (isUpdating ?? isRemoving) && 'pointer-events-none opacity-50',
         isOutOfStock && 'bg-muted/50',
+        isSelected && 'ring-primary ring-2',
       )}
     >
+      {/* Selection Checkbox */}
+      {onToggleSelect && (
+        <div className="flex items-start pt-8">
+          <Checkbox
+            checked={isSelected}
+            onCheckedChange={onToggleSelect}
+            disabled={isOutOfStock}
+            aria-label="Chọn sản phẩm"
+          />
+        </div>
+      )}
       {/* Product Image */}
       <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-md">
         <img

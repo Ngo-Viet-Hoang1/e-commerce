@@ -1,12 +1,17 @@
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { CartItem as CartItemComponent, CartSummary } from '@/components/cart'
+import {
+  CartItem as CartItemComponent,
+  CartSummary,
+  SelectAllCheckbox,
+} from '@/components/cart'
 import {
   useClearCart,
   useCart,
   useRemoveCartItem,
   useUpdateCartItem,
 } from '@/hooks/useCart'
+import { useCartSelection } from '@/hooks/useCartSelection'
 import { Loader2, ShoppingBag } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import {
@@ -32,6 +37,15 @@ export default function ShoppingCart() {
   const removeCartItem = useRemoveCartItem()
   const clearCart = useClearCart()
 
+  const {
+    selectedIds,
+    selectedSummary,
+    isAllSelected,
+    toggleItem,
+    selectAll,
+    getItemId,
+  } = useCartSelection(cart)
+
   const handleUpdateQuantity = (
     productId: number,
     variantId: number,
@@ -50,7 +64,13 @@ export default function ShoppingCart() {
   }
 
   const handleCheckout = () => {
-    navigate('/checkout')
+    if (selectedSummary.items.length === 0) return
+
+    navigate('/checkout', {
+      state: {
+        selectedItems: selectedSummary.items,
+      },
+    })
   }
 
   if (!isAuthenticated) {
@@ -122,25 +142,57 @@ export default function ShoppingCart() {
       <div className="flex flex-col gap-8 lg:flex-row">
         {/* Cart Items */}
         <div className="flex-1 space-y-4">
-          {cart.items.map((item) => (
-            <CartItemComponent
-              key={`${item.productId}-${item.variantId}-${item.quantity}-${item.currentPrice}`}
-              item={item}
-              onUpdateQuantity={handleUpdateQuantity}
-              onRemove={handleRemoveItem}
-              isUpdating={updateCartItem.isPending}
-              isRemoving={removeCartItem.isPending}
-            />
-          ))}
+          {/* Select All */}
+          <SelectAllCheckbox
+            totalCount={cart.items.length}
+            selectedCount={selectedSummary.count}
+            isAllSelected={isAllSelected}
+            onSelectAll={selectAll}
+          />
+
+          {cart.items.map((item) => {
+            const itemId = getItemId(item.productId, item.variantId)
+            const isSelected = selectedIds.has(itemId)
+
+            return (
+              <CartItemComponent
+                key={`${item.productId}-${item.variantId}-${item.quantity}-${item.currentPrice}`}
+                item={item}
+                isSelected={isSelected}
+                onToggleSelect={() =>
+                  toggleItem(item.productId, item.variantId)
+                }
+                onUpdateQuantity={handleUpdateQuantity}
+                onRemove={handleRemoveItem}
+                isUpdating={updateCartItem.isPending}
+                isRemoving={removeCartItem.isPending}
+              />
+            )
+          })}
         </div>
 
         {/* Order Summary */}
         <div className="w-full lg:w-96">
           <CartSummary
-            summary={cart.summary}
+            summary={{
+              itemCount: selectedSummary.count,
+              totalQuantity: selectedSummary.items.reduce(
+                (sum, item) => sum + item.quantity,
+                0,
+              ),
+              subtotal: selectedSummary.subtotal,
+              hasPriceChanges: selectedSummary.items.some(
+                (item) => item.priceChanged,
+              ),
+              hasOutOfStock: selectedSummary.hasIssues,
+            }}
             onCheckout={handleCheckout}
             onClearCart={() => setShowClearDialog(true)}
-            isCheckoutDisabled={clearCart.isPending}
+            isCheckoutDisabled={
+              clearCart.isPending ||
+              selectedSummary.count === 0 ||
+              selectedSummary.hasIssues
+            }
           />
         </div>
       </div>
