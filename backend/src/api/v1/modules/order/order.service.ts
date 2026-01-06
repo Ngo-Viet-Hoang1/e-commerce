@@ -6,6 +6,8 @@ import {
   type UpdateOrderBody,
   type listOrdersQuerySchema,
 } from './order.schema'
+import { productVariantRepository } from '../product-variant'
+import { prisma } from '../../shared/config/database/postgres'
 
 class OrderService {
   findAll = async (query: listOrdersQuerySchema) => {
@@ -63,12 +65,14 @@ class OrderService {
       billingAddress,
       metadata,
       shippingFee = 0,
+      paymentMethod = 'cod',
+      shippingProvinceId,
+      shippingDistrictId,
+      userId,
       ...rest
     } = data
 
-    const { productVariantRepository } =
-      await import('../product-variant/product-variant.repository')
-    const { prisma } = await import('../../shared/config/database/postgres')
+    const isCOD = paymentMethod === 'cod'
 
     const itemsData = await Promise.all(
       items.map(async (item) => {
@@ -78,13 +82,26 @@ class OrderService {
           throw new NotFoundException('Variant', item.variantId.toString())
         }
 
+        if (variant.deletedAt) {
+          throw new NotFoundException(
+            'Product variant is no longer available',
+            item.variantId.toString(),
+          )
+        }
+
         if (variant.productId !== item.productId) {
           throw new NotFoundException('Variant does not belong to product')
         }
 
+        if (variant.stockQuantity < item.quantity) {
+          throw new NotFoundException(
+            `Insufficient stock for variant ${variant.title || variant.sku}. Available: ${variant.stockQuantity}, Requested: ${item.quantity}`,
+          )
+        }
+
         const unitPrice = variant.price
-        const totalPrice =
-          unitPrice.toNumber() * item.quantity - (item.discount || 0)
+        const discount = item.discount || 0
+        const totalPrice = unitPrice.toNumber() * item.quantity - discount
 
         return {
           productId: item.productId,
@@ -92,7 +109,7 @@ class OrderService {
           quantity: item.quantity,
           unitPrice,
           totalPrice,
-          discount: item.discount || 0,
+          discount,
         }
       }),
     )
@@ -100,15 +117,28 @@ class OrderService {
     const itemsTotal = itemsData.reduce((sum, item) => sum + item.totalPrice, 0)
     const totalAmount = itemsTotal + shippingFee
 
+    const orderStatus = 'pending'
+    const orderPaymentStatus = 'pending'
+
+    const orderMetadata = {
+      ...(typeof metadata === 'object' ? metadata : {}),
+      paymentMethod,
+    }
+
     const order = await prisma.$transaction(async (tx) => {
       const newOrder = await tx.order.create({
         data: {
           ...rest,
+          userId,
           totalAmount,
           shippingFee,
+          status: orderStatus,
+          paymentStatus: orderPaymentStatus,
+          shippingProvinceId,
+          shippingDistrictId,
           shippingAddress: shippingAddress ?? undefined,
           billingAddress: billingAddress ?? undefined,
-          metadata: metadata ?? undefined,
+          metadata: orderMetadata,
           orderItems: {
             create: itemsData,
           },
@@ -118,8 +148,50 @@ class OrderService {
         },
       })
 
+      if (isCOD) {
+        for (const item of itemsData) {
+          const updated = await tx.productVariant.updateMany({
+            where: {
+              id: item.variantId,
+              stockQuantity: {
+                gte: item.quantity,
+              },
+              deletedAt: null,
+            },
+            data: {
+              stockQuantity: {
+                decrement: item.quantity,
+              },
+            },
+          })
+
+          if (updated.count === 0) {
+            const currentVariant = await tx.productVariant.findUnique({
+              where: { id: item.variantId },
+            })
+
+            if (!currentVariant || currentVariant.deletedAt) {
+              throw new NotFoundException(
+                'Product variant is no longer available',
+                item.variantId.toString(),
+              )
+            }
+
+            throw new NotFoundException(
+              `Insufficient stock. Available: ${currentVariant.stockQuantity}, Requested: ${item.quantity}`,
+            )
+          }
+        }
+      }
+
       return newOrder
     })
+
+    // TODO: For online payment, integrate with payment gateway
+    // if (!isCOD) {
+    //   const paymentUrl = await generatePaymentUrl(order, paymentMethod)
+    //   return { ...order, paymentUrl }
+    // }
 
     return order
   }
@@ -188,17 +260,81 @@ class OrderService {
   cancelUserOrder = async (userId: number, orderId: number) => {
     const order = await this.findUserOrderById(userId, orderId)
 
-    // Only allow cancellation if order is pending or processing
-    if (!['pending', 'processing'].includes(order.status)) {
-      throw new NotFoundException('Order', orderId.toString())
+    if (!['pending', 'processing', 'shipped'].includes(order.status)) {
+      throw new NotFoundException(
+        'Cannot cancel order with status: ' + order.status,
+      )
     }
 
-    const cancelledOrder = await orderRepository.update(orderId, {
-      status: 'cancelled',
+    const cancelledOrder = await prisma.$transaction(async (tx) => {
+      const updated = await tx.order.update({
+        where: { orderId },
+        data: {
+          status: 'cancelled',
+        },
+        include: {
+          orderItems: true,
+        },
+      })
+
+      const orderMeta = order.metadata as { paymentMethod?: string } | null
+      const wasCOD = orderMeta?.paymentMethod === 'cod'
+      const shouldRestoreStock = wasCOD || order.paymentStatus === 'paid'
+
+      if (shouldRestoreStock) {
+        for (const item of updated.orderItems) {
+          if (item.variantId) {
+            await tx.productVariant.update({
+              where: { id: item.variantId },
+              data: {
+                stockQuantity: {
+                  increment: item.quantity,
+                },
+              },
+            })
+          }
+        }
+      }
+
+      return updated
     })
 
     return cancelledOrder
   }
+
+  // TODO: Handle payment confirmation webhook (VNPay, PayPal)
+  // confirmPayment = async (orderId: number, paymentData: any) => {
+  //   const order = await this.findById(orderId)
+  //
+  //   // Verify payment with gateway
+  //   // If valid, update order status and decrement stock
+  //
+  //   const { prisma } = await import('../../shared/config/database/postgres')
+  //
+  //   await prisma.$transaction(async (tx) => {
+  //     // Update order
+  //     await tx.order.update({
+  //       where: { orderId },
+  //       data: {
+  //         status: 'pending',
+  //         paymentStatus: 'paid',
+  //       },
+  //     })
+  //
+  //     // Decrement stock (same logic as COD)
+  //     for (const item of order.orderItems) {
+  //       await tx.productVariant.updateMany({
+  //         where: {
+  //           id: item.variantId,
+  //           stockQuantity: { gte: item.quantity },
+  //         },
+  //         data: {
+  //           stockQuantity: { decrement: item.quantity },
+  //         },
+  //       })
+  //     }
+  //   })
+  // }
 }
 
 export const orderService = new OrderService()

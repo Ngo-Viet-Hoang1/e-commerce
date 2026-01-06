@@ -69,6 +69,10 @@ export const createOrderBodySchema = z.object({
   shippingFee: z.number().min(0).optional().default(0),
 
   paymentStatus: z.string().default('pending'),
+  paymentMethod: z
+    .enum(['cod', 'vnpay', 'paypal', 'card'])
+    .optional()
+    .default('cod'),
   metadata: z.record(z.string(), z.any()).optional(),
 })
 
@@ -104,8 +108,9 @@ export const updateOrderStatusBodySchema = z.object({
     'shipped',
     'delivered',
     'cancelled',
+    'refunded',
   ]),
-  paymentStatus: z.enum(['pending', 'paid', 'failed']),
+  paymentStatus: z.enum(['pending', 'paid', 'failed', 'refunded']),
 })
 
 const ORDER_SORT_FIELDS = [
