@@ -25,6 +25,17 @@ export const removeCartItemBodySchema = z.object({
   variantId: z.number().int().positive(),
 })
 
+export const removeCartItemsBodySchema = z.object({
+  items: z
+    .array(
+      z.object({
+        productId: z.number().int().positive(),
+        variantId: z.number().int().positive(),
+      }),
+    )
+    .min(1, 'At least one item is required'),
+})
+
 export const cartItemDtoSchema = z.object({
   productId: z.number(),
   variantId: z.number(),
@@ -69,6 +80,7 @@ export const cartDtoSchema = z.object({
 export type AddToCartBody = z.infer<typeof addToCartBodySchema>
 export type UpdateCartItemBody = z.infer<typeof updateCartItemBodySchema>
 export type RemoveCartItemBody = z.infer<typeof removeCartItemBodySchema>
+export type RemoveCartItemsBody = z.infer<typeof removeCartItemsBodySchema>
 
 export type CartItemDto = z.infer<typeof cartItemDtoSchema>
 export type CartDto = z.infer<typeof cartDtoSchema>

@@ -5,6 +5,7 @@ import { cartController } from './cart.controller'
 import {
   addToCartBodySchema,
   removeCartItemBodySchema,
+  removeCartItemsBodySchema,
   updateCartItemBodySchema,
 } from './cart.schema'
 
@@ -30,6 +31,12 @@ router.delete(
   '/items',
   validate(removeCartItemBodySchema, 'body'),
   cartController.removeCartItem,
+)
+
+router.delete(
+  '/items/bulk',
+  validate(removeCartItemsBodySchema, 'body'),
+  cartController.removeCartItems,
 )
 
 router.delete('/', cartController.clearCart)
