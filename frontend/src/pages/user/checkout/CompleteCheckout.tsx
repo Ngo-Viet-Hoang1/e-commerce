@@ -347,7 +347,7 @@ const CompleteCheckout = ({ className }: CompleteCheckoutProps) => {
                 <Button
                   className="w-full"
                   variant="default"
-                  onClick={() => navigate('/user/orders')}
+                  onClick={() => navigate('/profile/orders')}
                 >
                   <Package className="mr-2 size-4" />
                   Xem đơn hàng

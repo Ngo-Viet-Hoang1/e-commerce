@@ -13,6 +13,7 @@ import { useState } from 'react'
 import { useCancelUserOrder, useUserOrders } from './order.queries'
 import OrderItems from './OrderItems'
 import { Package } from 'lucide-react'
+import { ConfirmDialog } from '@/components/common/ConfirmDialog'
 
 const OrdersPage = () => {
   const [params] = useState<PaginationParams>({
@@ -20,6 +21,7 @@ const OrdersPage = () => {
     limit: 10,
   })
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
+  const [cancelOrderId, setCancelOrderId] = useState<number | null>(null)
 
   const { data, isLoading, isError } = useUserOrders(params)
   const cancelOrder = useCancelUserOrder()
@@ -29,8 +31,16 @@ const OrdersPage = () => {
   }
 
   const handleCancelOrder = (orderId: number) => {
-    if (confirm('Are you sure you want to cancel this order?')) {
-      cancelOrder.mutate(orderId)
+    setCancelOrderId(orderId)
+  }
+
+  const confirmCancelOrder = () => {
+    if (cancelOrderId) {
+      cancelOrder.mutate(cancelOrderId, {
+        onSuccess: () => {
+          setCancelOrderId(null)
+        },
+      })
     }
   }
 
@@ -105,6 +115,18 @@ const OrdersPage = () => {
           {selectedOrder && <OrderDetail order={selectedOrder} />}
         </DialogContent>
       </Dialog>
+
+      <ConfirmDialog
+        open={!!cancelOrderId}
+        onClose={() => setCancelOrderId(null)}
+        onConfirm={confirmCancelOrder}
+        title="Xác nhận hủy đơn hàng"
+        description={`Bạn có chắc chắn muốn hủy đơn hàng #${cancelOrderId}? Hành động này không thể hoàn tác.`}
+        confirmText="Hủy đơn hàng"
+        cancelText="Đóng"
+        variant="destructive"
+        isLoading={cancelOrder.isPending}
+      />
     </div>
   )
 }
