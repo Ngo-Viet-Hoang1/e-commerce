@@ -1,6 +1,5 @@
 import { Spinner } from '@/components/ui/spinner'
 import { useAdminAuthStore, useAuthStore } from '@/store/zustand/useAuthStore'
-import { useEffect } from 'react'
 import { Navigate, Outlet } from 'react-router-dom'
 
 interface ProtectedRouteProps {
@@ -18,14 +17,8 @@ const ProtectedRoute = ({
   const adminAuth = useAdminAuthStore()
 
   const authStore = type === 'admin' ? adminAuth : userAuth
-  const { me, isAuthenticated, isInitialized, initializeAuth } = authStore
+  const { me, isAuthenticated, isInitialized } = authStore
   const hasRole = me?.roles?.includes(type)
-
-  useEffect(() => {
-    if (!isInitialized) {
-      void initializeAuth()
-    }
-  }, [isInitialized, initializeAuth])
 
   if (!isInitialized) {
     return (
