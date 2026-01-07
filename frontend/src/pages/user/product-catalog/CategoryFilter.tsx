@@ -47,8 +47,8 @@ interface CategoryFilterProps {
 }
 
 const sortOptions = [
-  { id: 'price-low', label: 'Price: Low to High' },
-  { id: 'price-high', label: 'Price: High to Low' },
+  { id: 'price-low', label: 'Giá: Thấp đến Cao' },
+  { id: 'price-high', label: 'Giá: Cao đến Thấp' },
 ]
 
 export default function CategoryFilter({
@@ -127,7 +127,7 @@ export default function CategoryFilter({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm" className="cursor-pointer">
-                Category:{' '}
+                Danh mục:{' '}
                 {categories.find((c) => c.id === selectedCategory)?.name}
                 <ChevronDown className="ms-2 size-4" />
               </Button>
@@ -157,7 +157,7 @@ export default function CategoryFilter({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm" className="cursor-pointer">
-                Brand: {brands.find((b) => b.id === selectedBrand)?.name}
+                Thương hiệu: {brands.find((b) => b.id === selectedBrand)?.name}
                 <ChevronDown className="ms-2 size-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -185,7 +185,7 @@ export default function CategoryFilter({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm" className="cursor-pointer">
-                Price:{' '}
+                Giá:{' '}
                 {priceRanges.find((p) => p.id === selectedPriceRange)?.label}
                 <ChevronDown className="ms-2 size-4" />
               </Button>
@@ -208,7 +208,7 @@ export default function CategoryFilter({
         {activeFilters.length > 0 && (
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-muted-foreground text-sm font-medium">
-              Active filters:
+              Bộ lọc đang áp dụng:
             </span>
             {activeFilters.map((filter, index) => (
               <Badge key={index} variant="secondary">
@@ -230,7 +230,7 @@ export default function CategoryFilter({
               onClick={clearAllFilters}
               className="text-muted-foreground h-auto cursor-pointer p-1.5 text-xs"
             >
-              Clear all
+              Xóa tất cả
             </Button>
           </div>
         )}
@@ -241,11 +241,11 @@ export default function CategoryFilter({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <span className="text-sm font-medium">
-              Showing {showingCount} results
+              Hiển thị {showingCount} kết quả
             </span>
             {searchQuery && (
               <span className="text-muted-foreground text-sm">
-                for "{searchQuery}"
+                cho "{searchQuery}"
               </span>
             )}
           </div>
@@ -258,7 +258,8 @@ export default function CategoryFilter({
                   className="ml-auto w-full cursor-pointer sm:w-auto"
                 >
                   <SlidersHorizontal className="me-2 size-4" />
-                  Sort: {sortOptions.find((s) => s.id === selectedSort)?.label}
+                  Sắp xếp:{' '}
+                  {sortOptions.find((s) => s.id === selectedSort)?.label}
                   <ChevronDown className="ms-2 size-4" />
                 </Button>
               </DropdownMenuTrigger>

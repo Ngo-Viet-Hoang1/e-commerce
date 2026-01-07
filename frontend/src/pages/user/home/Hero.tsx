@@ -148,7 +148,7 @@ export default function StorefrontHero() {
                       <CarouselItem key={product.id} className="h-full">
                         <Card className="relative size-full overflow-hidden rounded-lg">
                           <CardContent className="p-0">
-                            <div className="relative size-full overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900">
+                            <div className="relative size-full overflow-hidden bg-linear-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900">
                               <img
                                 src={primaryImage?.url ?? '/placeholder.png'}
                                 alt={primaryImage?.altText ?? product.name}
@@ -157,7 +157,7 @@ export default function StorefrontHero() {
                               />
                             </div>
                             {/* Enhanced gradient overlay for better text readability */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+                            <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/40 to-transparent" />
 
                             <div className="absolute inset-0 flex flex-col justify-end p-8">
                               <div className="relative z-10 max-w-md space-y-4">
