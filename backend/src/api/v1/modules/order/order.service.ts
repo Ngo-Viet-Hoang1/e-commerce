@@ -8,6 +8,8 @@ import {
 } from './order.schema'
 import { productVariantRepository } from '../product-variant'
 import { prisma } from '../../shared/config/database/postgres'
+import puppeteer from 'puppeteer'
+import { generateInvoiceHTML, type InvoiceData } from './invoice.template'
 
 class OrderService {
   findAll = async (query: listOrdersQuerySchema) => {
@@ -300,6 +302,91 @@ class OrderService {
     })
 
     return cancelledOrder
+  }
+
+  generateInvoicePDF = async (orderId: number, userId?: number) => {
+    // Fetch order with all related data and verify access
+    if (userId) {
+      await this.findUserOrderById(userId, orderId)
+    } else {
+      await this.findById(orderId)
+    }
+
+    const orderWithDetails = await orderRepository.findById(orderId)
+
+    if (!orderWithDetails) {
+      throw new NotFoundException('Order', orderId.toString())
+    }
+
+    // Convert Decimal to number for template
+    const orderData = {
+      ...orderWithDetails,
+      totalAmount: Number(orderWithDetails.totalAmount),
+      shippingFee: orderWithDetails.shippingFee
+        ? Number(orderWithDetails.shippingFee)
+        : null,
+      orderItems: orderWithDetails.orderItems.map((item) => ({
+        ...item,
+        unitPrice: Number(item.unitPrice),
+        totalPrice: Number(item.totalPrice),
+        discount: Number(item.discount),
+      })),
+    }
+
+    // Generate HTML from template
+    const html = generateInvoiceHTML(orderData as InvoiceData)
+
+    // Launch Puppeteer and generate PDF
+    // Try to use system Chrome first, fallback to bundled Chromium
+    let browser
+    try {
+      browser = await puppeteer.launch({
+        headless: true,
+        args: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',
+          '--disable-gpu',
+        ],
+      })
+    } catch {
+      // If Puppeteer Chrome not found, try to use system Chrome
+      browser = await puppeteer.launch({
+        headless: true,
+        executablePath:
+          process.platform === 'win32'
+            ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
+            : process.platform === 'darwin'
+              ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+              : '/usr/bin/google-chrome',
+        args: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',
+          '--disable-gpu',
+        ],
+      })
+    }
+
+    try {
+      const page = await browser.newPage()
+      await page.setContent(html, { waitUntil: 'networkidle0' })
+
+      const pdfBuffer = await page.pdf({
+        format: 'A4',
+        printBackground: true,
+        margin: {
+          top: '20px',
+          right: '20px',
+          bottom: '20px',
+          left: '20px',
+        },
+      })
+
+      return pdfBuffer
+    } finally {
+      await browser.close()
+    }
   }
 
   // TODO: Handle payment confirmation webhook (VNPay, PayPal)

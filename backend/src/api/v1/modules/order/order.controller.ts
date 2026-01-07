@@ -122,6 +122,33 @@ class OrderController {
 
     SuccessResponse.send(res, cancelled, 'Order cancelled successfully')
   }
+
+  exportUserOrderPDF = async (req: Request, res: Response) => {
+    const userId = req.user!.id
+    const { orderId } = req.validatedData?.params as { orderId: number }
+
+    const pdfBuffer = await orderService.generateInvoicePDF(orderId, userId)
+
+    res.setHeader('Content-Type', 'application/pdf')
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="invoice-${orderId}.pdf"`,
+    )
+    res.send(pdfBuffer)
+  }
+
+  exportOrderPDF = async (req: Request, res: Response) => {
+    const { id } = req.validatedData?.params as OrderIdParam
+
+    const pdfBuffer = await orderService.generateInvoicePDF(id)
+
+    res.setHeader('Content-Type', 'application/pdf')
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="invoice-${id}.pdf"`,
+    )
+    res.send(pdfBuffer)
+  }
 }
 
 export const orderController = new OrderController()
