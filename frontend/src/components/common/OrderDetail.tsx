@@ -1,4 +1,5 @@
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Table,
@@ -20,16 +21,19 @@ import { formatCurrency, formatDate } from '@/lib/format'
 import {
   CalendarIcon,
   CreditCardIcon,
+  Download,
   MapPinIcon,
   PackageIcon,
   PhoneIcon,
   TruckIcon,
   UserIcon,
 } from 'lucide-react'
+import { useState } from 'react'
 
 interface OrderDetailProps {
   order: Order
   showCustomerEmail?: boolean
+  onExportPDF?: (orderId: number) => Promise<void>
 }
 
 interface InfoItemProps {
@@ -57,9 +61,25 @@ function InfoItem({ label, value, icon }: InfoItemProps) {
 export function OrderDetail({
   order,
   showCustomerEmail = false,
+  onExportPDF,
 }: OrderDetailProps) {
+  const [isExporting, setIsExporting] = useState(false)
+
   const shippingFee = order.shippingFee ?? 0
   const totalAmount = order.totalAmount
+
+  const handleExportPDF = async () => {
+    if (!onExportPDF) return
+
+    try {
+      setIsExporting(true)
+      await onExportPDF(order.orderId)
+    } catch (error) {
+      console.error('Failed to export PDF:', error)
+    } finally {
+      setIsExporting(false)
+    }
+  }
 
   const metadata = order.metadata as { paymentMethod?: string } | null
   const paymentMethod = metadata?.paymentMethod
@@ -82,6 +102,30 @@ export function OrderDetail({
 
   return (
     <div className="space-y-6 print:space-y-4 print:text-black">
+      {/* Export PDF Button */}
+      {onExportPDF && (
+        <div className="flex justify-end">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleExportPDF}
+            disabled={isExporting}
+          >
+            {isExporting ? (
+              <>
+                <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                Đang xuất...
+              </>
+            ) : (
+              <>
+                <Download className="mr-2 h-4 w-4" />
+                Xuất PDF
+              </>
+            )}
+          </Button>
+        </div>
+      )}
+
       {/* Header Section */}
       <div className="rounded-lg border bg-gradient-to-br from-slate-50 to-slate-100 p-6 print:rounded-none print:border-0 print:bg-white print:p-4">
         <div className="flex flex-wrap items-start justify-between gap-4">

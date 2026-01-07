@@ -27,6 +27,27 @@ class UserOrderService {
     )
     return data
   }
+
+  static exportOrderPDF = async (orderId: number): Promise<Blob> => {
+    try {
+      const response = await api.get(`/users/orders/${orderId}/export-pdf`, {
+        responseType: 'blob',
+      })
+      return response.data
+    } catch (error: any) {
+      // Handle blob error response
+      if (error.response?.data instanceof Blob) {
+        const text = await error.response.data.text()
+        try {
+          const jsonError = JSON.parse(text)
+          throw new Error(jsonError.message || 'Failed to export PDF')
+        } catch {
+          throw new Error('Failed to export PDF')
+        }
+      }
+      throw error
+    }
+  }
 }
 
 export default UserOrderService

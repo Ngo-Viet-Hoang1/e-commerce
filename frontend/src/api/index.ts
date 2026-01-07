@@ -204,8 +204,9 @@ const handleError = (axiosError: AxiosError<IErrorResponse>): ApiError => {
       504: 'Gateway Timeout - Request took too long',
     }
 
+    const statusCode = error?.statusCode ?? axiosError.response.status ?? 500
     const msg =
-      errorMessages[error.statusCode] ??
+      errorMessages[statusCode] ??
       axiosError.response.data.message ??
       'Something went wrong'
 
@@ -213,7 +214,7 @@ const handleError = (axiosError: AxiosError<IErrorResponse>): ApiError => {
     if (!customConfig?.skipToast) {
       toast.error(msg)
 
-      if (error.details) {
+      if (error?.details) {
         Object.entries(error.details).forEach(([_, messsages]) =>
           messsages.forEach((msg: string) => toast.error(msg)),
         )
@@ -222,8 +223,8 @@ const handleError = (axiosError: AxiosError<IErrorResponse>): ApiError => {
 
     return new ApiError(
       msg,
-      error.statusCode,
-      error.details as Record<string, string[]> | undefined,
+      statusCode,
+      error?.details as Record<string, string[]> | undefined,
     )
   } else if (axiosError.request) {
     if (!(axiosError.config as CustomAxiosRequestConfig)?.skipToast) {
