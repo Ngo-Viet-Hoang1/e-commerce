@@ -29,9 +29,9 @@ function ProductCard({
   maxPrice,
   minSalePrice,
   tagText,
-  maxRating = 5,
-  rating = 4.5,
-  reviewCount = 128,
+  // maxRating = 5,
+  // rating = 4.5,
+  // reviewCount = 128,
   onToggleWishlist = () => {
     //empty
   },

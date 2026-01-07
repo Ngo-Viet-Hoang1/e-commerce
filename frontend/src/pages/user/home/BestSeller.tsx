@@ -66,6 +66,7 @@ const BestSeller = () => {
                 key={p.id}
                 imageUrl={p.image}
                 productName={p.title}
+                sku={String(p.id)}
                 minPrice={p.price}
                 maxPrice={p.price * 1.2}
                 minSalePrice={p.price * 0.8}
