@@ -14,6 +14,9 @@ import { useCancelUserOrder, useUserOrders } from './order.queries'
 import OrderItems from './OrderItems'
 import { Package } from 'lucide-react'
 import { ConfirmDialog } from '@/components/common/ConfirmDialog'
+import UserOrderService from '@/api/services/user/order.user.service'
+import { downloadBlob, generateOrderPDFFilename } from '@/utils/download'
+import { toast } from 'sonner'
 
 const OrdersPage = () => {
   const [params] = useState<PaginationParams>({
@@ -41,6 +44,21 @@ const OrdersPage = () => {
           setCancelOrderId(null)
         },
       })
+    }
+  }
+
+  const handleExportPDF = async (orderId: number) => {
+    try {
+      const blob = await UserOrderService.exportOrderPDF(orderId)
+      const filename = generateOrderPDFFilename(orderId)
+      downloadBlob(blob, filename)
+      toast.success('Xuất PDF thành công!')
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Xuất PDF thất bại. Vui lòng thử lại!'
+      toast.error(errorMessage)
     }
   }
 
@@ -112,7 +130,9 @@ const OrdersPage = () => {
           <DialogHeader>
             <DialogTitle>Chi tiết đơn hàng</DialogTitle>
           </DialogHeader>
-          {selectedOrder && <OrderDetail order={selectedOrder} />}
+          {selectedOrder && (
+            <OrderDetail order={selectedOrder} onExportPDF={handleExportPDF} />
+          )}
         </DialogContent>
       </Dialog>
 

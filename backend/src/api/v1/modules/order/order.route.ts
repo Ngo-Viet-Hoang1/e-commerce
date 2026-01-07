@@ -44,6 +44,13 @@ router.post(
 )
 
 router.get(
+  '/user/orders/:orderId/pdf',
+  authenticate,
+  validate(userOrderIdParamSchema, 'params'),
+  orderController.exportUserOrderPDF,
+)
+
+router.get(
   '/',
   validate(listOrdersQuerySchema, 'query'),
   orderController.findAll,
@@ -53,6 +60,12 @@ router.get(
   '/:id',
   validate(orderIdParamSchema, 'params'),
   orderController.findById,
+)
+
+router.get(
+  '/:id/export-pdf',
+  validate(orderIdParamSchema, 'params'),
+  orderController.exportOrderPDF,
 )
 
 router.post(

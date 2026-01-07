@@ -53,7 +53,9 @@ const buildBestSellers = (orders: Order[]) => {
       const sku =
         item.product?.sku ?? item.variant?.sku ?? String(item.productId)
       const productName =
-        item.product?.name ?? item.variant?.title ?? `Product #${item.productId}`
+        item.product?.name ??
+        item.variant?.title ??
+        `Product #${item.productId}`
 
       const current = productMap.get(item.productId)
       const imageUrl = getBestSellerImage(item)
@@ -140,7 +142,9 @@ const BestSeller = () => {
   })
 
   const productMap = useMemo(() => {
-    return new Map(productDetails?.map((product) => [product.id, product]) ?? [])
+    return new Map(
+      productDetails?.map((product) => [product.id, product]) ?? [],
+    )
   }, [productDetails])
 
   const { data: favoritesData } = useFavoriteProducts()
@@ -181,7 +185,7 @@ const BestSeller = () => {
       const imageUrl =
         item.imageUrl && item.imageUrl !== DEFAULT_IMAGE_URL
           ? item.imageUrl
-          : productImage ?? DEFAULT_IMAGE_URL
+          : (productImage ?? DEFAULT_IMAGE_URL)
 
       return {
         ...item,

@@ -40,6 +40,12 @@ router.put(
   orderController.cancelUserOrder,
 )
 
+router.get(
+  '/orders/:orderId/export-pdf',
+  validate(userOrderIdParamSchema, 'params'),
+  orderController.exportUserOrderPDF,
+)
+
 router.get('/', validate(listUsersQuerySchema, 'query'), userController.findAll)
 
 router.get('/favorites', userController.getFavoriteProducts)

@@ -109,6 +109,12 @@ const ORDER_BASE_FIELDS = {
     select: {
       id: true,
       name: true,
+      province: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
     },
   },
 } as const
