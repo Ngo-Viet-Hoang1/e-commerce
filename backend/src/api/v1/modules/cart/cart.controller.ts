@@ -4,6 +4,7 @@ import { SuccessResponse } from '../../shared/models/success-response.model'
 import type {
   AddToCartBody,
   RemoveCartItemBody,
+  RemoveCartItemsBody,
   UpdateCartItemBody,
 } from './cart.schema'
 import { cartService } from './cart.service'
@@ -56,6 +57,19 @@ class CartController {
     )
 
     SuccessResponse.send(res, cart, 'Item removed from cart successfully')
+  }
+
+  removeCartItems = async (req: Request, res: Response) => {
+    const userId = req.user!.id
+    const data = req.validatedData?.body as RemoveCartItemsBody
+
+    const cart = await cartService.removeCartItems(data.items, userId)
+
+    SuccessResponse.send(
+      res,
+      cart,
+      `${data.items.length} item(s) removed from cart successfully`,
+    )
   }
 
   clearCart = async (req: Request, res: Response) => {

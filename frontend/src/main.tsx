@@ -9,6 +9,7 @@ import 'nprogress/nprogress.css'
 import { RouterProvider } from 'react-router-dom'
 import 'stream-chat-react/dist/css/v2/index.css'
 import './index.css'
+import { AuthProvider } from './providers/AuthProvider.tsx'
 import { QueryProvider } from './providers/QueryProvider.tsx'
 import router from './routes/Routes.tsx'
 
@@ -24,9 +25,11 @@ createRoot(document.getElementById('root')!).render(
           /* empty */
         }}
       >
-        <QueryProvider>
-          <RouterProvider router={router} />
-        </QueryProvider>
+        <AuthProvider>
+          <QueryProvider>
+            <RouterProvider router={router} />
+          </QueryProvider>
+        </AuthProvider>
         <Toaster position="top-right" richColors closeButton />
       </ErrorBoundary>
     </ThemeProvider>

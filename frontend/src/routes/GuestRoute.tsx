@@ -1,6 +1,5 @@
 import { Navigate, Outlet } from 'react-router-dom'
 import { useAuthStore, useAdminAuthStore } from '@/store/zustand/useAuthStore'
-import { useEffect } from 'react'
 import { Spinner } from '@/components/ui/spinner'
 
 interface GuestRouteProps {
@@ -16,13 +15,7 @@ const GuestRoute = ({
   const adminAuth = useAdminAuthStore()
 
   const authStore = authType === 'admin' ? adminAuth : userAuth
-  const { isAuthenticated, isInitialized, initializeAuth } = authStore
-
-  useEffect(() => {
-    if (!isInitialized) {
-      void initializeAuth()
-    }
-  }, [isInitialized, initializeAuth])
+  const { isAuthenticated, isInitialized } = authStore
 
   if (!isInitialized) {
     return (

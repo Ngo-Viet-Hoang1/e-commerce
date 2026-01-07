@@ -16,6 +16,8 @@ export const queryKeys = {
     detailBySlug: (slug: string) =>
       [...queryKeys.products.details(), 'slug', slug] as const,
     featured: () => [...queryKeys.products.all, 'featured'] as const,
+    byBrand: (brandId: number, limit: number) =>
+      [...queryKeys.products.all, 'brand', brandId, limit] as const,
   },
 }
 
@@ -47,6 +49,20 @@ export const useFeaturedProducts = (limit = 8) => {
   return useQuery({
     queryKey: [...queryKeys.products.featured(), limit],
     queryFn: () => ProductService.getFeatured(limit),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  })
+}
+
+export const useProductsByBrand = (brandId?: number, limit = 8) => {
+  return useQuery({
+    queryKey: queryKeys.products.byBrand(brandId ?? 0, limit),
+    queryFn: () =>
+      ProductService.getPaginated({
+        brandId,
+        limit,
+        page: 1,
+      }),
+    enabled: !!brandId,
     staleTime: 1000 * 60 * 5, // 5 minutes
   })
 }

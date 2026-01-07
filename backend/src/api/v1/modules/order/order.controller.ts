@@ -1,4 +1,5 @@
 import type { Request, Response } from 'express'
+import { UnauthorizedException } from '../../shared/models/app-error.model'
 import { SuccessResponse } from '../../shared/models/success-response.model'
 import {
   type listOrdersQuerySchema,
@@ -34,6 +35,22 @@ class OrderController {
     const data = req.validatedData?.body as CreateOrderBody
 
     const created = await orderService.create(data)
+
+    SuccessResponse.created(res, created, 'Order created successfully')
+  }
+
+  createUserOrder = async (req: Request, res: Response) => {
+    const userId = req.user?.id
+
+    if (!userId) {
+      throw new UnauthorizedException('User authentication required')
+    }
+
+    const data = req.validatedData?.body as CreateOrderBody
+
+    const orderData = { ...data, userId }
+
+    const created = await orderService.create(orderData)
 
     SuccessResponse.created(res, created, 'Order created successfully')
   }

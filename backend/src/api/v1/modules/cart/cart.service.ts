@@ -4,7 +4,12 @@ import {
 } from '../../shared/models/app-error.model'
 import redis from '../../shared/config/database/redis'
 import { cartRepository } from './cart.repo'
-import type { AddToCartBody, CartDto, UpdateCartItemBody } from './cart.schema'
+import type {
+  AddToCartBody,
+  CartDto,
+  RemoveCartItemsBody,
+  UpdateCartItemBody,
+} from './cart.schema'
 
 const CART_TTL = 30 * 24 * 60 * 60 // 30 days
 
@@ -243,6 +248,25 @@ class CartService {
 
     cart.items = cart.items.filter(
       (item) => !(item.productId === productId && item.variantId === variantId),
+    )
+
+    await this.saveCartToRedis(cart, userId)
+    return this.populateCartItems(cart.items)
+  }
+
+  removeCartItems = async (
+    items: Array<{ productId: number; variantId: number }>,
+    userId: number,
+  ): Promise<CartDto> => {
+    const cart = await this.getCartFromRedis(userId)
+
+    // Create a Set for efficient lookup
+    const itemsToRemove = new Set(
+      items.map((item) => `${item.productId}-${item.variantId}`),
+    )
+
+    cart.items = cart.items.filter(
+      (item) => !itemsToRemove.has(`${item.productId}-${item.variantId}`),
     )
 
     await this.saveCartToRedis(cart, userId)

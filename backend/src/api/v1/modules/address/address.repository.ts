@@ -5,18 +5,22 @@ import { executePrismaQuery } from '../../shared/utils/prisma-error.util'
 export const ADDRESS_SELECT_FIELDS = {
   id: true,
   userId: true,
+  districtCode: true,
+  provinceCode: true,
   detail: true,
   isDefault: true,
   createdAt: true,
   updatedAt: true,
   district: {
     select: {
+      id: true,
       code: true,
       name: true,
     },
   },
   province: {
     select: {
+      id: true,
       code: true,
       name: true,
     },

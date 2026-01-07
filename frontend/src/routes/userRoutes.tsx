@@ -22,6 +22,9 @@ const ProductDetail = lazy(
 )
 const ShoppingCart = lazy(() => import('@/pages/user/cart/ShoppingCart'))
 const Checkout = lazy(() => import('@/pages/user/checkout/Checkout'))
+const CompleteCheckout = lazy(
+  () => import('@/pages/user/checkout/CompleteCheckout'),
+)
 
 export const userRoutes: RouteObject[] = [
   {
@@ -71,6 +74,13 @@ export const userRoutes: RouteObject[] = [
         element: <Checkout />,
         handle: {
           breadcrumb: 'Thanh toán',
+        },
+      },
+      {
+        path: 'checkout/complete/:orderId',
+        element: <CompleteCheckout />,
+        handle: {
+          breadcrumb: 'Hoàn tất đơn hàng',
         },
       },
       {

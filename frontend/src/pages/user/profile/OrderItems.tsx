@@ -15,9 +15,14 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { Badge } from '@/components/ui/badge'
 import { Package } from 'lucide-react'
 import type { Order } from '@/interfaces/order.interface'
 import { formatCurrency, formatDate } from '@/lib/format'
+import {
+  getOrderStatusColor,
+  getOrderStatusLabel,
+} from '@/constants/order.constants'
 
 interface OrderItemsProps {
   order: Order
@@ -39,7 +44,15 @@ const OrderItems = ({
   return (
     <Card>
       <CardHeader className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-        <CardTitle className="text-lg">Đơn hàng số {order.orderId}</CardTitle>
+        <div className="flex flex-col gap-2">
+          <CardTitle className="text-lg">Đơn hàng số {order.orderId}</CardTitle>
+          <Badge
+            variant="secondary"
+            className={getOrderStatusColor(order.status)}
+          >
+            {getOrderStatusLabel(order.status)}
+          </Badge>
+        </div>
         <div className="text-muted-foreground text-sm">
           {formatDate(order.createdAt)}
         </div>
