@@ -40,9 +40,25 @@ const monthLabels = Array.from(
   (_, index) => `Tháng ${index + 1}`,
 )
 
+const parseOrderDate = (value: Date | string | null | undefined) => {
+  if (!value) return null
+  if (value instanceof Date) {
+    return isNaN(value.getTime()) ? null : value
+  }
+
+  const trimmed = value.trim()
+  if (!trimmed) return null
+
+  let parsed = new Date(trimmed)
+  if (isNaN(parsed.getTime()) && trimmed.includes(' ')) {
+    parsed = new Date(trimmed.replace(' ', 'T'))
+  }
+
+  return isNaN(parsed.getTime()) ? null : parsed
+}
+
 const getOrderDate = (order: Order) => {
-  const rawDate = order.placedAt ?? order.createdAt
-  return rawDate ? new Date(rawDate) : null
+  return parseOrderDate(order.createdAt)
 }
 
 const getOrderTotal = (order: Order) => {
@@ -85,17 +101,22 @@ const AdminDashboard = () => {
   const orders = useMemo(() => ordersQuery.data ?? [], [ordersQuery.data])
 
   const yearOptions = useMemo(() => {
-    const years = new Set<number>()
-    orders.forEach((order) => {
-      const date = getOrderDate(order)
-      if (date) years.add(date.getFullYear())
-    })
+    const years = orders
+      .map(getOrderDate)
+      .filter((date): date is Date => !!date)
+      .map((date) => date.getFullYear())
 
-    if (years.size === 0) {
-      years.add(new Date().getFullYear())
+    if (years.length === 0) {
+      return [new Date().getFullYear()]
     }
 
-    return Array.from(years).sort((a, b) => b - a)
+    const minYear = Math.min(...years)
+    const maxYear = Math.max(...years)
+
+    return Array.from(
+      { length: maxYear - minYear + 1 },
+      (_, index) => maxYear - index,
+    )
   }, [orders])
 
   const safeSelectedYear = yearOptions.includes(selectedYear)
@@ -117,17 +138,22 @@ const AdminDashboard = () => {
       if (!date || date.getFullYear() !== safeSelectedYear) return
 
       const index = date.getMonth()
-      const totalAmount = Number(order.totalAmount) || 0
+      const totalAmount = getOrderTotal(order)
+      const isCancelled = order.status === 'cancelled'
+      const isPaymentFailed = order.paymentStatus === 'failed'
 
       stats[index].orders += 1
-      stats[index].revenue += totalAmount
       stats[index].currency = order.currency ?? stats[index].currency
+
+      if (!isCancelled && !isPaymentFailed) {
+        stats[index].revenue += totalAmount
+      }
 
       if (order.paymentStatus === 'paid') {
         stats[index].paidOrders += 1
       }
 
-      if (order.status === 'cancelled') {
+      if (isCancelled) {
         stats[index].cancelledOrders += 1
       }
     })
@@ -181,6 +207,9 @@ const AdminDashboard = () => {
     orders.forEach((order) => {
       const date = getOrderDate(order)
       if (!date || date.getFullYear() !== safeSelectedYear) return
+      if (order.status === 'cancelled' || order.paymentStatus === 'failed') {
+        return
+      }
 
       order.orderItems?.forEach((item) => {
         const productId = item.productId
