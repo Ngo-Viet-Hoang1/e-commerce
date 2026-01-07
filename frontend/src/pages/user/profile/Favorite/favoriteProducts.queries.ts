@@ -1,13 +1,17 @@
 import UserService from '@/api/services/user/user.service'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useAuthStore } from '@/store/zustand/useAuthStore'
 import { toast } from 'sonner'
 
 export const FAVORITES_QUERY_KEY = ['favorites']
 
 export const useFavoriteProducts = () => {
+  const { isAuthenticated } = useAuthStore()
+
   return useQuery({
     queryKey: FAVORITES_QUERY_KEY,
     queryFn: UserService.getFavorites,
+    enabled: isAuthenticated,
   })
 }
 

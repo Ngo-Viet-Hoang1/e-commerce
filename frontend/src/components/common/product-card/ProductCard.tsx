@@ -16,6 +16,7 @@ interface ProductCardProps {
   rating?: number
   maxRating?: number
   reviewCount?: number
+  isWishlisted?: boolean
   onToggleWishlist?: () => void
   onAddToCart?: () => void
   onBuyNow?: () => void
@@ -32,6 +33,7 @@ function ProductCard({
   maxRating = 5,
   rating = 4.5,
   reviewCount = 128,
+  isWishlisted = false,
   onToggleWishlist = () => {
     //empty
   },
@@ -60,16 +62,18 @@ function ProductCard({
       {/* Wishlist icon */}
       <Button
         variant="ghost"
-        aria-label="Add to wishlist"
+        aria-label={
+          isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'
+        }
         onClick={(e) => {
           e.stopPropagation()
           onToggleWishlist()
         }}
-        className="absolute top-3 right-3 z-20 scale-90 cursor-pointer rounded-full opacity-0 shadow backdrop-blur transition-all duration-200 group-hover:scale-100 group-hover:opacity-100 hover:text-red-500"
+        className={`absolute top-3 right-3 z-20 scale-90 cursor-pointer rounded-full opacity-0 shadow backdrop-blur transition-all duration-200 group-hover:scale-100 group-hover:opacity-100 hover:text-red-500 ${isWishlisted ? 'text-red-500' : 'text-gray-500'}`}
       >
         <Heart
-          // fill={isWishlisted ? 'red' : 'none'}
-          color="red"
+          fill={isWishlisted ? 'currentColor' : 'none'}
+          color="currentColor"
           size={18}
         />
       </Button>

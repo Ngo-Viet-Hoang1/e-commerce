@@ -11,6 +11,7 @@ import {
   useRemoveFavorite,
 } from '@/pages/user/profile/Favorite/favoriteProducts.queries'
 import { useMemo, useState } from 'react'
+import { toast } from 'sonner'
 import CategoryFilter, {
   type BrandOption,
   type CategoryOption,
@@ -19,9 +20,12 @@ import CategoryFilter, {
 import { useBrands } from './brand.queries'
 import { useCategories } from './category.queries'
 import { useAllCatalogProducts } from './product.queries'
-import { useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useAuthStore } from '@/store/zustand/useAuthStore'
 
 export default function ProductCatalog() {
+  const navigate = useNavigate()
+  const { isAuthenticated } = useAuthStore()
   const [searchParams] = useSearchParams()
   const initialBrand = Number(searchParams.get('brandId'))
   const initialBrandFilter =
@@ -75,6 +79,11 @@ export default function ProductCatalog() {
   }, [favoritesData?.data])
 
   const handleToggleFavorite = (productId: number, isFavorite: boolean) => {
+    if (!isAuthenticated) {
+      toast.error('Vui lòng đăng nhập để thêm vào yêu thích')
+      navigate('/auth/login', { state: { from: window.location.pathname } })
+      return
+    }
     if (pendingFavoriteId === productId) return
     setPendingFavoriteId(productId)
     const mutation = isFavorite ? removeFavorite : addFavorite
@@ -298,6 +307,7 @@ export default function ProductCatalog() {
                   imageUrl={imageSrc}
                   minPrice={minPrice}
                   maxPrice={maxPrice}
+                  isWishlisted={isFavorite}
                   onToggleWishlist={() =>
                     handleToggleFavorite(product.id, isFavorite)
                   }

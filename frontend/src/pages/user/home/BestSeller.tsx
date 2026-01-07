@@ -10,9 +10,17 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel'
 import { useQuery } from '@tanstack/react-query'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import AdminOrderService from '@/api/services/admin/order.admin.service'
 import ProductService from '@/api/services/user/product.service'
+import {
+  useAddFavorite,
+  useFavoriteProducts,
+  useRemoveFavorite,
+} from '@/pages/user/profile/Favorite/favoriteProducts.queries'
+import { useAuthStore } from '@/store/zustand/useAuthStore'
+import { toast } from 'sonner'
+import { useNavigate } from 'react-router-dom'
 
 const BEST_SELLER_LIMIT = 8
 const ORDER_FETCH_LIMIT = 200
@@ -81,6 +89,8 @@ const buildBestSellers = (orders: Order[]) => {
 }
 
 const BestSeller = () => {
+  const navigate = useNavigate()
+  const { isAuthenticated } = useAuthStore()
   const { data } = useQuery({
     queryKey: ['best-sellers', 'orders', 'all'],
     queryFn: async () => {
@@ -133,6 +143,30 @@ const BestSeller = () => {
     return new Map(productDetails?.map((product) => [product.id, product]) ?? [])
   }, [productDetails])
 
+  const { data: favoritesData } = useFavoriteProducts()
+  const addFavorite = useAddFavorite()
+  const removeFavorite = useRemoveFavorite()
+  const [pendingFavoriteId, setPendingFavoriteId] = useState<number | null>(
+    null,
+  )
+  const favoriteIds = useMemo(() => {
+    return new Set((favoritesData?.data ?? []).map((product) => product.id))
+  }, [favoritesData?.data])
+
+  const handleToggleFavorite = (productId: number, isFavorite: boolean) => {
+    if (!isAuthenticated) {
+      toast.error('Vui lòng đăng nhập để thêm vào yêu thích')
+      navigate('/auth/login', { state: { from: window.location.pathname } })
+      return
+    }
+    if (pendingFavoriteId === productId) return
+    setPendingFavoriteId(productId)
+    const mutation = isFavorite ? removeFavorite : addFavorite
+    mutation.mutate(productId, {
+      onSettled: () => setPendingFavoriteId(null),
+    })
+  }
+
   const displayItems = useMemo(() => {
     return bestSellers.map((item) => {
       const product = productMap.get(item.productId)
@@ -173,22 +207,29 @@ const BestSeller = () => {
 
       <Carousel>
         <CarouselContent>
-          {displayItems.map((item) => (
-            <CarouselItem
-              key={item.productId}
-              className="basis-full pl-2 sm:basis-1/2 md:pl-4 lg:basis-1/3 xl:basis-1/4"
-            >
-              <ProductCard
+          {displayItems.map((item) => {
+            const isFavorite = favoriteIds.has(item.productId)
+            return (
+              <CarouselItem
                 key={item.productId}
-                imageUrl={item.imageUrl}
-                productName={item.productName}
-                sku={item.sku}
-                minPrice={item.minPrice}
-                maxPrice={item.maxPrice}
-                tagText="Bán chạy"
-              />
-            </CarouselItem>
-          ))}
+                className="basis-full pl-2 sm:basis-1/2 md:pl-4 lg:basis-1/3 xl:basis-1/4"
+              >
+                <ProductCard
+                  key={item.productId}
+                  imageUrl={item.imageUrl}
+                  productName={item.productName}
+                  sku={item.sku}
+                  minPrice={item.minPrice}
+                  maxPrice={item.maxPrice}
+                  tagText="Bán chạy"
+                  isWishlisted={isFavorite}
+                  onToggleWishlist={() =>
+                    handleToggleFavorite(item.productId, isFavorite)
+                  }
+                />
+              </CarouselItem>
+            )
+          })}
         </CarouselContent>
         <CarouselPrevious className="hidden lg:flex" />
         <CarouselNext className="hidden lg:flex" />

@@ -53,7 +53,7 @@ export default function Footer() {
               {categories.map((category) => (
                 <li key={category.slug}>
                   <Link
-                    to={`/category/${category.slug}`}
+                    to={`/#`}
                     className="text-muted-foreground hover:text-foreground transition"
                   >
                     {category.name}
@@ -72,7 +72,7 @@ export default function Footer() {
             <ul className="mt-3 space-y-2 text-sm">
               <li>
                 <Link
-                  to="/support"
+                  to="/#"
                   className="text-muted-foreground hover:text-foreground transition"
                 >
                   Trung tâm hỗ trợ
@@ -80,7 +80,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  to="/warranty"
+                  to="/#"
                   className="text-muted-foreground hover:text-foreground transition"
                 >
                   Chính sách bảo hành
@@ -88,7 +88,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  to="/shipping"
+                  to="/#"
                   className="text-muted-foreground hover:text-foreground transition"
                 >
                   Vận chuyển & giao hàng
@@ -96,7 +96,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  to="/contact"
+                  to="/#"
                   className="text-muted-foreground hover:text-foreground transition"
                 >
                   Liên hệ
@@ -129,10 +129,10 @@ export default function Footer() {
           </p>
 
           <div className="flex gap-4">
-            <Link to="/terms" className="hover:text-foreground transition">
+            <Link to="/#" className="hover:text-foreground transition">
               Điều khoản
             </Link>
-            <Link to="/privacy" className="hover:text-foreground transition">
+            <Link to="/#" className="hover:text-foreground transition">
               Quyền riêng tư
             </Link>
           </div>
