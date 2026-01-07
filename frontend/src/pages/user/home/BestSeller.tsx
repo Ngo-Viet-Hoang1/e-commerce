@@ -1,4 +1,7 @@
 import ProductCard from '@/components/common/product-card/ProductCard'
+import { DEFAULT_IMAGE_URL } from '@/constants'
+import type { Order, OrderItem } from '@/interfaces/order.interface'
+import type { Product } from '@/interfaces/product.interface'
 import {
   Carousel,
   CarouselContent,
@@ -6,71 +9,183 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel'
+import { useQuery } from '@tanstack/react-query'
+import { useMemo } from 'react'
+import AdminOrderService from '@/api/services/admin/order.admin.service'
+import ProductService from '@/api/services/user/product.service'
 
-interface Product {
-  id: number
-  title: string
-  image: string
-  price: number
-  rating: number
+const BEST_SELLER_LIMIT = 8
+const ORDER_FETCH_LIMIT = 200
+const ORDER_FIRST_PAGE = 1
+
+const getBestSellerImage = (item: OrderItem) => {
+  const images = item.variant?.productImages ?? item.product?.productImages
+  if (!images || images.length === 0) return DEFAULT_IMAGE_URL
+  const primary = images.find((image) => image.isPrimary)?.url
+  const fallback = images[0]?.url
+  return primary ?? fallback ?? DEFAULT_IMAGE_URL
 }
 
-const products: Product[] = [
-  {
-    id: 1,
-    title: 'Eclax Semispherical',
-    image:
-      'https://images.unsplash.com/photo-1540932239986-30128078f3c5?q=60&w=600&auto=format&fit=crop',
-    price: 399999999,
-    rating: 5,
-  },
-  {
-    id: 2,
-    title: 'Eclax Cone',
-    image:
-      'https://images.unsplash.com/photo-1524484485831-a92ffc0de03f?q=60&w=600&auto=format&fit=crop',
-    price: 399999999,
-    rating: 4,
-  },
-  {
-    id: 3,
-    title: 'Eclax Cage Pack',
-    image:
-      'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?q=60&w=600&auto=format&fit=crop',
-    price: 499999999,
-    rating: 5,
-  },
-]
+const buildBestSellers = (orders: Order[]) => {
+  const productMap = new Map<
+    number,
+    {
+      productId: number
+      productName: string
+      sku: string
+      imageUrl: string
+      minPrice: number
+      maxPrice: number
+      totalQuantity: number
+    }
+  >()
+
+  orders.forEach((order) => {
+    order.orderItems?.forEach((item) => {
+      const sku =
+        item.product?.sku ?? item.variant?.sku ?? String(item.productId)
+      const productName =
+        item.product?.name ?? item.variant?.title ?? `Product #${item.productId}`
+
+      const current = productMap.get(item.productId)
+      const imageUrl = getBestSellerImage(item)
+      const minPrice = item.unitPrice
+      const maxPrice = item.unitPrice
+
+      if (!current) {
+        productMap.set(item.productId, {
+          productId: item.productId,
+          productName,
+          sku,
+          imageUrl,
+          minPrice,
+          maxPrice,
+          totalQuantity: item.quantity,
+        })
+        return
+      }
+
+      current.totalQuantity += item.quantity
+      current.minPrice = Math.min(current.minPrice, minPrice)
+      current.maxPrice = Math.max(current.maxPrice, maxPrice)
+
+      if (!current.imageUrl) {
+        current.imageUrl = imageUrl
+      }
+    })
+  })
+
+  return Array.from(productMap.values())
+    .sort((a, b) => b.totalQuantity - a.totalQuantity)
+    .slice(0, BEST_SELLER_LIMIT)
+}
 
 const BestSeller = () => {
+  const { data } = useQuery({
+    queryKey: ['best-sellers', 'orders', 'all'],
+    queryFn: async () => {
+      const orders: Order[] = []
+      let page = ORDER_FIRST_PAGE
+      let hasNextPage = true
+
+      while (hasNextPage) {
+        const response = await AdminOrderService.getPaginated({
+          page,
+          limit: ORDER_FETCH_LIMIT,
+        })
+        orders.push(...(response.data ?? []))
+        hasNextPage = response.meta?.hasNextPage ?? false
+        page += 1
+      }
+
+      return { data: orders }
+    },
+  })
+
+  const bestSellers = useMemo(() => {
+    return buildBestSellers(data?.data ?? [])
+  }, [data])
+
+  const bestSellerIds = useMemo(
+    () => bestSellers.map((item) => item.productId),
+    [bestSellers],
+  )
+
+  const { data: productDetails } = useQuery({
+    queryKey: ['best-sellers', 'products', bestSellerIds],
+    queryFn: async () => {
+      const results = await Promise.all(
+        bestSellerIds.map(async (id) => {
+          try {
+            const response = await ProductService.getById(id)
+            return response.data
+          } catch {
+            return null
+          }
+        }),
+      )
+      return results.filter(Boolean) as Product[]
+    },
+    enabled: bestSellerIds.length > 0,
+  })
+
+  const productMap = useMemo(() => {
+    return new Map(productDetails?.map((product) => [product.id, product]) ?? [])
+  }, [productDetails])
+
+  const displayItems = useMemo(() => {
+    return bestSellers.map((item) => {
+      const product = productMap.get(item.productId)
+      const variantImages = product?.variants?.flatMap(
+        (variant) => variant.productImages ?? [],
+      )
+      const productImage =
+        product?.productImages?.find((img) => img.isPrimary)?.url ??
+        product?.productImages?.[0]?.url ??
+        variantImages?.[0]?.url
+
+      const imageUrl =
+        item.imageUrl && item.imageUrl !== DEFAULT_IMAGE_URL
+          ? item.imageUrl
+          : productImage ?? DEFAULT_IMAGE_URL
+
+      return {
+        ...item,
+        productName: product?.name ?? item.productName,
+        sku: product?.sku ?? item.sku,
+        minPrice: item.minPrice ?? product?.minPrice ?? item.minPrice,
+        imageUrl,
+      }
+    })
+  }, [bestSellers, productMap])
+
   return (
     <section className="space-y-8 py-12">
       <header className="space-y-2 text-center">
         <h2 className="text-3xl font-bold text-balance sm:text-4xl">
-          Best Sellers
+          Bán chạy nhất
         </h2>
         <p className="text-muted-foreground mx-auto max-w-[160ch] text-balance">
-          Top-performing products that consistently deliver quality, durability,
-          and customer satisfaction.
+          Những sản phẩm được đặt mua nhiều nhất, luôn đảm bảo chất lượng và sự
+          hài lòng của khách hàng.
         </p>
       </header>
 
       <Carousel>
         <CarouselContent>
-          {products.map((p) => (
+          {displayItems.map((item) => (
             <CarouselItem
-              key={p.id}
+              key={item.productId}
               className="basis-full pl-2 sm:basis-1/2 md:pl-4 lg:basis-1/3 xl:basis-1/4"
             >
               <ProductCard
-                key={p.id}
-                imageUrl={p.image}
-                productName={p.title}
-                minPrice={p.price}
-                maxPrice={p.price * 1.2}
-                minSalePrice={p.price * 0.8}
-                rating={p.rating}
-                tagText="Best Seller"
+                key={item.productId}
+                imageUrl={item.imageUrl}
+                productName={item.productName}
+                sku={item.sku}
+                minPrice={item.minPrice}
+                maxPrice={item.maxPrice}
+                tagText="Bán chạy"
               />
             </CarouselItem>
           ))}
