@@ -1,53 +1,49 @@
-import { Button } from "@/components/ui/button";
-import type { Product } from "@/interfaces/product.interface";
-import { formatCurrency } from "@/lib/format";
-import { ShoppingCart, Trash, Truck } from "lucide-react";
-import { useState } from "react";
+import type { Product } from '@/interfaces/product.interface'
+import { formatCurrency } from '@/lib/format'
+import { Trash, Truck } from 'lucide-react'
+import { useState } from 'react'
 
 const DEFAULT_IMAGE_URL =
-  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRe3voLMssoFCjgCJvU-0063NQqO9E2UCb-Ig&s";
+  'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRe3voLMssoFCjgCJvU-0063NQqO9E2UCb-Ig&s'
 
 export interface FavoriteProductItemProps {
-  product: Product;
-  currency?: string;
-  onAddToCart?: () => void;
-  onBuyNow?: () => void;
-  onRemove?: () => void;
+  product: Product
+  currency?: string
+  onAddToCart?: () => void
+  onBuyNow?: () => void
+  onRemove?: () => void
 }
 
 export default function FavoriteProductItem({
   product,
-  currency = "VND",
-  onAddToCart,
-  onBuyNow,
+  currency = 'VND',
   onRemove,
 }: FavoriteProductItemProps) {
-  const [imgError, setImgError] = useState(false);
+  const [imgError, setImgError] = useState(false)
 
   const imageUrl =
     product.productImages?.[0]?.url ??
     product.variants?.[0]?.productImages?.[0]?.url ??
-    DEFAULT_IMAGE_URL;
-  const productName = product.name;
+    DEFAULT_IMAGE_URL
+  const productName = product.name
 
-  const displayImageUrl = imgError ? DEFAULT_IMAGE_URL : imageUrl;
+  const displayImageUrl = imgError ? DEFAULT_IMAGE_URL : imageUrl
 
-  const displayPrice =
-    product.minPrice ?? product.variants?.[0]?.price;
+  const displayPrice = product.minPrice ?? product.variants?.[0]?.price
 
   return (
     <div className="group relative flex w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:shadow-md dark:border-gray-800 dark:bg-gray-900">
       {onRemove && (
         <button
           onClick={onRemove}
-          className="absolute right-3 top-3 z-10 rounded-full bg-white/80 p-2 text-gray-600 backdrop-blur-sm transition-colors hover:bg-red-50 hover:text-red-600 dark:bg-gray-800/80 dark:text-gray-300 dark:hover:bg-red-900/30 dark:hover:text-red-400"
+          className="absolute top-3 right-3 z-10 rounded-full bg-white/80 p-2 text-gray-600 backdrop-blur-sm transition-colors hover:bg-red-50 hover:text-red-600 dark:bg-gray-800/80 dark:text-gray-300 dark:hover:bg-red-900/30 dark:hover:text-red-400"
           aria-label="Remove from favorites"
         >
           <Trash className="h-5 w-5" />
         </button>
       )}
 
-      <div className="relative w-[200px] flex-shrink-0 overflow-hidden p-4">
+      <div className="relative w-[200px] shrink-0 overflow-hidden p-4">
         <div className="flex h-full items-center justify-center transition-transform duration-500 group-hover:scale-105">
           <img
             src={displayImageUrl}
@@ -73,7 +69,7 @@ export default function FavoriteProductItem({
         <div className="mt-auto space-y-2">
           <div className="space-y-1">
             {displayPrice ? (
-              <div className="text-xl font-semibold leading-none">
+              <div className="text-xl leading-none font-semibold">
                 {formatCurrency(displayPrice, currency)}
               </div>
             ) : (
@@ -84,18 +80,8 @@ export default function FavoriteProductItem({
               Free delivery
             </p>
           </div>
-
-          <div className="flex items-center gap-3">
-            <Button variant="outline" onClick={onAddToCart} className="flex-1" size="sm">
-              <ShoppingCart className="mr-2 h-4 w-4" />
-              Thêm vào giỏ
-            </Button>
-            <Button className="flex-1 text-white" onClick={onBuyNow} size="sm">
-              Mua ngay
-            </Button>
-          </div>
         </div>
       </div>
     </div>
-  );
+  )
 }

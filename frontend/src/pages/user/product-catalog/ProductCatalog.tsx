@@ -11,6 +11,7 @@ import {
   useRemoveFavorite,
 } from '@/pages/user/profile/Favorite/favoriteProducts.queries'
 import { useMemo, useState } from 'react'
+import { toast } from 'sonner'
 import CategoryFilter, {
   type BrandOption,
   type CategoryOption,
@@ -18,22 +19,29 @@ import CategoryFilter, {
 } from './CategoryFilter'
 import { useBrands } from './brand.queries'
 import { useCategories } from './category.queries'
-import { useAllCatalogProducts, useCatalogProducts } from './product.queries'
+import { useAllCatalogProducts } from './product.queries'
+import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useAuthStore } from '@/store/zustand/useAuthStore'
 
 export default function ProductCatalog() {
+  const navigate = useNavigate()
+  const { isAuthenticated } = useAuthStore()
+  const [searchParams] = useSearchParams()
+  const initialBrand = Number(searchParams.get('brandId'))
+  const initialBrandFilter =
+    Number.isFinite(initialBrand) && initialBrand > 0 ? initialBrand : 'all'
   const [page, setPage] = useState(1)
   const [limit] = useState(12)
   const [selectedSort, setSelectedSort] = useState('featured')
-  const params = useMemo(
-    () => ({ page, limit, sort: 'createdAt', order: SORT_ORDER.DEST }),
-    [page, limit],
-  )
-  const { data, isPending, error } = useCatalogProducts(params)
   const allProductsParams = useMemo(
     () => ({ page: 1, limit: 100, sort: 'createdAt', order: SORT_ORDER.DEST }),
     [],
   )
-  const { data: allProductsData } = useAllCatalogProducts(allProductsParams)
+  const {
+    data: allProductsData,
+    isPending,
+    error,
+  } = useAllCatalogProducts(allProductsParams)
   const categoryParams = useMemo(
     () => ({ page: 1, limit: 100, sort: 'name', order: SORT_ORDER.ASC }),
     [],
@@ -54,11 +62,12 @@ export default function ProductCatalog() {
     'all',
   )
   const [selectedPriceRange, setSelectedPriceRange] = useState('all')
-  const [selectedBrand, setSelectedBrand] = useState<number | 'all'>('all')
-  const products = useMemo(() => data?.data ?? [], [data?.data])
-  const allProducts = useMemo(
-    () => (allProductsData?.length ? allProductsData : products),
-    [allProductsData, products],
+  const [selectedBrand, setSelectedBrand] = useState<number | 'all'>(
+    initialBrandFilter,
+  )
+  const allProducts = useMemo<Product[]>(
+    () => allProductsData ?? [],
+    [allProductsData],
   )
   const categories = useMemo(
     () => categoryData?.data ?? [],
@@ -70,6 +79,11 @@ export default function ProductCatalog() {
   }, [favoritesData?.data])
 
   const handleToggleFavorite = (productId: number, isFavorite: boolean) => {
+    if (!isAuthenticated) {
+      toast.error('Vui lòng đăng nhập để thêm vào yêu thích')
+      navigate('/auth/login', { state: { from: window.location.pathname } })
+      return
+    }
     if (pendingFavoriteId === productId) return
     setPendingFavoriteId(productId)
     const mutation = isFavorite ? removeFavorite : addFavorite
@@ -94,7 +108,7 @@ export default function ProductCatalog() {
     [],
   )
 
-  const totalProducts = allProducts.length ?? data?.meta?.total ?? 0
+  const totalProducts = allProducts.length
   const categoryCounts = useMemo(() => {
     const counts = new Map<number, number>()
     allProducts.forEach((product) => {
@@ -144,7 +158,7 @@ export default function ProductCatalog() {
   )
 
   const filteredProducts = useMemo(() => {
-    return products.filter((product) => {
+    return allProducts.filter((product) => {
       const categoryId = product.categoryId ?? product.category?.id
       const matchesCategory =
         selectedCategory === 'all' || categoryId === selectedCategory
@@ -172,7 +186,7 @@ export default function ProductCatalog() {
 
       return matchesCategory && matchesBrand && matchesPrice
     })
-  }, [products, selectedCategory, selectedBrand, selectedPrice])
+  }, [allProducts, selectedCategory, selectedBrand, selectedPrice])
 
   const sortedProducts = useMemo(() => {
     const items = [...filteredProducts]
@@ -201,6 +215,13 @@ export default function ProductCatalog() {
     return items
   }, [filteredProducts, selectedSort])
 
+  const totalPages = Math.max(1, Math.ceil(sortedProducts.length / limit))
+  const currentPage = Math.min(page, totalPages)
+  const pagedProducts = useMemo(() => {
+    const start = (currentPage - 1) * limit
+    return sortedProducts.slice(start, start + limit)
+  }, [currentPage, limit, sortedProducts])
+
   const handleCategoryChange = (value: number | 'all') => {
     setSelectedCategory(value)
     setPage(1)
@@ -223,7 +244,7 @@ export default function ProductCatalog() {
 
   return (
     <div className="bg-white">
-      <h2 className="sr-only">Products</h2>
+      <h2 className="sr-only">Sản phẩm</h2>
 
       <CategoryFilter
         categories={categoryOptions}
@@ -233,7 +254,7 @@ export default function ProductCatalog() {
         selectedPriceRange={selectedPriceRange}
         selectedBrand={selectedBrand}
         selectedSort={selectedSort}
-        showingCount={sortedProducts.length}
+        showingCount={pagedProducts.length}
         onCategoryChange={handleCategoryChange}
         onPriceRangeChange={handlePriceRangeChange}
         onBrandChange={handleBrandChange}
@@ -258,7 +279,7 @@ export default function ProductCatalog() {
 
         {!isPending &&
           !error &&
-          sortedProducts.map((product: Product) => {
+          pagedProducts.map((product: Product) => {
             const isFavorite = favoriteIds.has(product.id)
             const variantImages =
               product.variants?.flatMap(
@@ -286,6 +307,7 @@ export default function ProductCatalog() {
                   imageUrl={imageSrc}
                   minPrice={minPrice}
                   maxPrice={maxPrice}
+                  isWishlisted={isFavorite}
                   onToggleWishlist={() =>
                     handleToggleFavorite(product.id, isFavorite)
                   }
@@ -295,30 +317,26 @@ export default function ProductCatalog() {
           })}
       </div>
 
-      {!isPending && !error && (data?.meta?.totalPages ?? 1) > 1 && (
+      {!isPending && !error && totalPages > 1 && (
         <div className="mt-10 flex items-center justify-center gap-2">
           <Button
             type="button"
             variant="outline"
             size="sm"
             onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-            disabled={page <= 1}
+            disabled={currentPage <= 1}
           >
             Trước
           </Button>
           <span className="text-muted-foreground text-sm">
-            Trang {page} / {data?.meta?.totalPages ?? 1}
+            Trang {currentPage} / {totalPages}
           </span>
           <Button
             type="button"
             variant="outline"
             size="sm"
-            onClick={() =>
-              setPage((prev) =>
-                Math.min(data?.meta?.totalPages ?? prev, prev + 1),
-              )
-            }
-            disabled={page >= (data?.meta?.totalPages ?? 1)}
+            onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
+            disabled={currentPage >= totalPages}
           >
             Sau
           </Button>
