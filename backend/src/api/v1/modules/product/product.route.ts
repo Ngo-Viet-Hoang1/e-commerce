@@ -6,8 +6,10 @@ import {
 import { productController } from './product.controller'
 import {
   createProductBodySchema,
+  createSimpleProductBodySchema,
   listProductsQuerySchema,
   productIdParamSchema,
+  productSlugParamSchema,
   updateProductBodySchema,
 } from './product.schema'
 
@@ -25,10 +27,22 @@ router.get(
   productController.findById,
 )
 
+router.get(
+  '/slug/:slug',
+  validate(productSlugParamSchema, 'params'),
+  productController.findBySlug,
+)
+
 router.post(
   '/',
   validate(createProductBodySchema, 'body'),
   productController.create,
+)
+
+router.post(
+  '/simple',
+  validate(createSimpleProductBodySchema, 'body'),
+  productController.createSimple,
 )
 
 router.put(

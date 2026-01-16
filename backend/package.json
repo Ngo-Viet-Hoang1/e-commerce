@@ -10,7 +10,10 @@
     "lint:fix": "eslint . --ext .ts,.js --fix",
     "format": "prettier --write \"src/**/*.{ts,js,json}\"",
     "format:check": "prettier --check \"src/**/*.{ts,js,json}\"",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "seed": "bun run prisma/seed/seed.ts",
+    "db:reset": "prisma migrate reset",
+    "db:seed": "bun run prisma/seed/seed.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
@@ -34,6 +37,7 @@
     "@types/pg": "^8.15.6",
     "@types/prettier": "^3.0.0",
     "@types/rate-limit-redis": "^3.0.0",
+    "@types/sanitize-html": "^2.16.0",
     "@types/winston": "^2.4.4",
     "eslint": "^9.39.1",
     "globals": "^16.5.0",
@@ -65,9 +69,15 @@
     "passport-jwt": "^4.0.1",
     "pg": "^8.16.3",
     "prettier": "^3.7.3",
+    "puppeteer": "^24.34.0",
     "rate-limit-redis": "^4.3.1",
+    "sanitize-html": "^2.17.0",
+    "stream-chat": "^9.27.2",
     "winston": "^3.18.3",
     "winston-daily-rotate-file": "^5.0.0",
     "zod": "^4.1.13"
+  },
+  "prisma": {
+    "seed": "bun run prisma/seed/seed.ts"
   }
 }

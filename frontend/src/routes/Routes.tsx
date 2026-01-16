@@ -1,6 +1,6 @@
 import App from '@/App'
 import AdminLayout from '@/components/layouts/admin/AdminLayout'
-import RootLayout from '@/components/layouts/RootLayout'
+import RootLayout from '@/components/layouts/user/RootLayout'
 import AdminLogin from '@/pages/admin/AdminLogin'
 import Login from '@/pages/user/auth/Login'
 import Register from '@/pages/user/auth/Register'

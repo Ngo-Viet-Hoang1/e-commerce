@@ -19,6 +19,7 @@ model User {
   password        String    @db.VarChar(500)
   googleId        String?   @unique @db.VarChar(255)
   name            String?   @db.VarChar(100)
+  phoneNumber     String?   @db.VarChar(14)
   emailVerified   Boolean   @default(false)
   lastLoginAt     DateTime? @db.Timestamptz
   isActive        Boolean   @default(true)
@@ -29,9 +30,10 @@ model User {
   deletedAt       DateTime? @db.Timestamptz
 
   orders Order[]
-
+  payments Payment[]
   userRoles UserRole[]
   productBadges ProductBadge[]
+  addresses Address[]
   
   @@index([createdAt])
   @@index([email])
@@ -41,6 +43,7 @@ model User {
 
   productFaqs ProductFaq[]
   productFaqsAnswered ProductFaq[] @relation("AnsweredByUser")
+  favoriteProducts Product[]
 }
 
 model Role {

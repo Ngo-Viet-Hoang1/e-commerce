@@ -6,11 +6,11 @@
 
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -18,18 +18,25 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
+
+  --primary: oklch(0.52 0.15 180);
+  --primary-foreground: oklch(1 0 0);
+
+  --secondary: oklch(0.97 0.02 180);
+  --secondary-foreground: oklch(0.45 0.14 180);
+
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --accent: oklch(0.97 0.02 180);
+  --accent-foreground: oklch(0.45 0.14 180);
+
   --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.985 0 0);
+
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --ring: oklch(0.6 0.15 180);
+
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -37,12 +44,12 @@
   --chart-5: oklch(0.769 0.188 70.08);
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary: oklch(0.52 0.15 180);
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-accent: oklch(0.97 0.02 180);
+  --sidebar-accent-foreground: oklch(0.45 0.14 180);
   --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar-ring: oklch(0.6 0.15 180);
 }
 
 @theme inline {
@@ -83,7 +90,6 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* Dark mode */
 .dark {
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
@@ -91,19 +97,25 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
+
+  --primary: oklch(0.65 0.14 180);
+  --primary-foreground: oklch(0.145 0 0);
+
+  --secondary: oklch(0.25 0.02 180);
   --secondary-foreground: oklch(0.985 0 0);
+
   --muted: oklch(0.269 0 0);
   --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
+  --accent: oklch(0.25 0.02 180);
+  --accent-foreground: oklch(0.65 0.14 180);
+
   --destructive: oklch(0.704 0.191 22.216);
   --destructive-foreground: oklch(0.985 0 0);
+
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  --ring: oklch(0.6 0.15 180);
+
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
@@ -111,19 +123,159 @@
   --chart-5: oklch(0.645 0.246 16.439);
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary: oklch(0.65 0.14 180); /* teal-400 */
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.25 0.02 180);
+  --sidebar-accent-foreground: oklch(0.65 0.14 180);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --sidebar-ring: oklch(0.6 0.15 180);
 }
 
 @layer base {
+  :root {
+    --font-sans:
+      'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+      'Helvetica Neue', Arial, sans-serif;
+
+    --font-mono:
+      ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+      'Courier New', monospace;
+  }
+
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    font-feature-settings:
+      'rlig' 1,
+      'calt' 1;
+    text-rendering: optimizeLegibility;
+  }
   * {
     @apply border-border outline-ring/50;
   }
   body {
     @apply bg-background text-foreground;
+  }
+
+  h1 {
+    @apply scroll-m-20 text-4xl font-bold tracking-tight lg:text-5xl;
+  }
+
+  h2 {
+    @apply scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight;
+  }
+
+  h3 {
+    @apply scroll-m-20 text-2xl font-semibold tracking-tight;
+  }
+
+  h4 {
+    @apply scroll-m-20 text-xl font-semibold tracking-tight;
+  }
+
+  p {
+    @apply text-muted-foreground leading-7;
+    line-height: 1.65;
+  }
+
+  small {
+    @apply text-muted-foreground text-sm;
+  }
+
+  /* TipTap Editor Base Styles */
+  .ProseMirror {
+    outline: none;
+  }
+
+  .ProseMirror p {
+    margin: 0.5rem 0;
+  }
+
+  .ProseMirror h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+
+  .ProseMirror ul,
+  .ProseMirror ol {
+    padding-left: 1.25rem;
+    margin: 0.5rem 0;
+  }
+
+  .ProseMirror blockquote {
+    border-left: 4px solid hsl(var(--border));
+    padding-left: 1rem;
+    color: hsl(var(--muted-foreground));
+    margin: 0.75rem 0;
+  }
+
+  .ProseMirror code {
+    background: hsl(var(--muted));
+    padding: 2px 4px;
+    border-radius: 4px;
+  }
+
+  .tiptap strong {
+    @apply font-bold;
+  }
+
+  .tiptap em {
+    @apply italic;
+  }
+
+  .tiptap u {
+    @apply underline;
+  }
+
+  .tiptap code {
+    @apply bg-muted rounded px-1.5 py-0.5 font-mono text-sm;
+  }
+
+  .tiptap a {
+    @apply text-blue-600 underline hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300;
+  }
+
+  .tiptap h1 {
+    @apply mb-4 text-3xl font-bold;
+  }
+
+  .tiptap h2 {
+    @apply mb-3 text-2xl font-bold;
+  }
+
+  .tiptap ul {
+    @apply mb-4 list-disc pl-6;
+  }
+
+  .tiptap ol {
+    @apply mb-4 list-decimal pl-6;
+  }
+
+  .tiptap blockquote {
+    @apply border-muted-foreground/30 text-muted-foreground my-4 border-l-4 pl-4 italic;
+  }
+
+  .tiptap pre {
+    @apply bg-muted overflow-x-auto rounded p-4;
+  }
+
+  .tiptap pre code {
+    @apply bg-transparent p-0;
+  }
+
+  .prose img {
+    @apply mx-auto block h-auto max-w-full rounded;
+  }
+
+  .prose table {
+    @apply w-full border-collapse;
+  }
+  .prose table th,
+  .prose table td {
+    @apply border px-3 py-2;
   }
 }

@@ -29,7 +29,40 @@ const REDIS_CONFIG = {
   connectionName: process.env.SERVICE_NAME || 'api-service',
 }
 
-export const redis = new Redis(REDIS_CONFIG)
+// export const redis = new Redis(REDIS_CONFIG)
+export const redis = process.env.REDIS_URL
+  ? new Redis(process.env.REDIS_URL, {
+      connectTimeout: 10000,
+      commandTimeout: 5000,
+      keepAlive: 30000,
+      retryStrategy: (times) => {
+        const delay = Math.min(times * 50, 2000)
+        logger.warn(`Redis retry attempt ${times}, waiting ${delay}ms`)
+        return delay
+      },
+      maxRetriesPerRequest: 3,
+      enableReadyCheck: true,
+      lazyConnect: true,
+      connectionName: process.env.SERVICE_NAME || 'api-service',
+    })
+  : new Redis({
+      host: process.env.REDIS_HOST || 'localhost',
+      port: parseInt(process.env.REDIS_PORT || '6379', 10),
+      password: process.env.REDIS_PASSWORD || undefined,
+      db: parseInt(process.env.REDIS_DB || '0', 10),
+      connectTimeout: 10000,
+      commandTimeout: 5000,
+      keepAlive: 30000,
+      retryStrategy: (times) => {
+        const delay = Math.min(times * 50, 2000)
+        logger.warn(`Redis retry attempt ${times}, waiting ${delay}ms`)
+        return delay
+      },
+      maxRetriesPerRequest: 3,
+      enableReadyCheck: true,
+      lazyConnect: true,
+      connectionName: process.env.SERVICE_NAME || 'api-service',
+    })
 
 let isConnected = false
 let isConnecting = false

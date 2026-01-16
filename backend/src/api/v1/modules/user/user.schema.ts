@@ -12,6 +12,7 @@ export const userSchema = z.object({
   password: z.string(),
   googleId: z.string().nullable(),
   name: z.string().nullable(),
+  phoneNumber: z.string().nullable(),
   emailVerified: z.boolean(),
   lastLoginAt: z.date().nullable(),
   isActive: z.boolean(),
@@ -53,6 +54,11 @@ export const createUserBodySchema = z.object({
     .max(100, 'Name must be at most 100 characters')
     .trim()
     .optional(),
+  phoneNumber: z
+    .string()
+    .min(8, 'Phone number must be at least 8 characters')
+    .max(14, 'Phone number must be at most 14 characters')
+    .optional(),
 })
 
 export const updateUserBodySchema = z.object({
@@ -62,9 +68,19 @@ export const updateUserBodySchema = z.object({
     .max(100, 'Name must be at most 100 characters')
     .trim()
     .optional(),
+  phoneNumber: z
+    .string()
+    .min(8, 'Phone number must be at least 8 characters')
+    .max(14, 'Phone number must be at most 14 characters')
+    .trim()
+    .optional(),
   emailVerified: z.boolean().optional(),
   isActive: z.boolean().optional(),
   isMfaActive: z.boolean().optional(),
+})
+
+export const favoriteProductParamSchema = z.object({
+  productId: z.coerce.number().int().positive(),
 })
 
 export type User = z.infer<typeof userSchema>
@@ -76,3 +92,5 @@ export type UserIdParam = z.infer<typeof userIdParamSchema>
 
 export type CreateUserBody = z.infer<typeof createUserBodySchema>
 export type UpdateUserBody = z.infer<typeof updateUserBodySchema>
+
+export type favoriteProductParam = z.infer<typeof favoriteProductParamSchema>

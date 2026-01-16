@@ -1,17 +1,27 @@
 import { Router } from 'express'
+import addressRoute from '../modules/address/address.route.js'
 import attributeRoute from '../modules/attributes/attribute.route'
 import attributeValueRoute from '../modules/attributeValue/attributeValue.route'
 import authRoute from '../modules/auth/routes/auth.route.js'
 import badgeRoute from '../modules/badge/badge.route.js'
 import brandRoute from '../modules/brand/brand.route.js'
+import cartRoute from '../modules/cart/cart.route.js'
 import categoryRoute from '../modules/category/category.route.js'
+import districtRoute from '../modules/district/district.route.js'
+import orderItemRoute from '../modules/order-items/order-items.route.js'
 import orderRouter from '../modules/order/order.route'
+import paymentRoute from '../modules/payment/payment.route.js'
 import productBadgeRoute from '../modules/product-badge/product-badge.route.js'
 import productFaqRoute from '../modules/product-faq/product-faq.route.js'
+import productImageRoute from '../modules/product-image/product-image.route.js'
 import productVariantRoute from '../modules/product-variant/product-variant.route.js'
+import { productVideoRouter } from '../modules/product-video/product-video.route.js'
 import productRoute from '../modules/product/product.route.js'
+import provinceRoute from '../modules/province/province.route.js'
 import userRoute from '../modules/user/user.route.js'
+import warrantyPoliciesRoute from '../modules/warrantyPolicies/warrantyPolicies.route.js'
 import adminRoute from './admin.route.js'
+import chatRoute from './chat.route.js'
 import errorRoute from './error.route.js'
 import homeRoute from './home.route.js'
 
@@ -30,8 +40,21 @@ router.use('/product-badges', productBadgeRoute)
 router.use('/orders', orderRouter)
 router.use('/attributes', attributeRoute)
 router.use('/attributes', attributeValueRoute)
+router.use('/warranty-policies', warrantyPoliciesRoute)
+router.use('/products', warrantyPoliciesRoute)
 router.use('/product-variants', productVariantRoute)
+router.use('/order-items', orderItemRoute)
+router.use('/product-images', productImageRoute)
+router.use('/product-videos', productVideoRouter)
+router.use('/payments', paymentRoute)
+router.use('/provinces', provinceRoute)
+router.use('/districts', districtRoute)
+router.use('/addresses', addressRoute)
+
+router.use('/chat', chatRoute)
 
 router.use('/admin', adminRoute)
+
+router.use('/cart', cartRoute)
 
 export default router

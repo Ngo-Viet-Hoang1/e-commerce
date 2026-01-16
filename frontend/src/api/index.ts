@@ -1,9 +1,5 @@
 /* eslint-disable no-console */
-import {
-  ACCESS_TOKEN_KEY,
-  LOGIN_ROUTE,
-  REFRESH_TOKEN_ENDPOINT,
-} from '@/constants'
+import { LOGIN_ROUTE, REFRESH_TOKEN_ENDPOINT } from '@/constants'
 import type { IErrorResponse } from '@/interfaces/base-response.interface'
 import { ApiError } from '@/models/ApiError'
 import {
@@ -28,7 +24,6 @@ export interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
 
 interface AxiosInstanceProps {
   baseURL: string
-  tokenKey: string
   refreshTokenEndpoint: string
   loginRoute: string
   authStore: () => AuthStore
@@ -36,7 +31,6 @@ interface AxiosInstanceProps {
 
 const createAuthAxiosInstance = ({
   baseURL,
-  tokenKey,
   refreshTokenEndpoint,
   loginRoute,
   authStore,
@@ -210,8 +204,9 @@ const handleError = (axiosError: AxiosError<IErrorResponse>): ApiError => {
       504: 'Gateway Timeout - Request took too long',
     }
 
+    const statusCode = error?.statusCode ?? axiosError.response.status ?? 500
     const msg =
-      errorMessages[error.statusCode] ??
+      errorMessages[statusCode] ??
       axiosError.response.data.message ??
       'Something went wrong'
 
@@ -219,7 +214,7 @@ const handleError = (axiosError: AxiosError<IErrorResponse>): ApiError => {
     if (!customConfig?.skipToast) {
       toast.error(msg)
 
-      if (error.details) {
+      if (error?.details) {
         Object.entries(error.details).forEach(([_, messsages]) =>
           messsages.forEach((msg: string) => toast.error(msg)),
         )
@@ -228,8 +223,8 @@ const handleError = (axiosError: AxiosError<IErrorResponse>): ApiError => {
 
     return new ApiError(
       msg,
-      error.statusCode,
-      error.details as Record<string, string[]> | undefined,
+      statusCode,
+      error?.details as Record<string, string[]> | undefined,
     )
   } else if (axiosError.request) {
     if (!(axiosError.config as CustomAxiosRequestConfig)?.skipToast) {
@@ -252,7 +247,6 @@ const generateRequestId = () => {
 
 export const api = createAuthAxiosInstance({
   baseURL: import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api/v1',
-  tokenKey: ACCESS_TOKEN_KEY.USER,
   refreshTokenEndpoint: REFRESH_TOKEN_ENDPOINT.USER,
   loginRoute: LOGIN_ROUTE.USER,
   authStore: () => useAuthStore.getState(),
@@ -260,7 +254,6 @@ export const api = createAuthAxiosInstance({
 
 export const adminApi = createAuthAxiosInstance({
   baseURL: import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api/v1',
-  tokenKey: ACCESS_TOKEN_KEY.ADMIN,
   refreshTokenEndpoint: REFRESH_TOKEN_ENDPOINT.ADMIN,
   loginRoute: LOGIN_ROUTE.ADMIN,
   authStore: () => useAdminAuthStore.getState(),

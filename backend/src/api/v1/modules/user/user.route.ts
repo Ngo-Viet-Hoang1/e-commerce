@@ -1,16 +1,18 @@
 import { Router } from 'express'
-import { RESOURCES } from '../../shared/constants/rbac'
-import {
-  authenticate,
-  autoAuthorize,
-} from '../../shared/middlewares/auth.middleware'
+import { authenticate } from '../../shared/middlewares/auth.middleware'
 import {
   validate,
   validateMultiple,
 } from '../../shared/middlewares/validate.middleware'
+import { orderController } from '../order/order.controller'
+import {
+  listOrdersQuerySchema,
+  userOrderIdParamSchema,
+} from '../order/order.schema'
 import { userController } from './user.controller'
 import {
   createUserBodySchema,
+  favoriteProductParamSchema,
   listUsersQuerySchema,
   updateUserBodySchema,
   userIdParamSchema,
@@ -18,9 +20,49 @@ import {
 
 const router = Router()
 router.use(authenticate)
-router.use(autoAuthorize(RESOURCES.USER))
+// router.use(autoAuthorize(RESOURCES.USER))
+
+router.get(
+  '/orders',
+  validate(listOrdersQuerySchema, 'query'),
+  orderController.findUserOrders,
+)
+
+router.get(
+  '/orders/:orderId',
+  validate(userOrderIdParamSchema, 'params'),
+  orderController.findUserOrderById,
+)
+
+router.put(
+  '/orders/:orderId/cancel',
+  validate(userOrderIdParamSchema, 'params'),
+  orderController.cancelUserOrder,
+)
+
+router.get(
+  '/orders/:orderId/export-pdf',
+  validate(userOrderIdParamSchema, 'params'),
+  orderController.exportUserOrderPDF,
+)
 
 router.get('/', validate(listUsersQuerySchema, 'query'), userController.findAll)
+
+router.get('/favorites', userController.getFavoriteProducts)
+
+router.post(
+  '/favorites/:productId',
+  validate(favoriteProductParamSchema, 'params'),
+  userController.addFavoriteProduct,
+)
+
+router.delete(
+  '/favorites/:productId',
+  validate(favoriteProductParamSchema, 'params'),
+  userController.removeFavoriteProduct,
+)
+
+router.delete('/favorites', userController.removeAllFavoriteProducts)
 
 router.get(
   '/:id',

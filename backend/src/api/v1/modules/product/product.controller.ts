@@ -2,8 +2,10 @@ import type { Request, Response } from 'express'
 import { SuccessResponse } from '../../shared/models/success-response.model'
 import type {
   CreateProductBody,
+  CreateSimpleProductBody,
   ListProductsQuery,
   ProductIdParam,
+  ProductSlugParam,
   UpdateProductBody,
 } from './product.schema'
 import { productService } from './product.service'
@@ -26,6 +28,14 @@ class ProductController {
     const { id } = req.validatedData?.params as ProductIdParam
 
     const product = await productService.findById(id)
+
+    SuccessResponse.send(res, product, 'Product retrieved successfully')
+  }
+
+  findBySlug = async (req: Request, res: Response) => {
+    const { slug } = req.validatedData?.params as ProductSlugParam
+
+    const product = await productService.findBySku(slug)
 
     SuccessResponse.send(res, product, 'Product retrieved successfully')
   }
@@ -73,6 +83,14 @@ class ProductController {
     const restoredProduct = await productService.restoreById(id)
 
     SuccessResponse.send(res, restoredProduct, 'Product restored successfully')
+  }
+
+  createSimple = async (req: Request, res: Response) => {
+    const data = req.validatedData?.body as CreateSimpleProductBody
+
+    const product = await productService.createSimple(data)
+
+    SuccessResponse.created(res, product, 'Product created successfully')
   }
 }
 

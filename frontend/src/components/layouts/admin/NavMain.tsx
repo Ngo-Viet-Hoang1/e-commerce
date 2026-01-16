@@ -1,12 +1,17 @@
-"use client"
+'use client'
 
-import { ChevronRight, type LucideIcon } from "lucide-react"
+import {
+  Bot,
+  ChevronRight,
+  SquareTerminal,
+  type LucideIcon,
+} from 'lucide-react'
 
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/components/ui/collapsible"
+} from '@/components/ui/collapsible'
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -16,27 +21,74 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-} from "@/components/ui/sidebar"
+} from '@/components/ui/sidebar'
+import { Link } from 'react-router-dom'
 
-export function NavMain({
-  items,
-}: {
-  items: {
+const navMain: {
+  title: string
+  url: string
+  icon?: LucideIcon
+  isActive?: boolean
+  items?: {
     title: string
     url: string
-    icon?: LucideIcon
-    isActive?: boolean
-    items?: {
-      title: string
-      url: string
-    }[]
   }[]
-}) {
+}[] = [
+  {
+    title: 'Playground',
+    url: '#',
+    icon: SquareTerminal,
+    isActive: true,
+    items: [
+      {
+        title: 'User Management',
+        url: '/admin/user-management',
+      },
+      {
+        title: 'Order Management',
+        url: '/admin/order-management',
+      },
+      {
+        title: 'Category Management',
+        url: '/admin/category-management',
+      },
+      {
+        title: 'Brand Management',
+        url: '/admin/brand-management',
+      },
+      {
+        title: 'Badge Management',
+        url: '/admin/badge-management',
+      },
+    ],
+  },
+  {
+    title: 'Product Management',
+    url: '#',
+    icon: Bot,
+    items: [
+      {
+        title: 'Products',
+        url: '/admin/products',
+      },
+      {
+        title: 'Add Product',
+        url: '/admin/products/create',
+      },
+      {
+        title: 'Edit Product',
+        url: '/admin/products/edit/:id',
+      },
+    ],
+  },
+]
+
+export function NavMain() {
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
       <SidebarMenu>
-        {items.map((item) => (
+        {navMain.map((item) => (
           <Collapsible
             key={item.title}
             asChild
@@ -56,9 +108,9 @@ export function NavMain({
                   {item.items?.map((subItem) => (
                     <SidebarMenuSubItem key={subItem.title}>
                       <SidebarMenuSubButton asChild>
-                        <a href={subItem.url}>
+                        <Link to={subItem.url}>
                           <span>{subItem.title}</span>
-                        </a>
+                        </Link>
                       </SidebarMenuSubButton>
                     </SidebarMenuSubItem>
                   ))}

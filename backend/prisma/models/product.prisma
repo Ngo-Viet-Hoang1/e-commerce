@@ -16,15 +16,20 @@ model Product {
   updatedAt        DateTime  @updatedAt @db.Timestamptz
   deletedAt        DateTime? @db.Timestamptz
 
-  brand    Brand        @relation(fields: [brandId], references: [id])
-  category Category     @relation(fields: [categoryId], references: [id])
-  faqs     ProductFaq[]
-
+  brand    Brand    @relation(fields: [brandId], references: [id])
+  category Category @relation(fields: [categoryId], references: [id])
+    
+  warranties    WarrantyPolicy[]
+  faqs          ProductFaq[]
   productBadges ProductBadge[]
   variants      ProductVariant[]
+  orderItems OrderItem[]
+  productImages ProductImage[]
+  productVideos ProductVideo[]
+  favoredBy User[]
 
   @@index([name])
   @@index([sku])
-  @@index([status])
+  @@index([status]) 
   @@index([isFeatured])
 }

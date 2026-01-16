@@ -1,0 +1,24 @@
+model Province {
+  id                           Int     @id @default(autoincrement())
+  code                         String  @unique @db.VarChar(10)
+  name                         String  @unique @db.VarChar(100)
+  nameEn                       String? @map("name_en") @db.VarChar(100)
+  fullName                     String? @map("full_name") @db.VarChar(200)
+  fullNameEn                   String? @map("full_name_en") @db.VarChar(200)
+  codeName                     String? @map("code_name") @db.VarChar(100)
+  administrativeUnitId         Int?    @map("administrative_unit_id")
+  administrativeUnitShortName  String? @map("administrative_unit_short_name") @db.VarChar(50)
+  administrativeUnitFullName   String? @map("administrative_unit_full_name") @db.VarChar(100)
+  administrativeUnitFullNameEn String? @map("administrative_unit_full_name_en") @db.VarChar(100)
+
+  districts District[]
+  addresses Address[]
+  orders    Order[]
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@index([code])
+  @@index([name])
+  @@index([codeName])
+}

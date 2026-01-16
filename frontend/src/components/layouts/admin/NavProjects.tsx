@@ -1,10 +1,12 @@
 import {
   Folder,
   Forward,
+  MessageCircle,
   MoreHorizontal,
+  PieChart,
   Trash2,
   type LucideIcon,
-} from "lucide-react"
+} from 'lucide-react'
 
 import {
   DropdownMenu,
@@ -12,7 +14,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from '@/components/ui/dropdown-menu'
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -21,30 +23,40 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@/components/ui/sidebar"
+} from '@/components/ui/sidebar'
+import { Link } from 'react-router-dom'
 
-export function NavProjects({
-  projects,
-}: {
-  projects: {
-    name: string
-    url: string
-    icon: LucideIcon
-  }[]
-}) {
+const projects: {
+  name: string
+  url: string
+  icon: LucideIcon
+}[] = [
+  {
+    name: 'Dashboard & Statistic',
+    url: '/admin/dashboard',
+    icon: PieChart,
+  },
+  {
+    name: 'Customer Support',
+    url: '/admin/chats',
+    icon: MessageCircle,
+  },
+]
+
+export function NavProjects() {
   const { isMobile } = useSidebar()
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      <SidebarGroupLabel>Projects</SidebarGroupLabel>
+      <SidebarGroupLabel>Dashboards</SidebarGroupLabel>
       <SidebarMenu>
         {projects.map((item) => (
           <SidebarMenuItem key={item.name}>
             <SidebarMenuButton asChild>
-              <a href={item.url}>
+              <Link to={item.url}>
                 <item.icon />
                 <span>{item.name}</span>
-              </a>
+              </Link>
             </SidebarMenuButton>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -55,8 +67,8 @@ export function NavProjects({
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 className="w-48 rounded-lg"
-                side={isMobile ? "bottom" : "right"}
-                align={isMobile ? "end" : "start"}
+                side={isMobile ? 'bottom' : 'right'}
+                align={isMobile ? 'end' : 'start'}
               >
                 <DropdownMenuItem>
                   <Folder className="text-muted-foreground" />

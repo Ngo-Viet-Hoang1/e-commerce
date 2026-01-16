@@ -6,6 +6,7 @@ export const USER_SELECT_FIELDS = {
   id: true,
   email: true,
   name: true,
+  phoneNumber: true,
   googleId: true,
   isActive: true,
   isMfaActive: true,
@@ -31,6 +32,20 @@ class UserRepository {
           ...(includeDeleted ? {} : { deletedAt: null }),
         },
         select: USER_SELECT_FIELDS,
+      }),
+    )
+  }
+
+  findByIdWithFavorites = async (id: number) => {
+    return executePrismaQuery(() =>
+      prisma.user.findUnique({
+        where: {
+          id,
+          deletedAt: null,
+        },
+        include: {
+          favoriteProducts: true,
+        },
       }),
     )
   }
