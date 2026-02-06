@@ -5,6 +5,12 @@ import {
   ConflictException,
   NotFoundException,
 } from '../../shared/models/app-error.model'
+import {
+  AttributeResolver,
+  ImageHandler,
+  ProductValidator,
+  VariantBuilder,
+} from './helpers'
 import productRepository from './product.repository'
 import type {
   CreateProductBody,
@@ -180,54 +186,8 @@ class ProductService {
   }
 
   createSimple = async (data: CreateSimpleProductBody) => {
-    const [brandExists, categoryExists] = await Promise.all([
-      prisma.brand.findUnique({ where: { id: data.brandId } }),
-      prisma.category.findUnique({ where: { id: data.categoryId } }),
-    ])
+    await ProductValidator.validateCreateSimpleData(data)
 
-    if (!brandExists) {
-      throw new NotFoundException(`Brand with ID ${data.brandId} not found`)
-    }
-    if (!categoryExists) {
-      throw new NotFoundException(
-        `Category with ID ${data.categoryId} not found`,
-      )
-    }
-
-    const defaultVariants = data.variants.filter((v) => v.isDefault)
-    if (defaultVariants.length === 0) {
-      if (data.variants.length > 0 && data.variants[0]) {
-        data.variants[0].isDefault = true
-      }
-    } else if (defaultVariants.length > 1) {
-      throw new ConflictException('Only one variant can be set as default')
-    }
-
-    // Check for duplicate variant SKUs
-    const variantSkus = data.variants.map((v) => v.sku)
-    const uniqueSkus = new Set(variantSkus)
-    if (uniqueSkus.size !== variantSkus.length) {
-      throw new ConflictException('Duplicate variant SKUs found')
-    }
-
-    //  Check if product SKU or variant SKUs already exist
-    const existingProduct = await prisma.product.findFirst({
-      where: { sku: data.sku },
-    })
-    if (existingProduct) {
-      throw new ConflictException(`Product with SKU ${data.sku} already exists`)
-    }
-
-    const existingVariant = await prisma.productVariant.findFirst({
-      where: { sku: { in: variantSkus } },
-    })
-    if (existingVariant) {
-      throw new ConflictException(
-        `Variant with SKU ${existingVariant.sku} already exists`,
-      )
-    }
-
-    //  Create product with variants in transaction
     const product = await prisma.$transaction(async (tx) => {
       const createdProduct = await tx.product.create({
         data: {
@@ -240,182 +200,23 @@ class ProductService {
         },
       })
 
-      const allAttributeNames = new Set<string>()
-      const allAttributeData = new Map<string, Set<string>>() // Map<attributeName, Set<values>>
-
-      for (const variant of data.variants) {
-        if (variant.attributes && variant.attributes.length > 0) {
-          for (const attr of variant.attributes) {
-            const normalizedName = attr.attributeName.trim().toLowerCase()
-            allAttributeNames.add(normalizedName)
-
-            if (!allAttributeData.has(normalizedName)) {
-              allAttributeData.set(normalizedName, new Set())
-            }
-            allAttributeData.get(normalizedName)!.add(attr.value.trim())
-          }
-        }
-      }
-
-      const existingAttributes = await tx.attribute.findMany({
-        where: {
-          name: { in: Array.from(allAttributeNames), mode: 'insensitive' },
-          deletedAt: null,
-        },
-        include: {
-          values: {
-            where: { deletedAt: null },
-          },
-        },
-      })
-      // Create Maps for quick lookup
-      const attributeMap = new Map<string, (typeof existingAttributes)[0]>()
-      existingAttributes.forEach((attr) => {
-        attributeMap.set(attr.name.toLowerCase(), attr)
-      })
-
-      const attributesToCreate = Array.from(allAttributeNames)
-        .filter((name) => !attributeMap.has(name))
-        .map((name) => ({
-          name:
-            data.variants
-              .flatMap((v) => v.attributes || [])
-              .find((a) => a.attributeName.trim().toLowerCase() === name)
-              ?.attributeName.trim() || name, // Preserve original casing
-          inputType: 'text',
-          isFilterable: true,
-          isSearchable: false,
-        }))
-
-      if (attributesToCreate.length > 0) {
-        const newAttributes = await tx.attribute.createManyAndReturn({
-          data: attributesToCreate,
-        })
-
-        newAttributes.forEach((attr) => {
-          attributeMap.set(attr.name.toLowerCase(), { ...attr, values: [] })
-        })
-      }
-
-      const attributeValuesToCreate: Array<{
-        attributeId: number
-        valueText: string
-      }> = []
-
-      for (const [attrName, values] of allAttributeData.entries()) {
-        const attribute = attributeMap.get(attrName)
-        if (!attribute) continue
-
-        const existingValues = new Set(
-          attribute.values.map((v) => v.valueText.toLowerCase()),
-        )
-
-        for (const value of values) {
-          if (!existingValues.has(value.toLowerCase())) {
-            attributeValuesToCreate.push({
-              attributeId: attribute.id,
-              valueText: value,
-            })
-          }
-        }
-      }
-
-      if (attributeValuesToCreate.length > 0) {
-        await tx.attributeValue.createMany({
-          data: attributeValuesToCreate,
-          skipDuplicates: true, // ← Important: Skip if race condition happens
-        })
-      }
-
-      const allAttributeValues = await tx.attributeValue.findMany({
-        where: {
-          attributeId: {
-            in: Array.from(attributeMap.values()).map((a) => a.id),
-          },
-          deletedAt: null,
-        },
-      })
-
-      // Create lookup map: "color|red" → attributeValueId
-      const attributeValueMap = new Map<string, number>()
-      allAttributeValues.forEach((av) => {
-        const attribute = Array.from(attributeMap.values()).find(
-          (a) => a.id === av.attributeId,
-        )
-        if (attribute) {
-          const key = `${attribute.name.toLowerCase()}|${av.valueText.toLowerCase()}`
-          attributeValueMap.set(key, av.id)
-        }
-      })
-
-      // ✅ Create Variants (using cached data)
-      const createdVariants = await Promise.all(
-        data.variants.map(async (variant) => {
-          const attributeValueIds: number[] = []
-
-          if (variant.attributes && variant.attributes.length > 0) {
-            for (const attr of variant.attributes) {
-              const key = `${attr.attributeName.trim().toLowerCase()}|${attr.value.trim().toLowerCase()}`
-              const valueId = attributeValueMap.get(key)
-              if (valueId) {
-                attributeValueIds.push(valueId)
-              }
-            }
-          }
-
-          return await tx.productVariant.create({
-            data: {
-              productId: createdProduct.id,
-              sku: variant.sku,
-              title: variant.title,
-              price: variant.price,
-              costPrice: variant.costPrice,
-              stockQuantity: variant.stockQuantity,
-              isDefault: variant.isDefault,
-              attributeValues:
-                attributeValueIds.length > 0
-                  ? {
-                      connect: attributeValueIds.map((id) => ({ id })),
-                    }
-                  : undefined,
-            },
-          })
-        }),
+      const { attributeValueMap } = await AttributeResolver.resolveAttributes(
+        tx,
+        data.variants,
       )
 
-      // Create Product-level Images
-      if (data.images && data.images.length > 0) {
-        await tx.productImage.createMany({
-          data: data.images.map((img, index) => ({
-            productId: createdProduct.id,
-            variantId: null,
-            url: img.url,
-            altText: img.altText,
-            isPrimary: img.isPrimary,
-            sortOrder: index,
-          })),
-        })
-      }
+      const createdVariants = await VariantBuilder.createVariants(
+        tx,
+        createdProduct.id,
+        data.variants,
+        attributeValueMap,
+      )
 
-      // Create Variant-specific Images
-      await Promise.all(
-        data.variants.map(async (variant, variantIndex) => {
-          if (variant.images && variant.images.length > 0) {
-            const createdVariant = createdVariants[variantIndex]
-            if (createdVariant) {
-              await tx.productImage.createMany({
-                data: variant.images.map((img, imgIndex) => ({
-                  productId: createdProduct.id,
-                  variantId: createdVariant.id,
-                  url: img.url,
-                  altText: img.altText,
-                  isPrimary: img.isPrimary,
-                  sortOrder: imgIndex,
-                })),
-              })
-            }
-          }
-        }),
+      await ImageHandler.createAllImages(
+        tx,
+        createdProduct.id,
+        data,
+        createdVariants,
       )
 
       return createdProduct
