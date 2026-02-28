@@ -103,6 +103,8 @@ const createAuthAxiosInstance = ({
         console.error('API Response Error:', error)
       }
 
+      progress.stop()
+
       if (!error.response && originalRequest && !originalRequest._retry) {
         originalRequest.retryCount = originalRequest.retryCount ?? 0
 
@@ -124,7 +126,6 @@ const createAuthAxiosInstance = ({
         originalRequest &&
         !originalRequest._retry
       ) {
-        progress.stop()
         if (isRefreshing) {
           return new Promise((resolve, reject) => {
             failedQueue.push({ resolve, reject })
@@ -173,7 +174,6 @@ const createAuthAxiosInstance = ({
         }
       }
 
-      progress.stop()
       return Promise.reject(handleError(error))
     },
   )

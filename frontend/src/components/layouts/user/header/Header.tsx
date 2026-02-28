@@ -12,7 +12,7 @@ import { Link } from 'react-router-dom'
 import { Input } from '@/components/ui/input'
 import { useCart } from '@/hooks/useCart'
 import PromoBanner from './PromoBanner'
-import ProductSearch from '@/components/layouts/product/search/ProductSearch'
+import ProductSearch from '@/components/product/search/ProductSearch'
 
 interface HeaderProps {
   logo?: string
