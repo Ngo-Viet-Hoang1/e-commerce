@@ -9,14 +9,14 @@ import { api } from '../..'
 class UserOrderService {
   static createOrder = async (payload: CreateOrderPayload) => {
     const { data } = await api.post<IApiResponse<Order>>(
-      '/users/orders',
+      '/me/orders',
       payload,
     )
     return data.data!
   }
 
   static getMyOrders = async (params: PaginationParams) => {
-    const { data } = await api.get<IPaginatedResponse<Order>>('/users/orders', {
+    const { data } = await api.get<IPaginatedResponse<Order>>('/me/orders', {
       params,
     })
     return data
@@ -24,21 +24,21 @@ class UserOrderService {
 
   static getMyOrderById = async (orderId: number) => {
     const { data } = await api.get<IApiResponse<Order>>(
-      `/users/orders/${orderId}`,
+      `/me/orders/${orderId}`,
     )
-    return data
+    return data.data!
   }
 
   static cancelMyOrder = async (orderId: number) => {
-    const { data } = await api.put<IApiResponse<Order>>(
-      `/users/orders/${orderId}/cancel`,
+    const { data } = await api.post<IApiResponse<Order>>(
+      `/me/orders/${orderId}/cancel`,
     )
-    return data
+    return data.data!
   }
 
   static exportOrderPDF = async (orderId: number): Promise<Blob> => {
     try {
-      const response = await api.get(`/users/orders/${orderId}/export-pdf`, {
+      const response = await api.get(`/me/orders/${orderId}/pdf`, {
         responseType: 'blob',
       })
       return response.data

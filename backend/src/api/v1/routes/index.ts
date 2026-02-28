@@ -9,7 +9,8 @@ import cartRoute from '../modules/cart/cart.route.js'
 import categoryRoute from '../modules/category/category.route.js'
 import districtRoute from '../modules/district/district.route.js'
 import orderItemRoute from '../modules/order-items/order-items.route.js'
-import orderRouter from '../modules/order/order.route'
+import orderAdminRouter from '../modules/order/order.admin.route'
+import orderUserRouter from '../modules/order/order.user.route'
 import paymentRoute from '../modules/payment/payment.route.js'
 import productBadgeRoute from '../modules/product-badge/product-badge.route.js'
 import productFaqRoute from '../modules/product-faq/product-faq.route.js'
@@ -37,7 +38,8 @@ router.use('/products', productRoute)
 router.use('/productFaqs', productFaqRoute)
 router.use('/errors', errorRoute)
 router.use('/product-badges', productBadgeRoute)
-router.use('/orders', orderRouter)
+router.use('/orders', orderAdminRouter)
+router.use('/me/orders', orderUserRouter)
 router.use('/attributes', attributeRoute)
 router.use('/attribute-values', attributeValueRoute)
 router.use('/warranty-policies', warrantyPoliciesRoute)
