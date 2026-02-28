@@ -4,6 +4,7 @@ import RootLayout from '@/components/layouts/user/RootLayout'
 import AdminLogin from '@/pages/admin/AdminLogin'
 import Login from '@/pages/user/auth/Login'
 import Register from '@/pages/user/auth/Register'
+import { authReadyPromise } from '@/store/zustand/useAuthStore'
 import { lazy } from 'react'
 import { createBrowserRouter } from 'react-router'
 import { adminRoutes } from './adminRoutes'
@@ -18,6 +19,7 @@ const router = createBrowserRouter([
   {
     path: '/',
     element: <App />,
+    loader: () => authReadyPromise,
     children: [
       {
         path: '/',

@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { LOGIN_ROUTE, REFRESH_TOKEN_ENDPOINT } from '@/constants'
+import { REFRESH_TOKEN_ENDPOINT } from '@/constants'
 import type { IErrorResponse } from '@/interfaces/base-response.interface'
 import { ApiError } from '@/models/ApiError'
 import {
@@ -7,7 +7,6 @@ import {
   useAuthStore,
   type AuthStore,
 } from '@/store/zustand/useAuthStore'
-import { navigateTo } from '@/utils/navigate.util'
 import { progress } from '@/utils/nprogress.util'
 import axios, {
   AxiosError,
@@ -25,14 +24,12 @@ export interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
 interface AxiosInstanceProps {
   baseURL: string
   refreshTokenEndpoint: string
-  loginRoute: string
   authStore: () => AuthStore
 }
 
 const createAuthAxiosInstance = ({
   baseURL,
   refreshTokenEndpoint,
-  loginRoute,
   authStore,
 }: AxiosInstanceProps) => {
   interface QueueItem {
@@ -155,7 +152,6 @@ const createAuthAxiosInstance = ({
             authStore().reset()
             const error = new ApiError('No access token received', 401)
             processQueue(error, null)
-            navigateTo(loginRoute)
             return Promise.reject(error)
           }
 
@@ -171,7 +167,6 @@ const createAuthAxiosInstance = ({
           processQueue(refreshError as Error, null)
           // localStorage.removeItem(tokenKey)
           authStore().reset()
-          navigateTo(loginRoute)
           return Promise.reject(refreshError)
         } finally {
           isRefreshing = false
@@ -248,13 +243,11 @@ const generateRequestId = () => {
 export const api = createAuthAxiosInstance({
   baseURL: import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api/v1',
   refreshTokenEndpoint: REFRESH_TOKEN_ENDPOINT.USER,
-  loginRoute: LOGIN_ROUTE.USER,
   authStore: () => useAuthStore.getState(),
 })
 
 export const adminApi = createAuthAxiosInstance({
   baseURL: import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api/v1',
   refreshTokenEndpoint: REFRESH_TOKEN_ENDPOINT.ADMIN,
-  loginRoute: LOGIN_ROUTE.ADMIN,
   authStore: () => useAdminAuthStore.getState(),
 })

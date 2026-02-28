@@ -1,6 +1,5 @@
+import { useAdminAuthStore, useAuthStore } from '@/store/zustand/useAuthStore'
 import { Navigate, Outlet } from 'react-router-dom'
-import { useAuthStore, useAdminAuthStore } from '@/store/zustand/useAuthStore'
-import { Spinner } from '@/components/ui/spinner'
 
 interface GuestRouteProps {
   redirectPath?: string
@@ -11,19 +10,8 @@ const GuestRoute = ({
   redirectPath = '/',
   authType = 'user',
 }: GuestRouteProps) => {
-  const userAuth = useAuthStore()
-  const adminAuth = useAdminAuthStore()
-
-  const authStore = authType === 'admin' ? adminAuth : userAuth
-  const { isAuthenticated, isInitialized } = authStore
-
-  if (!isInitialized) {
-    return (
-      <div className="flex items-center justify-center">
-        <Spinner />
-      </div>
-    )
-  }
+  const authStore = authType === 'admin' ? useAdminAuthStore : useAuthStore
+  const isAuthenticated = authStore((s) => s.isAuthenticated)
 
   if (isAuthenticated) {
     return <Navigate to={redirectPath} replace />

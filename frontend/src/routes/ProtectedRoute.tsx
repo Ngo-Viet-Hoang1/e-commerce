@@ -1,4 +1,3 @@
-import { Spinner } from '@/components/ui/spinner'
 import { useAdminAuthStore, useAuthStore } from '@/store/zustand/useAuthStore'
 import { Navigate, Outlet } from 'react-router-dom'
 
@@ -13,20 +12,10 @@ const ProtectedRoute = ({
   children,
   type = 'user',
 }: ProtectedRouteProps) => {
-  const userAuth = useAuthStore()
-  const adminAuth = useAdminAuthStore()
-
-  const authStore = type === 'admin' ? adminAuth : userAuth
-  const { me, isAuthenticated, isInitialized } = authStore
+  const authStore = type === 'admin' ? useAdminAuthStore : useAuthStore
+  const isAuthenticated = authStore((s) => s.isAuthenticated)
+  const me = authStore((s) => s.me)
   const hasRole = me?.roles?.includes(type)
-
-  if (!isInitialized) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <Spinner />
-      </div>
-    )
-  }
 
   if (!isAuthenticated) {
     return <Navigate to={redirectPath} replace />

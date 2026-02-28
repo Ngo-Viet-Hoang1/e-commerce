@@ -19,7 +19,8 @@ const StreamChatProvider = ({ children, role }: ChatProviderProps) => {
   const isInitializingRef = useRef(false)
 
   const authStore = role === 'admin' ? useAdminAuthStore : useAuthStore
-  const { isInitialized, isAuthenticated } = authStore()
+  const isInitialized = authStore((s) => s.isInitialized)
+  const isAuthenticated = authStore((s) => s.isAuthenticated)
 
   const apiClient = role === 'admin' ? adminApi : api
   const queryKey = role === 'admin' ? 'admin-chat-token' : 'user-chat-token'
