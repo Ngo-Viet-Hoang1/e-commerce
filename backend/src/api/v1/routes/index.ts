@@ -24,10 +24,12 @@ import warrantyPoliciesRoute from '../modules/warrantyPolicies/warrantyPolicies.
 import adminRoute from './admin.route.js'
 import chatRoute from './chat.route.js'
 import errorRoute from './error.route.js'
+import healthRoute from './health.route.js'
 import homeRoute from './home.route.js'
 
 const router = Router()
 
+router.use('/health', healthRoute)
 router.use('/', homeRoute)
 router.use('/auth', authRoute)
 router.use('/users', userRoute)
