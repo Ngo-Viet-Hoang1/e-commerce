@@ -17,42 +17,34 @@ import {
 
 const router = Router()
 
+router.use(authenticate, requireAdmin)
+
 router.get(
   '/',
-  authenticate,
-  requireAdmin,
   validate(listOrdersQuerySchema, 'query'),
   orderController.findAll,
 )
 
 router.get(
   '/:id',
-  authenticate,
-  requireAdmin,
   validate(orderIdParamSchema, 'params'),
   orderController.findById,
 )
 
 router.get(
   '/:id/export-pdf',
-  authenticate,
-  requireAdmin,
   validate(orderIdParamSchema, 'params'),
   orderController.exportOrderPDF,
 )
 
 router.post(
   '/',
-  authenticate,
-  requireAdmin,
   validate(createOrderBodySchema, 'body'),
   orderController.create,
 )
 
 router.put(
   '/:id',
-  authenticate,
-  requireAdmin,
   validateMultiple({
     params: orderIdParamSchema,
     body: updateOrderBodySchema,
@@ -62,24 +54,18 @@ router.put(
 
 router.delete(
   '/:id',
-  authenticate,
-  requireAdmin,
   validate(orderIdParamSchema, 'params'),
   orderController.deleteById,
 )
 
 router.delete(
   '/:id/soft',
-  authenticate,
-  requireAdmin,
   validate(orderIdParamSchema, 'params'),
   orderController.softDeleteById,
 )
 
 router.post(
   '/:id/restore',
-  authenticate,
-  requireAdmin,
   validate(orderIdParamSchema, 'params'),
   orderController.restoreById,
 )
