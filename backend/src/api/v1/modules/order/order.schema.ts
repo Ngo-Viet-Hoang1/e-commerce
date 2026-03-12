@@ -2,7 +2,7 @@ import { z } from 'zod'
 import {
   createPaginationSchema,
   numericIdParamSchema,
-} from '../../shared/schemas'
+} from '@v1/shared/schemas'
 import {
   ORDER_STATUSES,
   PAYMENT_METHODS,
@@ -56,7 +56,6 @@ const orderItemInputSchema = z.object({
 export const createOrderBodySchema = z.object({
   userId: z.number().optional(),
 
-  status: z.enum(ORDER_STATUSES).default('pending'),
   currency: z.string().default('VND'),
 
   items: z.array(orderItemInputSchema).min(1),
@@ -67,13 +66,11 @@ export const createOrderBodySchema = z.object({
   shippingRecipientName: z.string().optional(),
   shippingPhone: z.string().optional(),
   shippingAddress: z.record(z.string(), z.any()).optional().nullable(),
-
   billingAddress: z.record(z.string(), z.any()).optional().nullable(),
 
   shippingMethod: z.string().optional(),
   shippingFee: z.number().min(0).optional().default(0),
 
-  paymentStatus: z.enum(PAYMENT_STATUSES).default('pending'),
   paymentMethod: z.enum(PAYMENT_METHODS).optional().default('cod'),
   metadata: z.record(z.string(), z.any()).optional(),
 })
@@ -96,7 +93,7 @@ export const updateOrderBodySchema = z.object({
   shippingFee: z.number().optional(),
 
   paymentStatus: z.enum(PAYMENT_STATUSES).optional(),
-  paymentMethod: z.enum(PAYMENT_METHODS).optional().default('cod'),
+  paymentMethod: z.enum(PAYMENT_METHODS).optional(),
   metadata: z.record(z.string(), z.any()).optional(),
 
   placedAt: z.string().optional(),

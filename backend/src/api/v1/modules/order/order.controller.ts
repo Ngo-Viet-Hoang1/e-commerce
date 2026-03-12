@@ -1,13 +1,14 @@
+import { UnauthorizedException } from '@v1/shared/models/app-error.model'
+import { SuccessResponse } from '@v1/shared/models/success-response.model'
 import type { Request, Response } from 'express'
-import { UnauthorizedException } from '../../shared/models/app-error.model'
-import { SuccessResponse } from '../../shared/models/success-response.model'
 import {
+  type CreateOrderBody,
   type listOrdersQuerySchema,
   type OrderIdParam,
-  type CreateOrderBody,
   type UpdateOrderBody,
 } from './order.schema'
 import { orderService } from './order.service'
+import type { PaymentRequestMeta } from './payment/payment.strategy.interface'
 
 class OrderController {
   findAll = async (req: Request, res: Response) => {
@@ -31,27 +32,32 @@ class OrderController {
     SuccessResponse.send(res, order, 'Order retrieved successfully')
   }
 
-  create = async (req: Request, res: Response) => {
+  createAdminOrder = async (req: Request, res: Response) => {
     const data = req.validatedData?.body as CreateOrderBody
 
-    const created = await orderService.create(data)
+    const requestMeta: PaymentRequestMeta = {
+      ipAddress: req.ip ?? req.socket.remoteAddress,
+      returnUrl: req.query.returnUrl as string | undefined,
+      locale: req.headers['accept-language']?.startsWith('vi') ? 'vn' : 'en',
+    }
 
+    const created = await orderService.create(data, requestMeta)
     SuccessResponse.created(res, created, 'Order created successfully')
   }
 
   createUserOrder = async (req: Request, res: Response) => {
     const userId = req.user?.id
-
-    if (!userId) {
-      throw new UnauthorizedException('User authentication required')
-    }
+    if (!userId) throw new UnauthorizedException('User authentication required')
 
     const data = req.validatedData?.body as CreateOrderBody
 
-    const orderData = { ...data, userId }
+    const requestMeta: PaymentRequestMeta = {
+      ipAddress: req.ip ?? req.socket.remoteAddress,
+      returnUrl: req.query.returnUrl as string | undefined,
+      locale: req.headers['accept-language']?.startsWith('vi') ? 'vn' : 'en',
+    }
 
-    const created = await orderService.create(orderData)
-
+    const created = await orderService.create({ ...data, userId }, requestMeta)
     SuccessResponse.created(res, created, 'Order created successfully')
   }
 

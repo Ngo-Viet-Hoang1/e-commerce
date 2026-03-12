@@ -40,7 +40,7 @@ router.get(
 router.post(
   '/',
   validate(createOrderBodySchema, 'body'),
-  orderController.create,
+  orderController.createAdminOrder,
 )
 
 router.put(

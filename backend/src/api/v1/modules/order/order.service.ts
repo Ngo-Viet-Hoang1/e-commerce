@@ -1,15 +1,21 @@
 import type { Prisma } from '@generated/prisma/client'
-import { NotFoundException } from '../../shared/models/app-error.model'
-import { orderRepository } from './order.repository'
+import { prisma } from '@v1/shared/config/database/postgres'
 import {
-  type CreateOrderBody,
-  type UpdateOrderBody,
-  type listOrdersQuerySchema,
-} from './order.schema'
-import { productVariantRepository } from '../product-variant'
-import { prisma } from '../../shared/config/database/postgres'
-import puppeteer from 'puppeteer'
+  BadRequestException,
+  NotFoundException,
+} from '@v1/shared/models/app-error.model'
 import { invoiceService } from '../invoice/invoice.service'
+import { productVariantService } from '../product-variant'
+import { OrderStatus, PaymentMethod, PaymentStatus } from './order.constants'
+import { orderRepository } from './order.repository'
+import type {
+  CreateOrderBody,
+  UpdateOrderBody,
+  listOrdersQuerySchema,
+} from './order.schema'
+import { PaymentStrategyFactory } from './payment/payment.factory'
+import type { PaymentRequestMeta } from './payment/payment.strategy.interface'
+import { parseOrderMetadata } from './order.util'
 
 class OrderService {
   findAll = async (query: listOrdersQuerySchema) => {
@@ -22,16 +28,8 @@ class OrderService {
           ...(Number.isInteger(Number(search))
             ? [{ orderId: Number(search) }]
             : []),
-          {
-            user: {
-              email: { contains: search, mode: 'insensitive' },
-            },
-          },
-          {
-            user: {
-              name: { contains: search, mode: 'insensitive' },
-            },
-          },
+          { user: { email: { contains: search, mode: 'insensitive' } } },
+          { user: { name: { contains: search, mode: 'insensitive' } } },
           { shippingRecipientName: { contains: search, mode: 'insensitive' } },
         ],
       }),
@@ -40,7 +38,7 @@ class OrderService {
     const [orders, total] = await Promise.all([
       orderRepository.findMany({
         where,
-        orderBy: { [sort || 'created_at']: order || 'desc' },
+        orderBy: { [sort || 'createdAt']: order || 'desc' },
         skip: (page - 1) * limit,
         take: limit,
       }),
@@ -53,57 +51,49 @@ class OrderService {
   findById = async (id: number) => {
     const order = await orderRepository.findById(id)
 
-    if (!order) {
-      throw new NotFoundException('Order', id.toString())
-    }
-
+    if (!order) throw new NotFoundException('Order', id.toString())
     return order
   }
 
-  create = async (data: CreateOrderBody) => {
+  create = async (
+    data: CreateOrderBody,
+    requestMeta: PaymentRequestMeta = {},
+  ) => {
     const {
       items,
       shippingAddress,
       billingAddress,
       metadata,
       shippingFee = 0,
-      paymentMethod = 'cod',
+      paymentMethod = PaymentMethod.COD,
       shippingProvinceId,
       shippingDistrictId,
       userId,
       ...rest
     } = data
 
-    const isCOD = paymentMethod === 'cod'
+    const strategy = PaymentStrategyFactory.get(paymentMethod)
 
     const itemsData = await Promise.all(
       items.map(async (item) => {
-        const variant = await productVariantRepository.findById(item.variantId)
-
-        if (!variant) {
-          throw new NotFoundException('Variant', item.variantId.toString())
-        }
-
-        if (variant.deletedAt) {
-          throw new NotFoundException(
-            'Product variant is no longer available',
-            item.variantId.toString(),
-          )
-        }
+        const variant = await productVariantService.findById(item.variantId)
 
         if (variant.productId !== item.productId) {
-          throw new NotFoundException('Variant does not belong to product')
+          throw new BadRequestException(
+            `Variant ${item.variantId} does not belong to product ${item.productId}`,
+          )
         }
 
         if (variant.stockQuantity < item.quantity) {
-          throw new NotFoundException(
-            `Insufficient stock for variant ${variant.title || variant.sku}. Available: ${variant.stockQuantity}, Requested: ${item.quantity}`,
+          throw new BadRequestException(
+            `Insufficient stock: ${variant.title ?? variant.sku}. ` +
+              `Available: ${variant.stockQuantity}, Requested: ${item.quantity}`,
           )
         }
 
-        const unitPrice = variant.price
-        const discount = item.discount || 0
-        const totalPrice = unitPrice.toNumber() * item.quantity - discount
+        const unitPrice = Number(variant.price)
+        const discount = item.discount ?? 0
+        const totalPrice = unitPrice * item.quantity - discount
 
         return {
           productId: item.productId,
@@ -116,123 +106,69 @@ class OrderService {
       }),
     )
 
-    const itemsTotal = itemsData.reduce((sum, item) => sum + item.totalPrice, 0)
-    const totalAmount = itemsTotal + shippingFee
-
-    const orderStatus = 'pending'
-    const orderPaymentStatus = 'pending'
-
-    const orderMetadata = {
-      ...(typeof metadata === 'object' ? metadata : {}),
-      paymentMethod,
-    }
+    const totalAmount =
+      itemsData.reduce((sum, item) => sum + item.totalPrice, 0) + shippingFee
 
     const order = await prisma.$transaction(async (tx) => {
-      const newOrder = await tx.order.create({
-        data: {
-          ...rest,
-          userId,
-          totalAmount,
-          shippingFee,
-          status: orderStatus,
-          paymentStatus: orderPaymentStatus,
-          shippingProvinceId,
-          shippingDistrictId,
-          shippingAddress: shippingAddress ?? undefined,
-          billingAddress: billingAddress ?? undefined,
-          metadata: orderMetadata,
-          orderItems: {
-            create: itemsData,
-          },
+      const createData: Prisma.OrderUncheckedCreateInput = {
+        ...rest,
+        userId: userId ?? null,
+        shippingProvinceId: shippingProvinceId ?? null,
+        shippingDistrictId: shippingDistrictId ?? null,
+        shippingAddress: shippingAddress ?? undefined,
+        billingAddress: billingAddress ?? undefined,
+        totalAmount,
+        shippingFee,
+        status: OrderStatus.PENDING,
+        paymentStatus: PaymentStatus.PENDING,
+        metadata: {
+          ...(typeof metadata === 'object' && metadata !== null
+            ? metadata
+            : {}),
+          paymentMethod,
         },
-        include: {
-          orderItems: true,
-        },
-      })
-
-      if (isCOD) {
-        for (const item of itemsData) {
-          const updated = await tx.productVariant.updateMany({
-            where: {
-              id: item.variantId,
-              stockQuantity: {
-                gte: item.quantity,
-              },
-              deletedAt: null,
-            },
-            data: {
-              stockQuantity: {
-                decrement: item.quantity,
-              },
-            },
-          })
-
-          if (updated.count === 0) {
-            const currentVariant = await tx.productVariant.findUnique({
-              where: { id: item.variantId },
-            })
-
-            if (!currentVariant || currentVariant.deletedAt) {
-              throw new NotFoundException(
-                'Product variant is no longer available',
-                item.variantId.toString(),
-              )
-            }
-
-            throw new NotFoundException(
-              `Insufficient stock. Available: ${currentVariant.stockQuantity}, Requested: ${item.quantity}`,
-            )
-          }
-        }
+        orderItems: { create: itemsData },
       }
 
+      const newOrder = await tx.order.create({
+        data: createData,
+        include: { orderItems: true },
+      })
+
+      await strategy.onOrderCreated(newOrder, tx)
       return newOrder
     })
 
-    // TODO: For online payment, integrate with payment gateway
-    // if (!isCOD) {
-    //   const paymentUrl = await generatePaymentUrl(order, paymentMethod)
-    //   return { ...order, paymentUrl }
-    // }
+    const paymentResult = await strategy.process(order, requestMeta)
 
-    return order
+    return { ...order, ...paymentResult }
   }
 
   updateById = async (id: number, data: UpdateOrderBody) => {
     await this.findById(id)
 
-    const updateData: Prisma.OrderUpdateInput = {
-      ...data,
-    }
+    const updateData: Prisma.OrderUpdateInput = { ...data }
 
-    if (data.status === 'delivered') {
+    if (data.status === OrderStatus.DELIVERED) {
       updateData.deliveredAt = new Date()
     }
 
-    const updatedOrder = await orderRepository.update(id, updateData)
-
-    return updatedOrder
+    return orderRepository.update(id, updateData)
   }
 
   deleteById = async (id: number) => {
     await this.findById(id)
-
-    const deletedOrder = await orderRepository.deleteById(id)
-
-    return deletedOrder
+    return orderRepository.deleteById(id)
   }
 
   softDeleteById = async (id: number) => {
     await this.findById(id)
-    const deletedOrder = await orderRepository.softDelete(id)
-
-    return deletedOrder
+    return orderRepository.softDelete(id)
   }
+
   restoreById = async (id: number) => {
     await this.findById(id)
-    const restoredOrder = await orderRepository.restore(id)
-
-    return restoredOrder
+    return orderRepository.update(id, { deletedAt: null })
   }
 
   findUserOrders = async (userId: number, query: listOrdersQuerySchema) => {
@@ -252,19 +188,23 @@ class OrderService {
   findUserOrderById = async (userId: number, orderId: number) => {
     const order = await orderRepository.findByIdForUser(orderId, userId)
 
-    if (!order) {
-      throw new NotFoundException('Order', orderId.toString())
-    }
-
+    if (!order) throw new NotFoundException('Order', orderId.toString())
     return order
   }
 
   cancelUserOrder = async (userId: number, orderId: number) => {
     const order = await this.findUserOrderById(userId, orderId)
 
-    if (!['pending', 'processing', 'shipped'].includes(order.status)) {
-      throw new NotFoundException(
-        'Cannot cancel order with status: ' + order.status,
+    if (
+      ![OrderStatus.PENDING, OrderStatus.PROCESSING].includes(
+        order.status as
+          | typeof OrderStatus.PENDING
+          | typeof OrderStatus.PROCESSING,
+      )
+    ) {
+      throw new BadRequestException(
+        `Cannot cancel order with status '${order.status}'. ` +
+          `Only 'pending' or 'processing' orders can be cancelled.`,
       )
     }
 
@@ -313,40 +253,6 @@ class OrderService {
 
     return invoiceService.generatePDF(order)
   }
-
-  // TODO: Handle payment confirmation webhook (VNPay, PayPal)
-  // confirmPayment = async (orderId: number, paymentData: any) => {
-  //   const order = await this.findById(orderId)
-  //
-  //   // Verify payment with gateway
-  //   // If valid, update order status and decrement stock
-  //
-  //   const { prisma } = await import('../../shared/config/database/postgres')
-  //
-  //   await prisma.$transaction(async (tx) => {
-  //     // Update order
-  //     await tx.order.update({
-  //       where: { orderId },
-  //       data: {
-  //         status: 'pending',
-  //         paymentStatus: 'paid',
-  //       },
-  //     })
-  //
-  //     // Decrement stock (same logic as COD)
-  //     for (const item of order.orderItems) {
-  //       await tx.productVariant.updateMany({
-  //         where: {
-  //           id: item.variantId,
-  //           stockQuantity: { gte: item.quantity },
-  //         },
-  //         data: {
-  //           stockQuantity: { decrement: item.quantity },
-  //         },
-  //       })
-  //     }
-  //   })
-  // }
 }
 
 export const orderService = new OrderService()
