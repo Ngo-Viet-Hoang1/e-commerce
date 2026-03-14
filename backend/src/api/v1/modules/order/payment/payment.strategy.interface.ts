@@ -1,5 +1,6 @@
 import type { PrismaTransaction } from '@/api/v1/shared/interfaces/prisma.interface'
 import type { Prisma } from '@generated/prisma/client'
+import type { PaymentStatus } from '../order.constants'
 
 export type OrderWithItems = Prisma.OrderGetPayload<{
   include: { orderItems: true }
@@ -12,7 +13,7 @@ export interface PaymentRequestMeta {
 }
 
 export interface PaymentResult {
-  paymentStatus: 'pending' | 'paid' | 'failed'
+  paymentStatus: PaymentStatus
   redirectUrl?: string
 }
 
