@@ -14,7 +14,7 @@ export class CodStrategy implements PaymentStrategy {
     _order: OrderWithItems,
     _requestMeta: PaymentRequestMeta,
   ): Promise<PaymentResult> {
-    return { paymentStatus: PaymentStatus.PAID }
+    return { paymentStatus: PaymentStatus.PENDING }
   }
 
   async onOrderCreated(

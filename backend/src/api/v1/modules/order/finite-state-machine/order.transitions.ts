@@ -138,28 +138,33 @@ const ORDER_TRANSITIONS: Record<OrderStatus, OrderTransition[]> = {
     {
       to: OrderStatus.CANCELLED,
       allowedFor: ['admin'],
-      onEnter: ({ order }): OrderTransitionResult => ({
-        newStatus: OrderStatus.CANCELLED,
-        orderUpdate: {},
-        stockInstructions: buildRestoreInstructions(order),
-        effects: ['restore_stock', 'send_cancellation_email'],
-      }),
+      onEnter: ({ order }): OrderTransitionResult => {
+        const isPaid = order.paymentStatus === PaymentStatus.PAID
+
+        return {
+          newStatus: OrderStatus.CANCELLED,
+          orderUpdate: {},
+          stockInstructions: buildRestoreInstructions(order),
+          cascadePaymentTransition: isPaid ? PaymentStatus.REFUNDED : undefined,
+          effects: ['restore_stock', 'send_cancellation_email'],
+        }
+      },
     },
     {
       to: OrderStatus.RETURNED,
       // Case đặc biệt: shipper báo hàng bị trả lại trước khi delivered
       // Chỉ admin xử lý được — user không tự return khi chưa nhận hàng
       allowedFor: ['admin'],
-      onEnter: ({ order }): OrderTransitionResult => ({
-        newStatus: OrderStatus.RETURNED,
-        orderUpdate: {},
-        stockInstructions: buildRestoreInstructions(order),
-        cascadePaymentTransition:
-          order.paymentStatus === PaymentStatus.PAID
-            ? PaymentStatus.REFUNDED
-            : undefined,
-        effects: ['restore_stock', 'cascade_refund', 'send_return_email'],
-      }),
+      onEnter: ({ order }): OrderTransitionResult => {
+        const isPaid = order.paymentStatus === PaymentStatus.PAID
+        return {
+          newStatus: OrderStatus.RETURNED,
+          orderUpdate: {},
+          stockInstructions: buildRestoreInstructions(order),
+          cascadePaymentTransition: isPaid ? PaymentStatus.REFUNDED : undefined,
+          effects: ['restore_stock', 'cascade_refund', 'send_return_email'],
+        }
+      },
     },
   ],
 
@@ -176,13 +181,16 @@ const ORDER_TRANSITIONS: Record<OrderStatus, OrderTransition[]> = {
 
         return true
       },
-      onEnter: ({ order }): OrderTransitionResult => ({
-        newStatus: OrderStatus.RETURNED,
-        orderUpdate: {},
-        stockInstructions: buildRestoreInstructions(order),
-        cascadePaymentTransition: PaymentStatus.REFUNDED,
-        effects: ['restore_stock', 'cascade_refund', 'send_return_email'],
-      }),
+      onEnter: ({ order }): OrderTransitionResult => {
+        const isPaid = order.paymentStatus === PaymentStatus.PAID
+        return {
+          newStatus: OrderStatus.RETURNED,
+          orderUpdate: {},
+          stockInstructions: buildRestoreInstructions(order),
+          cascadePaymentTransition: isPaid ? PaymentStatus.REFUNDED : undefined,
+          effects: ['restore_stock', 'cascade_refund', 'send_return_email'],
+        }
+      },
     },
   ],
 

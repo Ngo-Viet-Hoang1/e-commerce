@@ -1,13 +1,19 @@
 import type { Prisma } from '@generated/prisma/client'
 import { prisma } from '@v1/shared/config/database/postgres'
+import type { PrismaTransaction } from '@v1/shared/interfaces/prisma.interface'
 import {
   BadRequestException,
   NotFoundException,
 } from '@v1/shared/models/app-error.model'
 import { invoiceService } from '../invoice/invoice.service'
 import { productVariantService } from '../product-variant'
+import type {
+  StockInstruction,
+  TransitionContext,
+} from './finite-state-machine'
+import { orderStateMachine, paymentStateMachine } from './finite-state-machine'
 import { OrderStatus, PaymentMethod, PaymentStatus } from './order.constants'
-import { orderRepository } from './order.repository'
+import { ORDER_SELECT_FIELDS, orderRepository } from './order.repository'
 import type {
   CreateOrderBody,
   UpdateOrderBody,
@@ -15,7 +21,7 @@ import type {
 } from './order.schema'
 import { PaymentStrategyFactory } from './payment/payment.factory'
 import type { PaymentRequestMeta } from './payment/payment.strategy.interface'
-import { parseOrderMetadata } from './order.util'
+import { decrementStockOptimistic, incrementStock } from './order.util'
 
 class OrderService {
   findAll = async (query: listOrdersQuerySchema) => {
@@ -49,10 +55,7 @@ class OrderService {
   }
 
   findById = async (id: number) => {
-    const order = await orderRepository.findById(id)
-
-    if (!order) throw new NotFoundException('Order', id.toString())
-    return order
+    return orderRepository.findById(id)
   }
 
   create = async (
@@ -93,14 +96,13 @@ class OrderService {
 
         const unitPrice = Number(variant.price)
         const discount = item.discount ?? 0
-        const totalPrice = unitPrice * item.quantity - discount
 
         return {
           productId: item.productId,
           variantId: item.variantId,
           quantity: item.quantity,
           unitPrice,
-          totalPrice,
+          totalPrice: unitPrice * item.quantity - discount,
           discount,
         }
       }),
@@ -110,28 +112,26 @@ class OrderService {
       itemsData.reduce((sum, item) => sum + item.totalPrice, 0) + shippingFee
 
     const order = await prisma.$transaction(async (tx) => {
-      const createData: Prisma.OrderUncheckedCreateInput = {
-        ...rest,
-        userId: userId ?? null,
-        shippingProvinceId: shippingProvinceId ?? null,
-        shippingDistrictId: shippingDistrictId ?? null,
-        shippingAddress: shippingAddress ?? undefined,
-        billingAddress: billingAddress ?? undefined,
-        totalAmount,
-        shippingFee,
-        status: OrderStatus.PENDING,
-        paymentStatus: PaymentStatus.PENDING,
-        metadata: {
-          ...(typeof metadata === 'object' && metadata !== null
-            ? metadata
-            : {}),
-          paymentMethod,
-        },
-        orderItems: { create: itemsData },
-      }
-
       const newOrder = await tx.order.create({
-        data: createData,
+        data: {
+          ...rest,
+          userId: userId ?? null,
+          shippingProvinceId: shippingProvinceId ?? null,
+          shippingDistrictId: shippingDistrictId ?? null,
+          shippingAddress: shippingAddress ?? undefined,
+          billingAddress: billingAddress ?? undefined,
+          totalAmount,
+          shippingFee,
+          status: OrderStatus.PENDING,
+          paymentStatus: PaymentStatus.PENDING,
+          metadata: {
+            ...(typeof metadata === 'object' && metadata !== null
+              ? metadata
+              : {}),
+            paymentMethod,
+          },
+          orderItems: { create: itemsData },
+        },
         include: { orderItems: true },
       })
 
@@ -145,15 +145,125 @@ class OrderService {
   }
 
   updateById = async (id: number, data: UpdateOrderBody) => {
-    await this.findById(id)
+    const order = await this.findById(id)
 
-    const updateData: Prisma.OrderUpdateInput = { ...data }
-
-    if (data.status === OrderStatus.DELIVERED) {
-      updateData.deliveredAt = new Date()
+    if (!data.status || data.status === order.status) {
+      return orderRepository.update(id, data)
     }
 
-    return orderRepository.update(id, updateData)
+    return prisma.$transaction(async (tx) => {
+      return this.executeTransition(
+        data.status as OrderStatus,
+        { order, triggeredBy: 'admin' },
+        tx,
+        data,
+      )
+    })
+  }
+
+  cancelUserOrder = async (userId: number, orderId: number) => {
+    const order = await this.findUserOrderById(userId, orderId)
+
+    return prisma.$transaction(async (tx) => {
+      return this.executeTransition(
+        OrderStatus.CANCELLED,
+        { order, triggeredBy: 'user' },
+        tx,
+      )
+    })
+  }
+
+  returnUserOrder = async (userId: number, orderId: number) => {
+    const order = await this.findUserOrderById(userId, orderId)
+
+    return prisma.$transaction(async (tx) => {
+      return this.executeTransition(
+        OrderStatus.RETURNED,
+        { order, triggeredBy: 'user' },
+        tx,
+      )
+    })
+  }
+
+  confirmPayment = async (orderId: number) => {
+    const order = await this.findById(orderId)
+
+    return prisma.$transaction(async (tx) => {
+      const { newStatus, stockInstructions } = paymentStateMachine.transition(
+        PaymentStatus.PAID,
+        { order, triggeredBy: 'webhook' },
+      )
+
+      await this.applyStockInstructions(stockInstructions, tx)
+
+      return tx.order.update({
+        where: { orderId: order.orderId },
+        data: { paymentStatus: newStatus },
+        select: ORDER_SELECT_FIELDS,
+      })
+    })
+  }
+
+  private executeTransition = async (
+    toStatus: OrderStatus,
+    ctx: TransitionContext,
+    tx: PrismaTransaction,
+    extraData?: Partial<UpdateOrderBody>,
+  ) => {
+    const instructions = orderStateMachine.transition(toStatus, ctx)
+    const {
+      paymentStatus: _ignorePaymentStatus,
+      status: _ignoreStatus,
+      ...safeExtraData
+    } = extraData ?? {}
+
+    await this.applyStockInstructions(instructions.stockInstructions, tx)
+
+    let paymentStatusUpdate: PaymentStatus | undefined
+    if (instructions.cascadePaymentTransition) {
+      const paymentInstructions = paymentStateMachine.transition(
+        instructions.cascadePaymentTransition,
+        { ...ctx, triggeredBy: 'system' },
+      )
+
+      await this.applyStockInstructions(
+        paymentInstructions.stockInstructions,
+        tx,
+      )
+
+      paymentStatusUpdate = paymentInstructions.newStatus
+    }
+
+    return tx.order.update({
+      where: { orderId: ctx.order.orderId },
+      data: {
+        ...safeExtraData,
+        status: instructions.newStatus,
+        ...instructions.orderUpdate,
+        ...(paymentStatusUpdate && { paymentStatus: paymentStatusUpdate }),
+      },
+      select: ORDER_SELECT_FIELDS,
+    })
+  }
+
+  private applyStockInstructions = async (
+    instructions: StockInstruction[],
+    tx: PrismaTransaction,
+  ) => {
+    for (const { operation, variantId, quantity } of instructions) {
+      switch (operation) {
+        case 'decrement':
+          await decrementStockOptimistic(tx, variantId, quantity)
+          break
+
+        case 'increment':
+          await incrementStock(tx, variantId, quantity)
+          break
+
+        default:
+          throw new BadRequestException(`Unknown stock operation: ${operation}`)
+      }
+    }
   }
 
   deleteById = async (id: number) => {
@@ -162,13 +272,25 @@ class OrderService {
   }
 
   softDeleteById = async (id: number) => {
-    await this.findById(id)
-    return orderRepository.softDelete(id)
+    const order = await this.findById(id)
+
+    return prisma.$transaction(async (tx) => {
+      await this.executeTransition(
+        OrderStatus.CANCELLED,
+        { order, triggeredBy: 'admin' },
+        tx,
+      )
+      return tx.order.update({
+        where: { orderId: order.orderId },
+        data: { deletedAt: new Date() },
+        select: ORDER_SELECT_FIELDS,
+      })
+    })
   }
 
   restoreById = async (id: number) => {
     await this.findById(id)
-    return orderRepository.update(id, { deletedAt: null })
+    return orderRepository.restore(id)
   }
 
   findUserOrders = async (userId: number, query: listOrdersQuerySchema) => {
@@ -187,61 +309,8 @@ class OrderService {
 
   findUserOrderById = async (userId: number, orderId: number) => {
     const order = await orderRepository.findByIdForUser(orderId, userId)
-
     if (!order) throw new NotFoundException('Order', orderId.toString())
     return order
-  }
-
-  cancelUserOrder = async (userId: number, orderId: number) => {
-    const order = await this.findUserOrderById(userId, orderId)
-
-    if (
-      ![OrderStatus.PENDING, OrderStatus.PROCESSING].includes(
-        order.status as
-          | typeof OrderStatus.PENDING
-          | typeof OrderStatus.PROCESSING,
-      )
-    ) {
-      throw new BadRequestException(
-        `Cannot cancel order with status '${order.status}'. ` +
-          `Only 'pending' or 'processing' orders can be cancelled.`,
-      )
-    }
-
-    const cancelledOrder = await prisma.$transaction(async (tx) => {
-      const updated = await tx.order.update({
-        where: { orderId },
-        data: {
-          status: 'cancelled',
-        },
-        include: {
-          orderItems: true,
-        },
-      })
-
-      const orderMeta = order.metadata as { paymentMethod?: string } | null
-      const wasCOD = orderMeta?.paymentMethod === 'cod'
-      const shouldRestoreStock = wasCOD || order.paymentStatus === 'paid'
-
-      if (shouldRestoreStock) {
-        for (const item of updated.orderItems) {
-          if (item.variantId) {
-            await tx.productVariant.update({
-              where: { id: item.variantId },
-              data: {
-                stockQuantity: {
-                  increment: item.quantity,
-                },
-              },
-            })
-          }
-        }
-      }
-
-      return updated
-    })
-
-    return cancelledOrder
   }
 
   generateInvoicePDF = async (orderId: number, userId?: number) => {
