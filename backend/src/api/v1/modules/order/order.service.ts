@@ -3,8 +3,10 @@ import { prisma } from '@v1/shared/config/database/postgres'
 import type { PrismaTransaction } from '@v1/shared/interfaces/prisma.interface'
 import {
   BadRequestException,
+  ConflictException,
   NotFoundException,
 } from '@v1/shared/models/app-error.model'
+import redis from '../../shared/config/database/redis'
 import { invoiceService } from '../invoice/invoice.service'
 import { productVariantService } from '../product-variant'
 import type {
@@ -19,9 +21,9 @@ import type {
   UpdateOrderBody,
   listOrdersQuerySchema,
 } from './order.schema'
+import { decrementStockOptimistic, incrementStock } from './order.util'
 import { PaymentStrategyFactory } from './payment/payment.factory'
 import type { PaymentRequestMeta } from './payment/payment.strategy.interface'
-import { decrementStockOptimistic, incrementStock } from './order.util'
 
 class OrderService {
   findAll = async (query: listOrdersQuerySchema) => {
@@ -61,7 +63,22 @@ class OrderService {
   create = async (
     data: CreateOrderBody,
     requestMeta: PaymentRequestMeta = {},
+    idempotencyKey?: string,
   ) => {
+    const key = `order:idempotency:${idempotencyKey}`
+    const lock = await redis.set(key, 'processing', 'EX', 120, 'NX')
+
+    if (!lock) {
+      const value = await redis.get(key)
+      if (value === null) {
+        throw new ConflictException('Please try again')
+      } else if (value === 'processing') {
+        throw new ConflictException('Order is being processed')
+      } else {
+        return this.findById(Number(value))
+      }
+    }
+
     const {
       items,
       shippingAddress,
@@ -77,71 +94,77 @@ class OrderService {
 
     const strategy = PaymentStrategyFactory.get(paymentMethod)
 
-    const itemsData = await Promise.all(
-      items.map(async (item) => {
-        const variant = await productVariantService.findById(item.variantId)
+    try {
+      const itemsData = await Promise.all(
+        items.map(async (item) => {
+          const variant = await productVariantService.findById(item.variantId)
 
-        if (variant.productId !== item.productId) {
-          throw new BadRequestException(
-            `Variant ${item.variantId} does not belong to product ${item.productId}`,
-          )
-        }
+          if (variant.productId !== item.productId) {
+            throw new BadRequestException(
+              `Variant ${item.variantId} does not belong to product ${item.productId}`,
+            )
+          }
 
-        if (variant.stockQuantity < item.quantity) {
-          throw new BadRequestException(
-            `Insufficient stock: ${variant.title ?? variant.sku}. ` +
-              `Available: ${variant.stockQuantity}, Requested: ${item.quantity}`,
-          )
-        }
+          if (variant.stockQuantity < item.quantity) {
+            throw new BadRequestException(
+              `Insufficient stock: ${variant.title ?? variant.sku}. ` +
+                `Available: ${variant.stockQuantity}, Requested: ${item.quantity}`,
+            )
+          }
 
-        const unitPrice = Number(variant.price)
-        const discount = item.discount ?? 0
+          const unitPrice = Number(variant.price)
+          const discount = item.discount ?? 0
 
-        return {
-          productId: item.productId,
-          variantId: item.variantId,
-          quantity: item.quantity,
-          unitPrice,
-          totalPrice: unitPrice * item.quantity - discount,
-          discount,
-        }
-      }),
-    )
+          return {
+            productId: item.productId,
+            variantId: item.variantId,
+            quantity: item.quantity,
+            unitPrice,
+            totalPrice: unitPrice * item.quantity - discount,
+            discount,
+          }
+        }),
+      )
 
-    const totalAmount =
-      itemsData.reduce((sum, item) => sum + item.totalPrice, 0) + shippingFee
+      const totalAmount =
+        itemsData.reduce((sum, item) => sum + item.totalPrice, 0) + shippingFee
 
-    const order = await prisma.$transaction(async (tx) => {
-      const newOrder = await tx.order.create({
-        data: {
-          ...rest,
-          userId: userId ?? null,
-          shippingProvinceId: shippingProvinceId ?? null,
-          shippingDistrictId: shippingDistrictId ?? null,
-          shippingAddress: shippingAddress ?? undefined,
-          billingAddress: billingAddress ?? undefined,
-          totalAmount,
-          shippingFee,
-          status: OrderStatus.PENDING,
-          paymentStatus: PaymentStatus.PENDING,
-          metadata: {
-            ...(typeof metadata === 'object' && metadata !== null
-              ? metadata
-              : {}),
-            paymentMethod,
+      const order = await prisma.$transaction(async (tx) => {
+        const newOrder = await tx.order.create({
+          data: {
+            ...rest,
+            userId: userId ?? null,
+            shippingProvinceId: shippingProvinceId ?? null,
+            shippingDistrictId: shippingDistrictId ?? null,
+            shippingAddress: shippingAddress ?? undefined,
+            billingAddress: billingAddress ?? undefined,
+            totalAmount,
+            shippingFee,
+            status: OrderStatus.PENDING,
+            paymentStatus: PaymentStatus.PENDING,
+            metadata: {
+              ...(typeof metadata === 'object' && metadata !== null
+                ? metadata
+                : {}),
+              paymentMethod,
+            },
+            orderItems: { create: itemsData },
           },
-          orderItems: { create: itemsData },
-        },
-        include: { orderItems: true },
+          include: { orderItems: true },
+        })
+
+        await strategy.onOrderCreated(newOrder, tx)
+        return newOrder
       })
 
-      await strategy.onOrderCreated(newOrder, tx)
-      return newOrder
-    })
+      const paymentResult = await strategy.process(order, requestMeta)
+      await redis.setex(key, 900, order.orderId)
 
-    const paymentResult = await strategy.process(order, requestMeta)
-
-    return { ...order, ...paymentResult }
+      return { ...order, ...paymentResult }
+    } catch (error) {
+      redis.del(key)
+      throw error
+    }
   }
 
   updateById = async (id: number, data: UpdateOrderBody) => {
