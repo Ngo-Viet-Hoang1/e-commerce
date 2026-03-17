@@ -34,7 +34,7 @@ class OrderController {
 
   createAdminOrder = async (req: Request, res: Response) => {
     const data = req.validatedData?.body as CreateOrderBody
-    const idempotencyKey = req.headers['Idempotency-Key'] as string | undefined
+    const idempotencyKey = req.headers['idempotency-key'] as string | undefined
 
     const requestMeta: PaymentRequestMeta = {
       ipAddress: req.ip ?? req.socket.remoteAddress,
@@ -51,7 +51,7 @@ class OrderController {
     if (!userId) throw new UnauthorizedException('User authentication required')
 
     const data = req.validatedData?.body as CreateOrderBody
-    const idempotencyKey = req.headers['Idempotency-Key'] as string | undefined
+    const idempotencyKey = req.headers['idempotency-key'] as string | undefined
 
     const requestMeta: PaymentRequestMeta = {
       ipAddress: req.ip ?? req.socket.remoteAddress,

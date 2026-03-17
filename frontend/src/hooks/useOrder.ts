@@ -19,11 +19,19 @@ export function useCreateOrder() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (data: CreateOrderPayload) =>
-      UserOrderService.createOrder(data),
+    mutationFn: ({
+      data,
+      idempotencyKey,
+    }: {
+      data: CreateOrderPayload
+      idempotencyKey: string
+    }) => UserOrderService.createOrder(data, idempotencyKey),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ORDER_QUERY_KEYS.lists() })
       toast.success('Đơn hàng được tạo thành công!')
+    },
+    onError: (error: Error) => {
+      toast.error(error.message ?? 'Tạo đơn hàng thất bại')
     },
   })
 }

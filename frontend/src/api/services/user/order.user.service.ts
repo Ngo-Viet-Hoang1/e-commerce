@@ -7,10 +7,14 @@ import type { PaginationParams } from '@/interfaces/pagination.interface'
 import { api } from '../..'
 
 class UserOrderService {
-  static createOrder = async (payload: CreateOrderPayload) => {
+  static createOrder = async (
+    payload: CreateOrderPayload,
+    idempotencyKey: string,
+  ) => {
     const { data } = await api.post<IApiResponse<Order>>(
       '/me/orders',
       payload,
+      { headers: { 'idempotency-key': idempotencyKey } },
     )
     return data.data!
   }
@@ -23,9 +27,7 @@ class UserOrderService {
   }
 
   static getMyOrderById = async (orderId: number) => {
-    const { data } = await api.get<IApiResponse<Order>>(
-      `/me/orders/${orderId}`,
-    )
+    const { data } = await api.get<IApiResponse<Order>>(`/me/orders/${orderId}`)
     return data.data!
   }
 
