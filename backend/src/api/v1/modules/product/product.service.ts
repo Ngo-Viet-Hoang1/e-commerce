@@ -15,11 +15,51 @@ import productRepository from './product.repository'
 import type {
   CreateProductBody,
   CreateSimpleProductBody,
+  ListBestSellersQuery,
   ListProductsQuery,
   UpdateProductBody,
 } from './product.schema'
 
 class ProductService {
+  findBestSellers = async (query: ListBestSellersQuery) => {
+    const limit = query.limit ?? 8
+    const orderedProductIds =
+      await productRepository.findBestSellerProductIds(limit)
+
+    if (orderedProductIds.length === 0) {
+      return []
+    }
+
+    const products = await productRepository.findMany({
+      where: {
+        deletedAt: null,
+        status: 'active',
+        id: {
+          in: orderedProductIds,
+        },
+      },
+    })
+
+    const productMap = new Map(products.map((product) => [product.id, product]))
+
+    const orderedProducts = await Promise.all(
+      orderedProductIds
+        .map((id) => productMap.get(id))
+        .filter((product): product is NonNullable<typeof product> =>
+          Boolean(product),
+        )
+        .map(async (product) => {
+          const minPrice = await productRepository.getMinPrice(product.id)
+          return {
+            ...product,
+            minPrice,
+          }
+        }),
+    )
+
+    return orderedProducts
+  }
+
   findAll = async (query: ListProductsQuery) => {
     const { page, limit, sort, order, search, sku, isFeatured, brandId } = query
 

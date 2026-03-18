@@ -11,6 +11,7 @@ import { productController } from './product.controller'
 import {
   createProductBodySchema,
   createSimpleProductBodySchema,
+  listBestSellersQuerySchema,
   listProductsQuerySchema,
   productIdParamSchema,
   productSlugParamSchema,
@@ -23,6 +24,12 @@ router.get(
   '/',
   validate(listProductsQuerySchema, 'query'),
   productController.findAll,
+)
+
+router.get(
+  '/best-sellers',
+  validate(listBestSellersQuerySchema, 'query'),
+  productController.findBestSellers,
 )
 
 router.get(

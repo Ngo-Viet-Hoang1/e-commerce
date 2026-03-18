@@ -29,20 +29,25 @@ export const listProductsQuerySchema = createPaginationSchema(
   PRODUCT_SORT_FIELDS as unknown as string[],
 ).extend({
   sku: z.string().optional(),
-  brandId: z.preprocess(
-    (val) => {
-      if (val === undefined || val === null || val === '') return undefined
-      const parsed = Number(val)
-      return Number.isNaN(parsed) ? undefined : parsed
-    },
-    z.number().int().positive().optional(),
-  ),
+  brandId: z.preprocess((val) => {
+    if (val === undefined || val === null || val === '') return undefined
+    const parsed = Number(val)
+    return Number.isNaN(parsed) ? undefined : parsed
+  }, z.number().int().positive().optional()),
   isFeatured: z
     .string()
     .optional()
     .transform((v) =>
       v === 'true' ? true : v === 'false' ? false : undefined,
     ),
+})
+
+export const listBestSellersQuerySchema = z.object({
+  limit: z.preprocess((val) => {
+    if (val === undefined || val === null || val === '') return undefined
+    const parsed = Number(val)
+    return Number.isNaN(parsed) ? undefined : parsed
+  }, z.number().int().positive().max(50).optional()),
 })
 
 export const productIdParamSchema = numericIdParamSchema
@@ -168,6 +173,7 @@ export const createSimpleProductBodySchema = z.object({
 export type Product = z.infer<typeof productSchema>
 
 export type ListProductsQuery = z.infer<typeof listProductsQuerySchema>
+export type ListBestSellersQuery = z.infer<typeof listBestSellersQuerySchema>
 export type ProductIdParam = z.infer<typeof productIdParamSchema>
 export type ProductSlugParam = z.infer<typeof productSlugParamSchema>
 export type CreateProductBody = z.infer<typeof createProductBodySchema>
