@@ -33,8 +33,9 @@ model Order {
   deliveredAt DateTime? @db.Timestamptz
   deletedAt   DateTime? @db.Timestamptz
 
-  orderItems OrderItem[]
-  payment    Payment[]
+  orderItems  OrderItem[]
+  payment     Payment[]
+  reservation StockReservation?
 
   @@index([createdAt])
   @@index([status])
