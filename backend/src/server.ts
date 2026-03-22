@@ -1,8 +1,9 @@
-import { connectPrisma } from '@/api/v1/shared/config/database/postgres'
-import { connectRedis } from '@/api/v1/shared/config/database/redis'
-import logger from '@/api/v1/shared/config/logger'
+import { reservationService } from '@v1/modules/order/reservation'
+import { connectPrisma } from '@v1/shared/config/database/postgres'
+import { connectRedis } from '@v1/shared/config/database/redis'
+import logger from '@v1/shared/config/logger'
+import setupProcessHandlers from '@v1/shared/utils/process-handler.util'
 import type { Server } from 'http'
-import setupProcessHandlers from './api/v1/shared/utils/process-handler.util'
 import app from './app'
 
 const port = process.env.PORT || 3000
@@ -11,6 +12,9 @@ async function startServer(): Promise<Server> {
   try {
     // Connect to databases
     await Promise.all([connectRedis(), connectPrisma()])
+
+    // Start periodic cleanup for expired online payment reservations.
+    reservationService.startExpirationJob()
 
     const server = app.listen(port, () => {
       logger.info(`🚀 Server listening at http://localhost:${port}`)

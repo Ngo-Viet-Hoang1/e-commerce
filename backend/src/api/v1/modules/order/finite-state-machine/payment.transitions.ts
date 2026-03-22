@@ -2,8 +2,7 @@ import {
   BadRequestException,
   ForbiddenException,
 } from '@v1/shared/models/app-error.model'
-import { PaymentMethod, PaymentStatus } from '../order.constants'
-import { parseOrderMetadata } from '../order.util'
+import { PaymentStatus } from '../order.constants'
 import type {
   PaymentTransition,
   PaymentTransitionResult,
@@ -15,27 +14,11 @@ const PAYMENT_TRANSITIONS: Record<PaymentStatus, PaymentTransition[]> = {
     {
       to: PaymentStatus.PAID,
       allowedFor: ['webhook', 'admin'],
-      onEnter: ({ order }): PaymentTransitionResult => {
-        const meta = parseOrderMetadata(order.metadata)
-        const isCOD = meta.paymentMethod === PaymentMethod.COD
-
-        const stockInstructions = isCOD
-          ? []
-          : order.orderItems
-              .filter((item) => item.variantId !== null)
-              .map((item) => ({
-                variantId: item.variantId!,
-                quantity: item.quantity,
-                operation: 'decrement' as const,
-              }))
-
+      onEnter: (): PaymentTransitionResult => {
         return {
           newStatus: PaymentStatus.PAID,
-          stockInstructions,
-          effects: [
-            ...(stockInstructions.length > 0 ? ['decrement_stock'] : []),
-            'send_payment_confirmation',
-          ],
+          stockInstructions: [],
+          effects: ['send_payment_confirmation'],
         }
       },
     },
