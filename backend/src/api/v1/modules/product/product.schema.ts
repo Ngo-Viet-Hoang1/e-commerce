@@ -45,6 +45,7 @@ export const listProductsQuerySchema = createPaginationSchema(
 export const listBestSellersQuerySchema = z.object({
   limit: z.preprocess((val) => {
     if (val === undefined || val === null || val === '') return undefined
+    if (typeof val === 'number') return val
     const parsed = Number(val)
     return Number.isNaN(parsed) ? undefined : parsed
   }, z.number().int().positive().max(50).optional()),
