@@ -31,6 +31,8 @@ const baseCorsOptions: CorsOptions = {
     'Content-Type',
     'Accept',
     'Authorization',
+    'Idempotency-Key',
+    'idempotency-key',
     'X-Request-ID',
     'X-API-Key',
   ],

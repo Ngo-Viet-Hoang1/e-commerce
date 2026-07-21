@@ -48,13 +48,14 @@ class AdminOrderService {
         responseType: 'blob',
       })
       return response.data
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Handle blob error response
-      if (error.response?.data instanceof Blob) {
-        const text = await error.response.data.text()
+      const axiosError = error as { response?: { data?: Blob } }
+      if (axiosError.response?.data instanceof Blob) {
+        const text = await axiosError.response.data.text()
         try {
           const jsonError = JSON.parse(text)
-          throw new Error(jsonError.message || 'Failed to export PDF')
+          throw new Error(jsonError.message ?? 'Failed to export PDF')
         } catch {
           throw new Error('Failed to export PDF')
         }

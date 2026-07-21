@@ -6,7 +6,6 @@ import { userService, type CreateUserBody } from '../../user'
 import type { LoginBody } from '../auth.schema'
 import { authService } from '../auth.service'
 import { AuthUtils } from '../auth.util'
-import { console } from 'inspector'
 
 class AuthController {
   me = async (req: Request, res: Response) => {
@@ -68,7 +67,6 @@ class AuthController {
 
   refreshToken = async (req: Request, res: Response) => {
     const { userRefreshToken: refreshToken } = req.cookies
-    console.log(req.cookies)
     if (!refreshToken) {
       throw new UnauthorizedException('Refresh token not provided')
     }

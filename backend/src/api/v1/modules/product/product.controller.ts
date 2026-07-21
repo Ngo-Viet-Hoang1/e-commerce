@@ -2,6 +2,7 @@ import type { Request, Response } from 'express'
 import { SuccessResponse } from '../../shared/models/success-response.model'
 import type {
   CreateProductBody,
+  ListBestSellersQuery,
   CreateSimpleProductBody,
   ListProductsQuery,
   ProductIdParam,
@@ -11,6 +12,17 @@ import type {
 import { productService } from './product.service'
 
 class ProductController {
+  findBestSellers = async (req: Request, res: Response) => {
+    const query = req.validatedData?.query as ListBestSellersQuery
+    const bestSellers = await productService.findBestSellers(query)
+
+    SuccessResponse.send(
+      res,
+      bestSellers,
+      'Best seller products retrieved successfully',
+    )
+  }
+
   findAll = async (req: Request, res: Response) => {
     const query = req.validatedData?.query as ListProductsQuery
 

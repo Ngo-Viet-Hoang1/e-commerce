@@ -1,4 +1,8 @@
 import { Router } from 'express'
+import {
+  authenticate,
+  requireAdmin,
+} from '../../shared/middlewares/auth.middleware'
 import { validate } from '../../shared/middlewares/validate.middleware'
 import { productVideoController } from './product-video.controller'
 import {
@@ -23,24 +27,32 @@ router.get(
 
 router.post(
   '/',
+  authenticate,
+  requireAdmin,
   validate(createProductVideoBodySchema, 'body'),
   productVideoController.create,
 )
 
 router.delete(
   '/:id',
+  authenticate,
+  requireAdmin,
   validate(productVideoIdParamSchema, 'params'),
   productVideoController.deleteById,
 )
 
 router.delete(
   '/:id/soft',
+  authenticate,
+  requireAdmin,
   validate(productVideoIdParamSchema, 'params'),
   productVideoController.softDeleteById,
 )
 
 router.post(
   '/:id/restore',
+  authenticate,
+  requireAdmin,
   validate(productVideoIdParamSchema, 'params'),
   productVideoController.restoreById,
 )

@@ -1,14 +1,6 @@
-import { useEffect } from 'react'
-import { Outlet, useNavigate } from 'react-router'
-import { setNavigator } from './utils/navigate.util'
+import { Outlet } from 'react-router'
 
 function App() {
-  const navigate = useNavigate()
-
-  useEffect(() => {
-    setNavigator(navigate)
-  }, [navigate])
-
   return <Outlet />
 }
 

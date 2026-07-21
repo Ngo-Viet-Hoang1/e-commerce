@@ -1,5 +1,9 @@
 import { Router } from 'express'
 import {
+  authenticate,
+  requireAdmin,
+} from '../../shared/middlewares/auth.middleware'
+import {
   validate,
   validateMultiple,
 } from '../../shared/middlewares/validate.middleware'
@@ -27,12 +31,16 @@ router.get(
 
 router.post(
   '/',
+  authenticate,
+  requireAdmin,
   validate(createBadgeBodySchema, 'body'),
   badgeController.create,
 )
 
 router.put(
   '/:id',
+  authenticate,
+  requireAdmin,
   validateMultiple({
     params: badgeIdParamSchema,
     body: updateBadgeBodySchema,
@@ -42,18 +50,24 @@ router.put(
 
 router.delete(
   '/:id',
+  authenticate,
+  requireAdmin,
   validate(badgeIdParamSchema, 'params'),
   badgeController.deleteById,
 )
 
 router.delete(
   '/:id/soft',
+  authenticate,
+  requireAdmin,
   validate(badgeIdParamSchema, 'params'),
   badgeController.softDeleteById,
 )
 
 router.post(
   '/:id/restore',
+  authenticate,
+  requireAdmin,
   validate(badgeIdParamSchema, 'params'),
   badgeController.restoreById,
 )

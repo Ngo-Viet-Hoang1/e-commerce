@@ -56,7 +56,7 @@ export default function ProductSearch() {
       </PopoverTrigger>
 
       <PopoverContent
-        className="mt-1 w-[var(--radix-popover-trigger-width)] rounded-md border bg-white p-0 shadow-lg"
+        className="mt-1 w-(--radix-popover-trigger-width) rounded-md border bg-white p-0 shadow-lg"
         align="start"
         sideOffset={5}
         onOpenAutoFocus={(e) => e.preventDefault()}
@@ -87,7 +87,7 @@ export default function ProductSearch() {
 
               <li
                 onClick={handleSearchAll}
-                className="cursor-pointer border-t bg-gray-50 p-2 text-center text-sm text-blue-600 hover:underline"
+                className="cursor-pointer rounded-md border-t bg-gray-50 p-2 text-center text-sm text-blue-600 hover:underline"
               >
                 Xem tất cả kết quả cho "{keyword}"
               </li>

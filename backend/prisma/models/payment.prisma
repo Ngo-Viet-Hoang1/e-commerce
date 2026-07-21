@@ -6,7 +6,7 @@ model Payment {
     paymentStatus String    @db.VarChar(50)
     amount        Float
     currency      String    @db.VarChar(10)
-    transactionId String    @db.VarChar(100)
+    transactionId String    @unique @db.VarChar(100)
     metaData      Json?     @db.JsonB
     paidAt        DateTime? @db.Timestamptz
     createdAt     DateTime  @default(now()) @db.Timestamptz

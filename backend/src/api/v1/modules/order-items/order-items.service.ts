@@ -9,8 +9,9 @@ import { orderItemRepository } from './order-items.repository'
 import {
   type CreateOrderItemBody,
   type ListOrderItemsQuery,
-  type updateOrderItemBody,
+  type UpdateOrderItemBody,
 } from './order-items.schema'
+import { OrderStatus } from '../order/order.constants'
 
 class OrderItemService {
   findAll = async (query: ListOrderItemsQuery) => {
@@ -65,28 +66,24 @@ class OrderItemService {
   findById = async (id: number) => {
     const orderItem = await orderItemRepository.findById(id)
 
-    if (!orderItem) {
-      throw new NotFoundException('OrderItem', id.toString())
-    }
-
+    if (!orderItem) throw new NotFoundException('OrderItem', id.toString())
     return orderItem
   }
 
   create = async (data: CreateOrderItemBody) => {
     const { orderId, productId, variantId, discount = 0, ...createData } = data
-
     const variant = await productVariantRepository.findById(variantId)
 
-    if (!variant) {
-      throw new NotFoundException('Variant not found')
-    }
+    if (!variant) throw new NotFoundException('Variant not found')
 
-    if (variant.productId !== productId) {
+    if (variant.productId !== productId)
       throw new ConflictException('Variant does not belong to the product')
-    }
 
     const unitPrice = variant.price
-    const totalPrice = unitPrice.toNumber() * createData.quantity - discount
+    const totalPrice = Math.max(
+      0,
+      unitPrice.toNumber() * createData.quantity - discount,
+    )
 
     const orderItem = await orderItemRepository.create({
       ...createData,
@@ -107,23 +104,20 @@ class OrderItemService {
   ) => {
     const item = await orderItemRepository.findByIdWithOrderStatus(orderItemId)
 
-    if (!item) {
-      throw new NotFoundException('Order item not found')
-    }
+    if (!item) throw new NotFoundException('Order item not found')
 
-    if (item.order.status !== 'CONFIRMED') {
+    if (
+      item.order.status !== OrderStatus.PENDING &&
+      item.order.status !== OrderStatus.PROCESSING
+    )
       throw new ConflictException('Cannot change variant after shipping')
-    }
 
     const variant = await productVariantRepository.findById(newVariantId)
 
-    if (!variant) {
-      throw new NotFoundException('Variant not found')
-    }
+    if (!variant) throw new NotFoundException('Variant not found')
 
-    if (variant.stockQuantity < item.quantity) {
+    if (variant.stockQuantity < item.quantity)
       throw new ConflictException('Variant out of stock')
-    }
 
     const unitPrice = variant.price
 
@@ -135,22 +129,25 @@ class OrderItemService {
     })
   }
 
-  updateById = async (id: number, data: updateOrderItemBody) => {
-    await this.findById(id)
+  updateById = async (id: number, data: UpdateOrderItemBody) => {
+    const existing = await this.findById(id)
 
-    const updateOrderItem = await orderItemRepository.update(id, {
+    const quantity = data.quantity ?? existing.quantity
+    const unitPrice = data.unitPrice ?? existing.unitPrice
+    const discount = data.discount ?? existing.discount
+    const totalPrice = Number(unitPrice) * quantity - Number(discount)
+
+    return orderItemRepository.update(id, {
       ...data,
+      totalPrice,
       metadata: normalizeJsonInput(data.metadata),
     })
-
-    return updateOrderItem
   }
 
   deleteById = async (id: number) => {
     await this.findById(id)
 
     const deletedOrderItem = await orderItemRepository.delete(id)
-
     return deletedOrderItem
   }
 
@@ -158,19 +155,15 @@ class OrderItemService {
     await this.findById(id)
 
     const deletedOrderItem = await orderItemRepository.softDelete(id)
-
     return deletedOrderItem
   }
 
   restoreById = async (id: number) => {
     const item = await orderItemRepository.findById(id, true)
 
-    if (!item) {
-      throw new NotFoundException('Order item not found')
-    }
+    if (!item) throw new NotFoundException('Order item not found')
 
     const restoredOrderItem = await orderItemRepository.restore(id)
-
     return restoredOrderItem
   }
 }

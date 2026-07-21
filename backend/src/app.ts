@@ -22,7 +22,9 @@ const app = express()
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-app.use(limiter)
+if (process.env.NODE_ENV === 'production') {
+  app.use(limiter)
+}
 app.use(requestIdMiddleware)
 
 app.use(corsMiddleware)

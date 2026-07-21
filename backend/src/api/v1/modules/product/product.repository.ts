@@ -1,6 +1,7 @@
 import type { Prisma } from '@generated/prisma/client'
 import { prisma } from '../../shared/config/database/postgres'
 import { executePrismaQuery } from '../../shared/utils/prisma-error.util'
+import { OrderStatus, PaymentStatus } from '../order/order.constants'
 
 export const PRODUCT_SELECT_FIELDS = {
   id: true,
@@ -100,6 +101,35 @@ export const PRODUCT_SELECT_FIELDS = {
 } as const satisfies Prisma.ProductSelect
 
 class ProductRepository {
+  findBestSellerProductIds = async (limit: number) => {
+    const grouped = await executePrismaQuery(() =>
+      prisma.orderItem.groupBy({
+        by: ['productId'],
+        where: {
+          deletedAt: null,
+          order: {
+            deletedAt: null,
+            paymentStatus: PaymentStatus.PAID,
+            status: {
+              not: OrderStatus.CANCELLED,
+            },
+          },
+        },
+        _sum: {
+          quantity: true,
+        },
+        orderBy: {
+          _sum: {
+            quantity: 'desc',
+          },
+        },
+        take: limit,
+      }),
+    )
+
+    return grouped.map((item) => item.productId)
+  }
+
   findById = async (id: number, includeDeleted = false) => {
     return executePrismaQuery(() =>
       prisma.product.findUnique({

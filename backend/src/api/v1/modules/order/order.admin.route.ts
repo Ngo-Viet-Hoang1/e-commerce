@@ -1,5 +1,8 @@
 import { Router } from 'express'
-import { authenticate } from '../../shared/middlewares/auth.middleware'
+import {
+  authenticate,
+  requireAdmin,
+} from '../../shared/middlewares/auth.middleware'
 import {
   validate,
   validateMultiple,
@@ -10,45 +13,11 @@ import {
   listOrdersQuerySchema,
   orderIdParamSchema,
   updateOrderBodySchema,
-  userOrderIdParamSchema,
 } from './order.schema'
 
 const router = Router()
 
-router.get(
-  '/user/orders',
-  authenticate,
-  validate(listOrdersQuerySchema, 'query'),
-  orderController.findUserOrders,
-)
-
-router.get(
-  '/user/orders/:orderId',
-  authenticate,
-  validate(userOrderIdParamSchema, 'params'),
-  orderController.findUserOrderById,
-)
-
-router.post(
-  '/user/orders',
-  authenticate,
-  validate(createOrderBodySchema, 'body'),
-  orderController.createUserOrder,
-)
-
-router.post(
-  '/user/orders/:orderId/cancel',
-  authenticate,
-  validate(userOrderIdParamSchema, 'params'),
-  orderController.cancelUserOrder,
-)
-
-router.get(
-  '/user/orders/:orderId/pdf',
-  authenticate,
-  validate(userOrderIdParamSchema, 'params'),
-  orderController.exportUserOrderPDF,
-)
+router.use(authenticate, requireAdmin)
 
 router.get(
   '/',
@@ -71,7 +40,7 @@ router.get(
 router.post(
   '/',
   validate(createOrderBodySchema, 'body'),
-  orderController.create,
+  orderController.createAdminOrder,
 )
 
 router.put(
@@ -100,4 +69,5 @@ router.post(
   validate(orderIdParamSchema, 'params'),
   orderController.restoreById,
 )
+
 export default router

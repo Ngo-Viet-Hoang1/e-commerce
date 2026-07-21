@@ -1,14 +1,18 @@
 import { z } from 'zod'
 import {
-  numericIdParamSchema,
   createPaginationSchema,
-} from '../../shared/schemas'
+  numericIdParamSchema,
+} from '@v1/shared/schemas'
+import {
+  ORDER_STATUSES,
+  PAYMENT_METHODS,
+  PAYMENT_STATUSES,
+} from './order.constants'
 
 export const orderSchema = z.object({
   orderId: z.number(),
   userId: z.number().optional(),
 
-  status: z.string(),
   totalAmount: z.number(),
   currency: z.string().optional(),
 
@@ -23,7 +27,8 @@ export const orderSchema = z.object({
   shippingMethod: z.string().optional(),
   shippingFee: z.number().optional(),
 
-  paymentStatus: z.string().optional(),
+  status: z.enum(ORDER_STATUSES).optional(),
+  paymentStatus: z.enum(PAYMENT_STATUSES).optional(),
   metadata: z.record(z.string(), z.any()).optional(),
 
   createdAt: z.date(),
@@ -51,7 +56,6 @@ const orderItemInputSchema = z.object({
 export const createOrderBodySchema = z.object({
   userId: z.number().optional(),
 
-  status: z.string().default('pending'),
   currency: z.string().default('VND'),
 
   items: z.array(orderItemInputSchema).min(1),
@@ -62,22 +66,17 @@ export const createOrderBodySchema = z.object({
   shippingRecipientName: z.string().optional(),
   shippingPhone: z.string().optional(),
   shippingAddress: z.record(z.string(), z.any()).optional().nullable(),
-
   billingAddress: z.record(z.string(), z.any()).optional().nullable(),
 
   shippingMethod: z.string().optional(),
   shippingFee: z.number().min(0).optional().default(0),
 
-  paymentStatus: z.string().default('pending'),
-  paymentMethod: z
-    .enum(['cod', 'vnpay', 'paypal', 'card'])
-    .optional()
-    .default('cod'),
+  paymentMethod: z.enum(PAYMENT_METHODS).optional().default('cod'),
   metadata: z.record(z.string(), z.any()).optional(),
 })
 
 export const updateOrderBodySchema = z.object({
-  status: z.string().optional(),
+  status: z.enum(ORDER_STATUSES).optional(),
   totalAmount: z.number().optional(),
   currency: z.string().optional(),
 
@@ -93,7 +92,8 @@ export const updateOrderBodySchema = z.object({
   shippingMethod: z.string().optional(),
   shippingFee: z.number().optional(),
 
-  paymentStatus: z.string().optional(),
+  paymentStatus: z.enum(PAYMENT_STATUSES).optional(),
+  paymentMethod: z.enum(PAYMENT_METHODS).optional(),
   metadata: z.record(z.string(), z.any()).optional(),
 
   placedAt: z.string().optional(),
@@ -102,15 +102,8 @@ export const updateOrderBodySchema = z.object({
 })
 
 export const updateOrderStatusBodySchema = z.object({
-  status: z.enum([
-    'pending',
-    'processing',
-    'shipped',
-    'delivered',
-    'cancelled',
-    'refunded',
-  ]),
-  paymentStatus: z.enum(['pending', 'paid', 'failed', 'refunded']),
+  status: z.enum(ORDER_STATUSES),
+  paymentStatus: z.enum(PAYMENT_STATUSES),
 })
 
 const ORDER_SORT_FIELDS = [
@@ -123,9 +116,9 @@ const ORDER_SORT_FIELDS = [
 export const listOrdersQuerySchema = createPaginationSchema(
   ORDER_SORT_FIELDS as unknown as string[],
 ).extend({
-  status: z.string().optional(),
+  status: z.enum(ORDER_STATUSES).optional(),
   userId: z.number().optional(),
-  paymentStatus: z.string().optional(),
+  paymentStatus: z.enum(PAYMENT_STATUSES).optional(),
 })
 
 export type listOrdersQuerySchema = z.infer<typeof listOrdersQuerySchema>

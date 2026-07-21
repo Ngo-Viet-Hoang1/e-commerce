@@ -31,14 +31,16 @@ class OrderItemRepository {
   }
 
   findByIdWithOrderStatus = (id: number) => {
-    return prisma.orderItem.findUnique({
-      where: { id },
-      include: {
-        order: {
-          select: { status: true },
+    return executePrismaQuery(() =>
+      prisma.orderItem.findUnique({
+        where: { id },
+        include: {
+          order: {
+            select: { status: true },
+          },
         },
-      },
-    })
+      }),
+    )
   }
 
   findMany = async (param: {

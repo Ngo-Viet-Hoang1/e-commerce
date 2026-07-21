@@ -12,7 +12,9 @@ const noFooterRoutes = ['/profile']
 const noBreadcrumbRoutes = ['/', '/about']
 
 export default function RootLayout() {
-  const { me, isAuthenticated, reset } = useAuthStore()
+  const me = useAuthStore((s) => s.me)
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
+  const reset = useAuthStore((s) => s.reset)
   const location = useLocation()
 
   const showFooter = !noFooterRoutes.some((route) =>

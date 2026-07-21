@@ -2,7 +2,7 @@ model ProductVariant {
     id        Int @id @default(autoincrement())
     productId Int
 
-    sku     String
+    sku     String  @unique
     title   String?
     barcode String?
 
@@ -16,17 +16,20 @@ model ProductVariant {
 
     metadata Json?
 
-    createdAt DateTime  @default(now())
-    updatedAt DateTime  @updatedAt
-    deletedAt DateTime?
+    createdAt DateTime  @default(now()) @db.Timestamptz
+    updatedAt DateTime  @updatedAt @db.Timestamptz
+    deletedAt DateTime? @db.Timestamptz
 
     product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
-    attributeValues AttributeValue[]
-    orderItems OrderItem[]
-    productImages   ProductImage[]
-    productVideos   ProductVideo[]
+    attributeValues  AttributeValue[]
+    orderItems       OrderItem[]
+    reservationItems StockReservationItem[]
+    productImages    ProductImage[]
+    productVideos    ProductVideo[]
 
     @@index([productId])
     @@index([deletedAt])
+    @@index([isDefault])
+    @@index([barcode])
 }

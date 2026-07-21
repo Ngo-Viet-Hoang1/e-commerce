@@ -1,18 +1,24 @@
 import { Router } from 'express'
 import {
+  authenticate,
+  requireAdmin,
+} from '../../shared/middlewares/auth.middleware'
+import {
   validate,
   validateMultiple,
 } from '../../shared/middlewares/validate.middleware'
 import { orderItemController } from './order-items.controller'
 import {
-  orderItemIdParamSchema,
   createOrderItemBodySchema,
-  updateOrderItemBodySchema,
   listOrderItemsQuerySchema,
+  orderItemIdParamSchema,
+  updateOrderItemBodySchema,
   updateOrderItemVariantBodySchema,
 } from './order-items.schema'
 
 const router = Router()
+
+router.use(authenticate, requireAdmin)
 
 router.get(
   '/',
