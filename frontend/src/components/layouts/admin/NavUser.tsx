@@ -31,6 +31,7 @@ import AdminAuthService from '@/api/services/admin/auth.admin.service'
 export function NavUser() {
   const { isMobile } = useSidebar()
   const me = useAdminAuthStore((state) => state.me)
+  const reset = useAdminAuthStore((state) => state.reset)
 
   return (
     <SidebarMenu>
@@ -99,7 +100,16 @@ export function NavUser() {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => AdminAuthService.logout()}>
+            <DropdownMenuItem
+              onClick={async () => {
+                try {
+                  await AdminAuthService.logout()
+                } finally {
+                  reset()
+                  window.location.href = '/admin/auth/login'
+                }
+              }}
+            >
               <LogOut />
               Log out
             </DropdownMenuItem>

@@ -1,5 +1,9 @@
 import { Router } from 'express'
 import {
+  authenticate,
+  requireAdmin,
+} from '../../shared/middlewares/auth.middleware'
+import {
   validate,
   validateMultiple,
 } from '../../shared/middlewares/validate.middleware'
@@ -27,12 +31,16 @@ router.get(
 
 router.post(
   '/',
+  authenticate,
+  requireAdmin,
   validate(createProductVariantBodySchema, 'body'),
   productVariantController.create,
 )
 
 router.put(
   '/:id',
+  authenticate,
+  requireAdmin,
   validateMultiple({
     params: productVariantIdParamSchema,
     body: updateProductVariantBodySchema,
@@ -42,18 +50,24 @@ router.put(
 
 router.delete(
   '/:id',
+  authenticate,
+  requireAdmin,
   validate(productVariantIdParamSchema, 'params'),
   productVariantController.deleteById,
 )
 
 router.delete(
   '/:id/soft',
+  authenticate,
+  requireAdmin,
   validate(productVariantIdParamSchema, 'params'),
   productVariantController.softDeleteById,
 )
 
 router.post(
   '/:id/restore',
+  authenticate,
+  requireAdmin,
   validate(productVariantIdParamSchema, 'params'),
   productVariantController.restoreById,
 )

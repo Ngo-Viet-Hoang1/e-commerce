@@ -1,14 +1,17 @@
 import AdminAuthService from '@/api/services/admin/auth.admin.service'
 import AuthService from '@/api/services/user/auth.service'
-import { ACCESS_TOKEN_KEY } from '@/constants'
+import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_ENDPOINT } from '@/constants'
 import type { AuthActions, AuthState } from '@/interfaces/auth.interface'
 import { storage } from '@/utils/localstorage.util'
+
+import axios from 'axios'
 import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 
 interface CreateAuthStoreProps {
   name: string
   tokenKey: string
+  refreshTokenEndpoint: string
   getMeService: () => ReturnType<typeof AuthService.getMe>
 }
 
@@ -17,6 +20,7 @@ export type AuthStore = AuthState & AuthActions
 const createAuthStore = ({
   name,
   tokenKey,
+  refreshTokenEndpoint,
   getMeService,
 }: CreateAuthStoreProps) => {
   const initialState: AuthState = {
@@ -24,6 +28,20 @@ const createAuthStore = ({
     accessToken: null,
     isAuthenticated: false,
     isInitialized: false,
+  }
+
+  const baseURL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api/v1'
+
+  const fetchMe = async () => {
+    const { success, data } = await getMeService()
+    if (success && data?.me) return data.me
+    throw new Error('Failed to fetch user')
+  }
+
+  const tryRefreshToken = async (): Promise<string | null> => {
+    const refreshApi = axios.create({ baseURL, withCredentials: true })
+    const res = await refreshApi.post(refreshTokenEndpoint)
+    return res.data?.data?.accessToken ?? null
   }
 
   const store = create<AuthStore>()(
@@ -54,36 +72,41 @@ const createAuthStore = ({
         },
 
         initializeAuth: async () => {
-          if (get().isInitialized) {
+          if (get().isInitialized) return
+
+          const markInitialized = () => set({ isInitialized: true })
+          const resetToGuest = () => {
+            storage.removeItem(tokenKey)
+            set({ ...initialState, isInitialized: true })
+          }
+
+          const existingToken = storage.getItem(tokenKey)
+          if (existingToken) {
+            set({ accessToken: existingToken, isAuthenticated: true })
+            try {
+              const me = await fetchMe()
+              set({ me, isInitialized: true })
+            } catch {
+              resetToGuest()
+            }
             return
           }
 
-          const token = storage.getItem(tokenKey)
-
-          if (token) {
-            set({
-              accessToken: token,
-              isAuthenticated: true,
-            })
-
-            try {
-              const { success, data } = await getMeService()
-              if (success && data?.me) {
-                set({ me: data.me, isInitialized: true })
-              } else {
-                throw new Error('Failed to fetch user')
-              }
-            } catch {
-              storage.removeItem(tokenKey)
-              set({
-                accessToken: null,
-                isAuthenticated: false,
-                me: null,
-                isInitialized: true,
-              })
+          try {
+            const newToken = await tryRefreshToken()
+            if (!newToken) {
+              markInitialized()
+              return
             }
-          } else {
-            set({ isInitialized: true })
+
+            storage.setItem(tokenKey, newToken)
+            set({ accessToken: newToken, isAuthenticated: true })
+
+            const me = await fetchMe()
+            set({ me, isInitialized: true })
+          } catch {
+            // No valid refresh token — guest user
+            markInitialized()
           }
         },
       }),
@@ -102,11 +125,18 @@ const createAuthStore = ({
 export const useAuthStore = createAuthStore({
   name: 'UserAuthStore',
   tokenKey: ACCESS_TOKEN_KEY.USER,
+  refreshTokenEndpoint: REFRESH_TOKEN_ENDPOINT.USER,
   getMeService: () => AuthService.getMe(),
 })
 
 export const useAdminAuthStore = createAuthStore({
   name: 'AdminAuthStore',
   tokenKey: ACCESS_TOKEN_KEY.ADMIN,
+  refreshTokenEndpoint: REFRESH_TOKEN_ENDPOINT.ADMIN,
   getMeService: () => AdminAuthService.getMe(),
 })
+
+export const authReadyPromise = Promise.all([
+  useAuthStore.getState().initializeAuth(),
+  useAdminAuthStore.getState().initializeAuth(),
+])

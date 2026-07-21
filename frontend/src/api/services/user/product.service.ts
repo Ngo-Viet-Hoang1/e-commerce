@@ -46,6 +46,16 @@ class ProductService {
     })
     return data
   }
+
+  static getBestSellers = async (limit = 8) => {
+    const { data } = await api.get<IApiResponse<Product[]>>(
+      '/products/best-sellers',
+      {
+        params: { limit },
+      },
+    )
+    return data
+  }
 }
 
 export default ProductService

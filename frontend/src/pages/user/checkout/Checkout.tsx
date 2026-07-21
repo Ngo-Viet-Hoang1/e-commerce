@@ -37,6 +37,7 @@ export default function Checkout() {
   const removeCartItems = useRemoveCartItems()
 
   const [step, setStep] = useState(1)
+  const [idempotencyKey] = useState(() => crypto.randomUUID())
 
   const [contactData, setContactData] = useState<ContactFormData>(() => {
     if (me) {
@@ -197,7 +198,10 @@ export default function Checkout() {
       shippingFee: orderSummary.shipping,
     }
 
-    const order = await createOrder.mutateAsync(orderData)
+    const order = await createOrder.mutateAsync({
+      data: orderData,
+      idempotencyKey,
+    })
 
     await removeCartItems.mutateAsync(
       selectedItems.map((item) => ({

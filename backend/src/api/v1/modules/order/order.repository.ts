@@ -1,34 +1,12 @@
 import type { Prisma } from '@generated/prisma/client'
 import { prisma } from '../../shared/config/database/postgres'
 import { executePrismaQuery } from '../../shared/utils/prisma-error.util'
+import { ORDER_ITEM_SELECT_FIELDS } from '../order-items/order-items.repository'
 
 const ORDER_ITEM_SELECT_BASIC = {
-  id: true,
-  orderId: true,
-  productId: true,
-  variantId: true,
-  quantity: true,
-  unitPrice: true,
-  totalPrice: true,
-  discount: true,
-  metadata: true,
-  createdAt: true,
-  updatedAt: true,
-  product: {
-    select: {
-      id: true,
-      name: true,
-      sku: true,
-    },
-  },
-  variant: {
-    select: {
-      id: true,
-      title: true,
-      sku: true,
-      price: true,
-    },
-  },
+  ...ORDER_ITEM_SELECT_FIELDS,
+  product: { select: { id: true, name: true, sku: true } },
+  variant: { select: { id: true, title: true, sku: true, price: true } },
 } as const
 
 const ORDER_ITEM_SELECT_FULL = {
@@ -39,12 +17,7 @@ const ORDER_ITEM_SELECT_FULL = {
       name: true,
       sku: true,
       productImages: {
-        select: {
-          imageId: true,
-          url: true,
-          altText: true,
-          isPrimary: true,
-        },
+        select: { imageId: true, url: true, altText: true, isPrimary: true },
         take: 1,
         orderBy: { isPrimary: 'desc' as const },
       },
@@ -57,12 +30,7 @@ const ORDER_ITEM_SELECT_FULL = {
       sku: true,
       price: true,
       productImages: {
-        select: {
-          imageId: true,
-          url: true,
-          altText: true,
-          isPrimary: true,
-        },
+        select: { imageId: true, url: true, altText: true, isPrimary: true },
         take: 1,
         orderBy: { isPrimary: 'desc' as const },
       },
@@ -92,29 +60,13 @@ const ORDER_BASE_FIELDS = {
   placedAt: true,
   deliveredAt: true,
   deletedAt: true,
-  user: {
-    select: {
-      id: true,
-      email: true,
-      name: true,
-    },
-  },
-  province: {
-    select: {
-      id: true,
-      name: true,
-    },
-  },
+  user: { select: { id: true, email: true, name: true } },
+  province: { select: { id: true, name: true } },
   district: {
     select: {
       id: true,
       name: true,
-      province: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
+      province: { select: { id: true, name: true } },
     },
   },
 } as const
@@ -146,9 +98,9 @@ class OrderRepository {
   findMany = async (options?: Prisma.OrderFindManyArgs) => {
     return executePrismaQuery(() =>
       prisma.order.findMany({
-        where: { deletedAt: null },
-        select: ORDER_SELECT_FIELDS,
         ...options,
+        where: { deletedAt: null, ...options?.where },
+        select: ORDER_SELECT_FIELDS,
       }),
     )
   }

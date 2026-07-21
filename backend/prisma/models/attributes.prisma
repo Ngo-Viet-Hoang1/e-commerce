@@ -5,7 +5,7 @@ model Attribute {
   isFilterable Boolean   @default(false)
   isSearchable Boolean   @default(false)
   createdAt    DateTime  @default(now()) @db.Timestamptz
-  updatedAt    DateTime  @default(now()) @db.Timestamptz
+  updatedAt    DateTime  @updatedAt @db.Timestamptz
   deletedAt    DateTime? @db.Timestamptz
 
   values AttributeValue[]
@@ -19,7 +19,7 @@ model AttributeValue {
   valueText   String    @db.VarChar(255)
   valueMeta   Json?
   createdAt   DateTime  @default(now()) @db.Timestamptz
-  updatedAt   DateTime  @default(now()) @db.Timestamptz
+  updatedAt   DateTime  @updatedAt @db.Timestamptz
   deletedAt   DateTime? @db.Timestamptz
 
   attribute       Attribute        @relation(fields: [attributeId], references: [id])

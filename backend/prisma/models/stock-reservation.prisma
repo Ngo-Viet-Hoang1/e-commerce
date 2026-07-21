@@ -1,0 +1,36 @@
+model StockReservation {
+    id Int @id @default(autoincrement())
+
+    orderId       Int       @unique
+    status        String    @default("active") @db.VarChar(50)
+    expiresAt     DateTime  @db.Timestamptz
+    committedAt   DateTime? @db.Timestamptz
+    releasedAt    DateTime? @db.Timestamptz
+    releaseReason String?   @db.VarChar(255)
+
+    createdAt DateTime @default(now()) @db.Timestamptz
+    updatedAt DateTime @updatedAt @db.Timestamptz
+
+    order Order                  @relation(fields: [orderId], references: [orderId], onDelete: Cascade)
+    items StockReservationItem[]
+
+    @@index([status, expiresAt])
+    @@index([orderId, status])
+}
+
+model StockReservationItem {
+    id Int @id @default(autoincrement())
+
+    reservationId Int
+    variantId     Int
+    quantity      Int
+
+    createdAt DateTime @default(now()) @db.Timestamptz
+
+    reservation StockReservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+    variant     ProductVariant   @relation(fields: [variantId], references: [id])
+
+    @@index([reservationId])
+    @@index([variantId])
+    @@index([reservationId, variantId])
+}

@@ -1,5 +1,9 @@
 import { Router } from 'express'
 import {
+  authenticate,
+  requireAdmin,
+} from '../../shared/middlewares/auth.middleware'
+import {
   validate,
   validateMultiple,
 } from '../../shared/middlewares/validate.middleware'
@@ -12,6 +16,8 @@ import {
 } from './payment.schema'
 
 const router = Router()
+
+router.use(authenticate, requireAdmin)
 
 router.get(
   '/',

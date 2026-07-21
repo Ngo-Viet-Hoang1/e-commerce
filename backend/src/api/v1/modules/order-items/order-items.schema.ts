@@ -43,13 +43,10 @@ export const listOrderItemsQuerySchema = createPaginationSchema(
   ORDER_ITEM_SORT_FIELDS as unknown as string[],
 ).extend({
   orderId: z.coerce.number().int().positive().optional(),
-
   productId: z.coerce.number().int().positive().optional(),
-
   variantId: z.coerce.number().int().positive().optional(),
 
   minQuantity: z.coerce.number().int().positive().optional(),
-
   maxQuantity: z.coerce.number().int().positive().optional(),
 })
 
@@ -88,8 +85,8 @@ export type ListOrderItemsQuery = z.infer<typeof listOrderItemsQuerySchema>
 export type OrderItemIdParam = z.infer<typeof orderItemIdParamSchema>
 
 export type CreateOrderItemBody = z.infer<typeof createOrderItemBodySchema>
-export type updateOrderItemBody = z.infer<typeof updateOrderItemBodySchema>
+export type UpdateOrderItemBody = z.infer<typeof updateOrderItemBodySchema>
 
-export type UpdateOrderItemVariantBodySchema = z.infer<
+export type UpdateOrderItemVariantBody = z.infer<
   typeof updateOrderItemVariantBodySchema
 >
