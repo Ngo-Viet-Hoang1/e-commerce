@@ -1,7 +1,7 @@
 model ProductVideo {
-  videoId   Int @id @default(autoincrement())
+  videoId   Int  @id @default(autoincrement())
   productId Int
-  variantId Int
+  variantId Int?
 
   title           String? @db.VarChar(255)
   provider        String? @db.VarChar(100)

@@ -35,7 +35,14 @@ INSERT INTO "Province"(
 ('86','Vĩnh Long','Vinh Long','Tỉnh Vĩnh Long','Vinh Long Province','vinh_long',2),
 ('91','An Giang','An Giang','Tỉnh An Giang','An Giang Province','an_giang',2),
 ('92','Cần Thơ','Can Tho','Thành phố Cần Thơ','Can Tho City','can_tho',1),
-('96','Cà Mau','Ca Mau','Tỉnh Cà Mau','Ca Mau Province','ca_mau',2);
+('96','Cà Mau','Ca Mau','Tỉnh Cà Mau','Ca Mau Province','ca_mau',2)
+ON CONFLICT (code) DO UPDATE SET
+  name = EXCLUDED.name,
+  name_en = EXCLUDED.name_en,
+  full_name = EXCLUDED.full_name,
+  full_name_en = EXCLUDED.full_name_en,
+  code_name = EXCLUDED.code_name,
+  administrative_unit_id = EXCLUDED.administrative_unit_id;
 
 INSERT INTO "District"(code,name,name_en,full_name,full_name_en,code_name,province_code,administrative_unit_id) VALUES
 ('00004','Ba Đình','Ba Dinh','Phường Ba Đình','Ba Dinh Ward','ba_dinh','01',3),
@@ -3358,4 +3365,12 @@ INSERT INTO "District"(code,name,name_en,full_name,full_name_en,code_name,provin
 ('32227','Nguyễn Việt Khái','Nguyen Viet Khai','Xã Nguyễn Việt Khái','Nguyen Viet Khai Commune','nguyen_viet_khai','96',4),
 ('32236','Tân Ân','Tan An','Xã Tân Ân','Tan An Commune','tan_an','96',4),
 ('32244','Phan Ngọc Hiển','Phan Ngoc Hien','Xã Phan Ngọc Hiển','Phan Ngoc Hien Commune','phan_ngoc_hien','96',4),
-('32248','Đất Mũi','Dat Mui','Xã Đất Mũi','Dat Mui Commune','dat_mui','96',4);
+('32248','Đất Mũi','Dat Mui','Xã Đất Mũi','Dat Mui Commune','dat_mui','96',4)
+ON CONFLICT (code) DO UPDATE SET
+  name = EXCLUDED.name,
+  name_en = EXCLUDED.name_en,
+  full_name = EXCLUDED.full_name,
+  full_name_en = EXCLUDED.full_name_en,
+  code_name = EXCLUDED.code_name,
+  province_code = EXCLUDED.province_code,
+  administrative_unit_id = EXCLUDED.administrative_unit_id;
