@@ -3,7 +3,6 @@ FROM oven/bun:1-alpine AS deps
 WORKDIR /app
 
 COPY package.json bun.lock ./
-
 COPY prisma ./prisma/
 COPY prisma.config.ts ./
 
@@ -38,28 +37,18 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
 
-RUN apk add --no-cache \
-    netcat-openbsd \
-    dumb-init \
-    && rm -rf /var/cache/apk/*
+RUN apk add --no-cache dumb-init && rm -rf /var/cache/apk/*
 
 RUN addgroup -g 1001 -S appgroup && \
     adduser -S appuser -u 1001 -G appgroup
 
 COPY --from=builder --chown=appuser:appgroup /app/node_modules ./node_modules
-
 COPY --from=builder --chown=appuser:appgroup /app/generated ./generated
-
 COPY --from=builder --chown=appuser:appgroup /app/prisma ./prisma
 COPY --from=builder --chown=appuser:appgroup /app/prisma.config.ts ./prisma.config.ts
-
 COPY --from=builder --chown=appuser:appgroup /app/src ./src
 COPY --from=builder --chown=appuser:appgroup /app/package.json ./package.json
 COPY --from=builder --chown=appuser:appgroup /app/tsconfig.json ./tsconfig.json
-
-COPY --chown=appuser:appgroup docker-entrypoint.sh ./docker-entrypoint.sh
-RUN chmod +x ./docker-entrypoint.sh
-
 COPY --from=builder --chown=appuser:appgroup /app/public ./public
 
 RUN mkdir -p /app/logs && chown -R appuser:appgroup /app/logs
@@ -71,6 +60,6 @@ EXPOSE ${PORT}
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
     CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT}/api/v1/health || exit 1
 
-ENTRYPOINT ["dumb-init", "--", "./docker-entrypoint.sh"]
+ENTRYPOINT ["dumb-init", "--"]
 
 CMD ["bun", "run", "src/server.ts"]
