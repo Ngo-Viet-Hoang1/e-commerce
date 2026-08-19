@@ -1,29 +1,31 @@
 import type { Prisma } from '@generated/prisma/client'
 import { prisma } from '@v1/shared/config/database/postgres'
-import type { PrismaTransaction } from '@v1/shared/interfaces/prisma.interface'
 import {
   BadRequestException,
   ConflictException,
   NotFoundException,
 } from '@v1/shared/models/app-error.model'
 import redis from '../../shared/config/database/redis'
+import type { PrismaTransaction } from '../../shared/interfaces/prisma.interface'
 import { invoiceService } from '../invoice/invoice.service'
 import { productVariantService } from '../product-variant'
-import type {
-  StockInstruction,
-  TransitionContext,
-} from './finite-state-machine'
-import { orderStateMachine, paymentStateMachine } from './finite-state-machine'
-import { OrderStatus, PaymentMethod, PaymentStatus } from './order.constants'
+import {
+  isOnlinePaymentMethod,
+  OrderStatus,
+  PaymentMethod,
+  PaymentStatus,
+} from './order.constants'
+import { paymentStateMachine } from './finite-state-machine'
 import { ORDER_SELECT_FIELDS, orderRepository } from './order.repository'
 import type {
   CreateOrderBody,
-  UpdateOrderBody,
   listOrdersQuerySchema,
+  UpdateOrderBody,
 } from './order.schema'
-import { decrementStockOptimistic, incrementStock } from './order.util'
+import { executeOrderTransition, getOrderPaymentMethod } from './order.util'
 import { PaymentStrategyFactory } from './payment/payment.factory'
 import type { PaymentRequestMeta } from './payment/payment.strategy.interface'
+import { reservationService } from './reservation'
 
 class OrderService {
   findAll = async (query: listOrdersQuerySchema) => {
@@ -65,17 +67,22 @@ class OrderService {
     requestMeta: PaymentRequestMeta = {},
     idempotencyKey?: string,
   ) => {
-    const key = `order:idempotency:${idempotencyKey}`
-    const lock = await redis.set(key, 'processing', 'EX', 120, 'NX')
+    const redisKey = idempotencyKey
+      ? `order:idempotency:${idempotencyKey}`
+      : undefined
 
-    if (!lock) {
-      const value = await redis.get(key)
-      if (value === null) {
-        throw new ConflictException('Please try again')
-      } else if (value === 'processing') {
-        throw new ConflictException('Order is being processed')
-      } else {
-        return this.findById(Number(value))
+    if (redisKey) {
+      const lock = await redis.set(redisKey, 'processing', 'EX', 120, 'NX')
+
+      if (!lock) {
+        const value = await redis.get(redisKey)
+        if (value === null) {
+          throw new ConflictException('Please try again')
+        } else if (value === 'processing') {
+          throw new ConflictException('Order is being processed')
+        } else {
+          return this.findById(Number(value))
+        }
       }
     }
 
@@ -158,11 +165,15 @@ class OrderService {
       })
 
       const paymentResult = await strategy.process(order, requestMeta)
-      await redis.setex(key, 900, order.orderId)
+      if (redisKey) {
+        await redis.setex(redisKey, 900, order.orderId)
+      }
 
       return { ...order, ...paymentResult }
     } catch (error) {
-      redis.del(key)
+      if (redisKey) {
+        redis.del(redisKey)
+      }
       throw error
     }
   }
@@ -175,12 +186,20 @@ class OrderService {
     }
 
     return prisma.$transaction(async (tx) => {
-      return this.executeTransition(
+      const updatedOrder = await executeOrderTransition(
         data.status as OrderStatus,
         { order, triggeredBy: 'admin' },
         tx,
         data,
       )
+
+      await this.releaseReservationOnPendingOnlineCancel(
+        order,
+        updatedOrder.status,
+        tx,
+      )
+
+      return updatedOrder
     })
   }
 
@@ -188,11 +207,20 @@ class OrderService {
     const order = await this.findUserOrderById(userId, orderId)
 
     return prisma.$transaction(async (tx) => {
-      return this.executeTransition(
+      const cancelledOrder = await executeOrderTransition(
         OrderStatus.CANCELLED,
         { order, triggeredBy: 'user' },
         tx,
       )
+
+      await this.releaseReservationOnPendingOnlineCancel(
+        order,
+        cancelledOrder.status,
+        tx,
+        'cancelled_by_user',
+      )
+
+      return cancelledOrder
     })
   }
 
@@ -200,7 +228,7 @@ class OrderService {
     const order = await this.findUserOrderById(userId, orderId)
 
     return prisma.$transaction(async (tx) => {
-      return this.executeTransition(
+      return executeOrderTransition(
         OrderStatus.RETURNED,
         { order, triggeredBy: 'user' },
         tx,
@@ -212,81 +240,48 @@ class OrderService {
     const order = await this.findById(orderId)
 
     return prisma.$transaction(async (tx) => {
-      const { newStatus, stockInstructions } = paymentStateMachine.transition(
-        PaymentStatus.PAID,
-        { order, triggeredBy: 'webhook' },
+      const { newStatus } = paymentStateMachine.transition(PaymentStatus.PAID, {
+        order,
+        triggeredBy: 'webhook',
+      })
+
+      const updated = await tx.order.updateMany({
+        where: { orderId: order.orderId, paymentStatus: PaymentStatus.PENDING },
+        data: { paymentStatus: newStatus },
+      })
+
+      if (updated.count === 0) return
+
+      if (isOnlinePaymentMethod(getOrderPaymentMethod(order))) {
+        await reservationService.commitByOrderId(orderId, tx)
+      }
+    })
+  }
+
+  markPaymentFailed = async (orderId: number, reason = 'payment_failed') => {
+    const order = await this.findById(orderId)
+
+    return prisma.$transaction(async (tx) => {
+      const { newStatus } = paymentStateMachine.transition(
+        PaymentStatus.FAILED,
+        {
+          order,
+          triggeredBy: 'webhook',
+        },
       )
 
-      await this.applyStockInstructions(stockInstructions, tx)
+      if (isOnlinePaymentMethod(getOrderPaymentMethod(order))) {
+        await reservationService.releaseByOrderId(orderId, tx, reason)
+      }
 
-      return tx.order.update({
-        where: { orderId: order.orderId },
+      await tx.order.updateMany({
+        where: {
+          orderId,
+          paymentStatus: PaymentStatus.PENDING,
+        },
         data: { paymentStatus: newStatus },
-        select: ORDER_SELECT_FIELDS,
       })
     })
-  }
-
-  private executeTransition = async (
-    toStatus: OrderStatus,
-    ctx: TransitionContext,
-    tx: PrismaTransaction,
-    extraData?: Partial<UpdateOrderBody>,
-  ) => {
-    const instructions = orderStateMachine.transition(toStatus, ctx)
-    const {
-      paymentStatus: _ignorePaymentStatus,
-      status: _ignoreStatus,
-      ...safeExtraData
-    } = extraData ?? {}
-
-    await this.applyStockInstructions(instructions.stockInstructions, tx)
-
-    let paymentStatusUpdate: PaymentStatus | undefined
-    if (instructions.cascadePaymentTransition) {
-      const paymentInstructions = paymentStateMachine.transition(
-        instructions.cascadePaymentTransition,
-        { ...ctx, triggeredBy: 'system' },
-      )
-
-      await this.applyStockInstructions(
-        paymentInstructions.stockInstructions,
-        tx,
-      )
-
-      paymentStatusUpdate = paymentInstructions.newStatus
-    }
-
-    return tx.order.update({
-      where: { orderId: ctx.order.orderId },
-      data: {
-        ...safeExtraData,
-        status: instructions.newStatus,
-        ...instructions.orderUpdate,
-        ...(paymentStatusUpdate && { paymentStatus: paymentStatusUpdate }),
-      },
-      select: ORDER_SELECT_FIELDS,
-    })
-  }
-
-  private applyStockInstructions = async (
-    instructions: StockInstruction[],
-    tx: PrismaTransaction,
-  ) => {
-    for (const { operation, variantId, quantity } of instructions) {
-      switch (operation) {
-        case 'decrement':
-          await decrementStockOptimistic(tx, variantId, quantity)
-          break
-
-        case 'increment':
-          await incrementStock(tx, variantId, quantity)
-          break
-
-        default:
-          throw new BadRequestException(`Unknown stock operation: ${operation}`)
-      }
-    }
   }
 
   deleteById = async (id: number) => {
@@ -298,11 +293,19 @@ class OrderService {
     const order = await this.findById(id)
 
     return prisma.$transaction(async (tx) => {
-      await this.executeTransition(
+      const softDeletedOrder = await executeOrderTransition(
         OrderStatus.CANCELLED,
         { order, triggeredBy: 'admin' },
         tx,
       )
+
+      await this.releaseReservationOnPendingOnlineCancel(
+        order,
+        softDeletedOrder.status,
+        tx,
+        'cancelled_by_admin',
+      )
+
       return tx.order.update({
         where: { orderId: order.orderId },
         data: { deletedAt: new Date() },
@@ -344,6 +347,19 @@ class OrderService {
     if (!order) throw new NotFoundException('Order', orderId.toString())
 
     return invoiceService.generatePDF(order)
+  }
+
+  private releaseReservationOnPendingOnlineCancel = async (
+    order: Prisma.OrderGetPayload<{ include: { orderItems: true } }>,
+    nextStatus: string,
+    tx: PrismaTransaction,
+    reason = 'order_cancelled',
+  ) => {
+    if (nextStatus !== OrderStatus.CANCELLED) return
+    if (order.paymentStatus !== PaymentStatus.PENDING) return
+    if (!isOnlinePaymentMethod(getOrderPaymentMethod(order))) return
+
+    await reservationService.releaseByOrderId(order.orderId, tx, reason)
   }
 }
 

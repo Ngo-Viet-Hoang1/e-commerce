@@ -14,7 +14,13 @@ export const PAYMENT_STATUSES = [
   'refunded',
 ] as const
 
-export const PAYMENT_METHODS = ['cod', 'vnpay', 'paypal', 'card'] as const
+export const PAYMENT_METHODS = [
+  'cod',
+  'vnpay',
+  'paypal',
+  'card',
+  'stripe',
+] as const
 
 export const OrderStatus = {
   PENDING: 'pending',
@@ -37,6 +43,7 @@ export const PaymentMethod = {
   VNPAY: 'vnpay',
   PAYPAL: 'paypal',
   CARD: 'card',
+  STRIPE: 'stripe',
 } as const
 
 export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus]
@@ -62,6 +69,19 @@ export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
   vnpay: 'VNPAY',
   paypal: 'PayPal',
   card: 'Thẻ tín dụng',
+  stripe: 'Stripe',
+}
+
+export const ONLINE_PAYMENT_METHODS: PaymentMethod[] = [
+  PaymentMethod.VNPAY,
+  PaymentMethod.PAYPAL,
+  PaymentMethod.CARD,
+  PaymentMethod.STRIPE,
+]
+
+export const isOnlinePaymentMethod = (method?: string | null): boolean => {
+  if (!method) return false
+  return ONLINE_PAYMENT_METHODS.includes(method as PaymentMethod)
 }
 
 export const getOrderStatusLabel = (status: string): string => {
