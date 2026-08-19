@@ -31,7 +31,7 @@ export default function CheckoutPayment({
           className="space-y-3"
         >
           {/* COD - Cash on Delivery */}
-          <div className="hover:bg-accent/50 flex cursor-pointer items-center space-x-3 rounded-lg border p-4">
+          <Label className="hover:bg-accent/50 flex cursor-pointer items-center space-x-3 rounded-lg border p-4">
             <RadioGroupItem value="cod" id="cod-payment" />
             <Banknote className="text-muted-foreground size-5" />
             <div className="flex-1">
@@ -45,10 +45,10 @@ export default function CheckoutPayment({
                 Thanh toán bằng tiền mặt khi nhận hàng
               </p>
             </div>
-          </div>
+          </Label>
 
           {/* VNPay */}
-          <div className="hover:bg-accent/50 flex cursor-pointer items-center space-x-3 rounded-lg border p-4">
+          <Label className="hover:bg-accent/50 flex cursor-pointer items-center space-x-3 rounded-lg border p-4">
             <RadioGroupItem value="vnpay" id="vnpay-payment" />
             <Smartphone className="text-muted-foreground size-5" />
             <div className="flex-1">
@@ -62,10 +62,10 @@ export default function CheckoutPayment({
                 Thanh toán qua ví điện tử VNPay
               </p>
             </div>
-          </div>
+          </Label>
 
           {/* PayPal / Stripe */}
-          <div className="hover:bg-accent/50 flex cursor-pointer items-center space-x-3 rounded-lg border p-4">
+          <Label className="hover:bg-accent/50 flex cursor-pointer items-center space-x-3 rounded-lg border p-4">
             <RadioGroupItem value="paypal" id="paypal-payment" />
             <Wallet className="text-muted-foreground size-5" />
             <div className="flex-1">
@@ -79,7 +79,7 @@ export default function CheckoutPayment({
                 Thanh toán qua PayPal hoặc thẻ quốc tế
               </p>
             </div>
-          </div>
+          </Label>
         </RadioGroup>
       </div>
 

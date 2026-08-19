@@ -69,10 +69,14 @@ export function useUserOrders(params: PaginationParams) {
   })
 }
 
-export function useUserOrderById(orderId: number) {
+export function useUserOrderById(
+  orderId: number,
+  options?: { refetchInterval?: number | false },
+) {
   return useQuery({
     queryKey: ORDER_QUERY_KEYS.detail(orderId),
     queryFn: () => UserOrderService.getMyOrderById(orderId),
     enabled: !!orderId,
+    refetchInterval: options?.refetchInterval,
   })
 }

@@ -203,6 +203,11 @@ export default function Checkout() {
       idempotencyKey,
     })
 
+    if (order.redirectUrl) {
+      window.location.href = order.redirectUrl
+      return
+    }
+
     await removeCartItems.mutateAsync(
       selectedItems.map((item) => ({
         productId: item.productId,

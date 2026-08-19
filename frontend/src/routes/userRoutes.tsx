@@ -25,6 +25,8 @@ const Checkout = lazy(() => import('@/pages/user/checkout/Checkout'))
 const CompleteCheckout = lazy(
   () => import('@/pages/user/checkout/CompleteCheckout'),
 )
+const PaymentSuccess = lazy(() => import('@/pages/user/payment/PaymentSuccess'))
+const PaymentFailed = lazy(() => import('@/pages/user/payment/PaymentFailed'))
 
 export const userRoutes: RouteObject[] = [
   {
@@ -57,6 +59,20 @@ export const userRoutes: RouteObject[] = [
     element: <ShoppingCart />,
     handle: {
       breadcrumb: 'Giỏ hàng',
+    },
+  },
+  {
+    path: 'payment/success',
+    element: <PaymentSuccess />,
+    handle: {
+      breadcrumb: 'Thanh toán thành công',
+    },
+  },
+  {
+    path: 'payment/failed',
+    element: <PaymentFailed />,
+    handle: {
+      breadcrumb: 'Thanh toán thất bại',
     },
   },
   {

@@ -10,7 +10,7 @@ class UserOrderService {
   static createOrder = async (
     payload: CreateOrderPayload,
     idempotencyKey: string,
-  ) => {
+  ): Promise<Order & { redirectUrl?: string }> => {
     const { data } = await api.post<IApiResponse<Order>>(
       '/me/orders',
       payload,
