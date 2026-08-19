@@ -28,6 +28,7 @@
         "rate-limit-redis": "^4.3.1",
         "sanitize-html": "^2.17.0",
         "stream-chat": "^9.27.2",
+        "stripe": "^20.4.1",
         "vnpay": "^2.4.4",
         "winston": "^3.18.3",
         "winston-daily-rotate-file": "^5.0.0",
@@ -939,6 +940,8 @@
     "strip-ansi": ["strip-ansi@6.0.1", "", { "dependencies": { "ansi-regex": "^5.0.1" } }, "sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A=="],
 
     "strip-json-comments": ["strip-json-comments@3.1.1", "", {}, "sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig=="],
+
+    "stripe": ["stripe@20.4.1", "", { "peerDependencies": { "@types/node": ">=16" }, "optionalPeers": ["@types/node"] }, "sha512-axCguHItc8Sxt0HC6aSkdVRPffjYPV7EQqZRb2GkIa8FzWDycE7nHJM19C6xAIynH1Qp1/BHiopSi96jGBxT0w=="],
 
     "supports-color": ["supports-color@7.2.0", "", { "dependencies": { "has-flag": "^4.0.0" } }, "sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw=="],
 

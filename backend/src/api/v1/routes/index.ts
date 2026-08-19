@@ -12,6 +12,7 @@ import orderItemRoute from '../modules/order-items/order-items.route.js'
 import orderAdminRouter from '../modules/order/order.admin.route'
 import orderUserRouter from '../modules/order/order.user.route'
 import paymentRoute from '../modules/payment/payment.route.js'
+import vnpayWebhookRoute from '../modules/payment/vnpay/vnpay.webhook.route'
 import productBadgeRoute from '../modules/product-badge/product-badge.route.js'
 import productFaqRoute from '../modules/product-faq/product-faq.route.js'
 import productImageRoute from '../modules/product-image/product-image.route.js'
@@ -49,6 +50,7 @@ router.use('/product-variants', productVariantRoute)
 router.use('/order-items', orderItemRoute)
 router.use('/product-images', productImageRoute)
 router.use('/product-videos', productVideoRouter)
+router.use('/payments', vnpayWebhookRoute)
 router.use('/payments', paymentRoute)
 router.use('/provinces', provinceRoute)
 router.use('/districts', districtRoute)
