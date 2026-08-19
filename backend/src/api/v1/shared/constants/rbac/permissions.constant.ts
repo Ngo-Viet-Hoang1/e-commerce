@@ -1,5 +1,5 @@
-import { ACTIONS, Action } from "./actions.constant";
-import { RESOURCES, Resource } from "./resources.constant";
+import { ACTIONS, type Action } from "./actions.constant";
+import { RESOURCES, type Resource } from "./resources.constant";
 
 export const createPermission = (resource: Resource, action: Action) =>
   `${resource}:${action}` as const;

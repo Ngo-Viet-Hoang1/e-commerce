@@ -62,19 +62,19 @@ export const adminRoutes: RouteObject[] = [
         element: <BadgeManagement />,
       },
       {
-        path: '/admin/products',
+        path: 'products',
         element: <ProductManagement />,
       },
       {
-        path: '/admin/products/create',
+        path: 'products/create',
         element: <CreateProductPage />,
       },
       {
-        path: '/admin/products/edit/:id',
+        path: 'products/edit/:id',
         element: <EditProductPage />,
       },
       {
-        path: '/admin/chats',
+        path: 'chats',
         element: <AdminChat />,
       },
     ],

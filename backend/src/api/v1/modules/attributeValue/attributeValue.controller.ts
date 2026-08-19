@@ -40,9 +40,10 @@ class AttributeValueController {
   }
 
   create = async (req: Request, res: Response) => {
+    const attributeId = Number(req.params.attributeId)
     const data = req.validatedData?.body as createAttributeValueBodySchema
 
-    const createdvalue = await attributeValueService.create(data)
+    const createdvalue = await attributeValueService.create(attributeId, data)
 
     SuccessResponse.created(
       res,

@@ -1,7 +1,7 @@
 // Deprecated: Use global error handler middleware instead ( from Express 5.x )
 import type { NextFunction, Request, Response } from 'express'
 import createError from 'http-errors'
-import AppError from '../models/app-error.model'
+import { AppError } from '../models/app-error.model'
 
 export const catchAsync = (
   fn: (req: Request, res: Response, next: NextFunction) => Promise<unknown>,
@@ -11,7 +11,7 @@ export const catchAsync = (
     res: Response,
     next: NextFunction,
   ): Promise<unknown> => {
-    return fn(req, res, next).catch((error) => {
+    return fn(req, res, next).catch((error: unknown) => {
       const httpError = ensureHttpError(error)
       next(httpError)
     })

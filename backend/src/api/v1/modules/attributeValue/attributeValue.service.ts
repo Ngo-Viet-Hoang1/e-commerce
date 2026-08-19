@@ -43,9 +43,14 @@ class AttributeValueService {
     }
     return attributeValue
   }
-  create = async (data: createAttributeValueBodySchema) => {
+  create = async (
+    attributeId: number,
+    data: createAttributeValueBodySchema,
+  ) => {
     const attributeValue = await attributeValueRepository.create({
-      ...data,
+      attribute: { connect: { id: attributeId } },
+      valueText: data.valueText,
+      valueMeta: data.valueMetadata ?? undefined,
     })
     return attributeValue
   }
