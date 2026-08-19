@@ -36,8 +36,8 @@ const createAuthAxiosInstance = ({
     reject: (reason?: unknown) => void
   }
 
-  const MAX_RETRIES = 3
-  const RETRY_DELAY = 1000
+  const MAX_RETRIES = 1
+  const RETRY_DELAY = 1500
 
   let isRefreshing = false
   let failedQueue: QueueItem[] = []
