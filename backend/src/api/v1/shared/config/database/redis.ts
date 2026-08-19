@@ -2,87 +2,75 @@ import Redis from 'ioredis'
 import { ExternalServiceException } from '../../models/app-error.model.js'
 import logger from '../logger.js'
 
+const rawRedisUrl = process.env.REDIS_URL?.trim()
+const isTls = rawRedisUrl?.startsWith('rediss://')
+
 const REDIS_CONFIG = {
   host: process.env.REDIS_HOST || 'localhost',
   port: parseInt(process.env.REDIS_PORT || '6379', 10),
   password: process.env.REDIS_PASSWORD || undefined,
   db: parseInt(process.env.REDIS_DB || '0', 10),
-
-  connectTimeout: 10000,
-  commandTimeout: 5000,
+  family: 4, // Force IPv4
+  connectTimeout: 20000,
+  commandTimeout: 15000,
   keepAlive: 30000,
-
   retryStrategy: (times: number) => {
-    const delay = Math.min(times * 50, 2000)
+    const delay = Math.min(times * 100, 3000)
     logger.warn(`Redis retry attempt ${times}, waiting ${delay}ms`)
     return delay
   },
-
-  maxRetriesPerRequest: 3,
+  maxRetriesPerRequest: 5,
   enableReadyCheck: true,
   enableOfflineQueue: true,
   autoResubscribe: true,
   autoResendUnfulfilledCommands: true,
-
   lazyConnect: true,
-
   connectionName: process.env.SERVICE_NAME || 'api-service',
 }
 
-// export const redis = new Redis(REDIS_CONFIG)
-export const redis = process.env.REDIS_URL
-  ? new Redis(process.env.REDIS_URL, {
-      connectTimeout: 10000,
-      commandTimeout: 5000,
+export const redis = rawRedisUrl
+  ? new Redis(rawRedisUrl, {
+      family: 4,
+      tls: isTls ? { rejectUnauthorized: false } : undefined,
+      connectTimeout: 20000,
+      commandTimeout: 15000,
       keepAlive: 30000,
       retryStrategy: (times) => {
-        const delay = Math.min(times * 50, 2000)
+        const delay = Math.min(times * 100, 3000)
         logger.warn(`Redis retry attempt ${times}, waiting ${delay}ms`)
         return delay
       },
-      maxRetriesPerRequest: 3,
+      maxRetriesPerRequest: 5,
       enableReadyCheck: true,
       lazyConnect: true,
       connectionName: process.env.SERVICE_NAME || 'api-service',
     })
-  : new Redis({
-      host: process.env.REDIS_HOST || 'localhost',
-      port: parseInt(process.env.REDIS_PORT || '6379', 10),
-      password: process.env.REDIS_PASSWORD || undefined,
-      db: parseInt(process.env.REDIS_DB || '0', 10),
-      connectTimeout: 10000,
-      commandTimeout: 5000,
-      keepAlive: 30000,
-      retryStrategy: (times) => {
-        const delay = Math.min(times * 50, 2000)
-        logger.warn(`Redis retry attempt ${times}, waiting ${delay}ms`)
-        return delay
-      },
-      maxRetriesPerRequest: 3,
-      enableReadyCheck: true,
-      lazyConnect: true,
-      connectionName: process.env.SERVICE_NAME || 'api-service',
-    })
+  : new Redis(REDIS_CONFIG)
 
 let isConnected = false
 let isConnecting = false
 
+const getSafeRedisHost = () => {
+  if (rawRedisUrl) {
+    try {
+      const parsed = new URL(rawRedisUrl)
+      return `${parsed.protocol}//${parsed.hostname}:${parsed.port}`
+    } catch {
+      return 'Cloud-Redis'
+    }
+  }
+  return `${REDIS_CONFIG.host}:${REDIS_CONFIG.port}`
+}
+
 // Event handlers
 redis.on('connect', () => {
-  logger.info('📡 Connecting to Redis...', {
-    host: REDIS_CONFIG.host,
-    port: REDIS_CONFIG.port,
-    db: REDIS_CONFIG.db,
-  })
+  logger.info(`📡 Connecting to Redis (${getSafeRedisHost()})...`)
 })
 
 redis.on('ready', () => {
   isConnected = true
   isConnecting = false
-  logger.info('✅ Redis is ready', {
-    host: REDIS_CONFIG.host,
-    port: REDIS_CONFIG.port,
-  })
+  logger.info(`✅ Redis is ready (${getSafeRedisHost()})`)
 })
 
 redis.on('error', (err) => {
@@ -91,8 +79,7 @@ redis.on('error', (err) => {
       message: err.message,
       stack: err.stack,
     },
-    host: REDIS_CONFIG.host,
-    port: REDIS_CONFIG.port,
+    target: getSafeRedisHost(),
   })
 })
 
@@ -105,7 +92,7 @@ redis.on('reconnecting', (delay: number) => {
   isConnecting = true
   logger.info('🔄 Reconnecting to Redis...', {
     delay: `${delay}ms`,
-    host: REDIS_CONFIG.host,
+    target: getSafeRedisHost(),
   })
 })
 
@@ -117,7 +104,6 @@ redis.on('end', () => {
 
 export async function connectRedis(): Promise<void> {
   try {
-    // Check connection status
     if (redis.status === 'ready' || isConnected) {
       logger.info('Redis already connected')
       return
@@ -125,11 +111,10 @@ export async function connectRedis(): Promise<void> {
 
     if (redis.status === 'connecting' || isConnecting) {
       logger.info('Redis connection in progress, waiting...')
-      // Wait for connection to complete
       await new Promise<void>((resolve, reject) => {
         const timeout = setTimeout(() => {
           reject(new Error('Redis connection timeout'))
-        }, 10000)
+        }, 20000)
 
         redis.once('ready', () => {
           clearTimeout(timeout)
@@ -153,8 +138,7 @@ export async function connectRedis(): Promise<void> {
       'Redis',
       error instanceof Error ? error : undefined,
       {
-        host: REDIS_CONFIG.host,
-        port: REDIS_CONFIG.port,
+        target: getSafeRedisHost(),
       },
     )
   }
@@ -174,7 +158,6 @@ export async function disconnectRedis(): Promise<void> {
     logger.info('✅ Redis connection closed gracefully')
   } catch (error) {
     logger.error('Error closing Redis connection:', error)
-    // Force close if graceful shutdown fails
     redis.disconnect(false)
   }
 }
