@@ -3,7 +3,8 @@ import { ExternalServiceException } from '../../models/app-error.model.js'
 import logger from '../logger.js'
 
 const rawRedisUrl = process.env.REDIS_URL?.trim()
-const isTls = rawRedisUrl?.startsWith('rediss://')
+const isTls =
+  rawRedisUrl?.startsWith('rediss://') || rawRedisUrl?.includes('upstash.io')
 
 const REDIS_CONFIG = {
   host: process.env.REDIS_HOST || 'localhost',
