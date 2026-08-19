@@ -1,6 +1,6 @@
 import AdminAuthService from '@/api/services/admin/auth.admin.service'
 import AuthService from '@/api/services/user/auth.service'
-import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_ENDPOINT } from '@/constants'
+import { ACCESS_TOKEN_KEY, API_BASE_URL, REFRESH_TOKEN_ENDPOINT } from '@/constants'
 import type { AuthActions, AuthState } from '@/interfaces/auth.interface'
 import { storage } from '@/utils/localstorage.util'
 
@@ -30,7 +30,7 @@ const createAuthStore = ({
     isInitialized: false,
   }
 
-  const baseURL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api/v1'
+  const baseURL = API_BASE_URL
 
   const fetchMe = async () => {
     const { success, data } = await getMeService()

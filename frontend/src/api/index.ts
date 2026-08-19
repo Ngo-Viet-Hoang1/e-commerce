@@ -1,5 +1,4 @@
-/* eslint-disable no-console */
-import { REFRESH_TOKEN_ENDPOINT } from '@/constants'
+import { API_BASE_URL, REFRESH_TOKEN_ENDPOINT } from '@/constants'
 import type { IErrorResponse } from '@/interfaces/base-response.interface'
 import { ApiError } from '@/models/ApiError'
 import {
@@ -241,13 +240,13 @@ const generateRequestId = () => {
 }
 
 export const api = createAuthAxiosInstance({
-  baseURL: import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api/v1',
+  baseURL: API_BASE_URL,
   refreshTokenEndpoint: REFRESH_TOKEN_ENDPOINT.USER,
   authStore: () => useAuthStore.getState(),
 })
 
 export const adminApi = createAuthAxiosInstance({
-  baseURL: import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api/v1',
+  baseURL: API_BASE_URL,
   refreshTokenEndpoint: REFRESH_TOKEN_ENDPOINT.ADMIN,
   authStore: () => useAdminAuthStore.getState(),
 })

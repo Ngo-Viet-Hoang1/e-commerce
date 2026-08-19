@@ -24,3 +24,19 @@ export const SORT_ORDER = {
 } as const
 
 export const DEFAULT_IMAGE_URL = 'https://ui.shadcn.com/placeholder.svg'
+
+const getBaseApiUrl = (): string => {
+  let url = (
+    import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api/v1'
+  ).trim()
+  if (url.endsWith('/')) {
+    url = url.slice(0, -1)
+  }
+  if (!url.endsWith('/api/v1')) {
+    url = `${url}/api/v1`
+  }
+  return url
+}
+
+export const API_BASE_URL = getBaseApiUrl()
+
