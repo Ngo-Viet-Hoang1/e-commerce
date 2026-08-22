@@ -37,6 +37,42 @@ const ORDER_TRANSITIONS: Record<OrderStatus, OrderTransition[]> = {
       }),
     },
     {
+      to: OrderStatus.SHIPPED,
+      allowedFor: ['admin', 'system'],
+      onEnter: () => ({
+        newStatus: OrderStatus.SHIPPED,
+        orderUpdate: {},
+        stockInstructions: [],
+        effects: ['send_shipping_email'],
+      }),
+    },
+    {
+      to: OrderStatus.DELIVERED,
+      allowedFor: ['admin', 'system'],
+      onEnter: ({ order }): OrderTransitionResult => {
+        const meta = parseOrderMetadata(order.metadata)
+        const isCOD =
+          !meta.paymentMethod ||
+          String(meta.paymentMethod).toLowerCase() === PaymentMethod.COD
+
+        const orderUpdate = {
+          deliveredAt: new Date(),
+          ...(isCOD && { paymentStatus: PaymentStatus.PAID }),
+        }
+
+        return {
+          newStatus: OrderStatus.DELIVERED,
+          orderUpdate,
+          stockInstructions: [],
+          effects: [
+            'set_delivered_at',
+            ...(isCOD ? ['auto_confirm_cod_payment'] : []),
+            'send_delivery_email',
+          ],
+        }
+      },
+    },
+    {
       to: OrderStatus.CANCELLED,
       allowedFor: ['user', 'admin', 'system'],
       condition: ({ triggeredBy, order }) => {
@@ -95,6 +131,32 @@ const ORDER_TRANSITIONS: Record<OrderStatus, OrderTransition[]> = {
       }),
     },
     {
+      to: OrderStatus.DELIVERED,
+      allowedFor: ['admin', 'system'],
+      onEnter: ({ order }): OrderTransitionResult => {
+        const meta = parseOrderMetadata(order.metadata)
+        const isCOD =
+          !meta.paymentMethod ||
+          String(meta.paymentMethod).toLowerCase() === PaymentMethod.COD
+
+        const orderUpdate = {
+          deliveredAt: new Date(),
+          ...(isCOD && { paymentStatus: PaymentStatus.PAID }),
+        }
+
+        return {
+          newStatus: OrderStatus.DELIVERED,
+          orderUpdate,
+          stockInstructions: [],
+          effects: [
+            'set_delivered_at',
+            ...(isCOD ? ['auto_confirm_cod_payment'] : []),
+            'send_delivery_email',
+          ],
+        }
+      },
+    },
+    {
       to: OrderStatus.CANCELLED,
       allowedFor: ['admin'],
       onEnter: ({ order }): OrderTransitionResult => {
@@ -116,7 +178,9 @@ const ORDER_TRANSITIONS: Record<OrderStatus, OrderTransition[]> = {
       allowedFor: ['admin', 'system'],
       onEnter: ({ order }): OrderTransitionResult => {
         const meta = parseOrderMetadata(order.metadata)
-        const isCOD = meta.paymentMethod === PaymentMethod.COD
+        const isCOD =
+          !meta.paymentMethod ||
+          String(meta.paymentMethod).toLowerCase() === PaymentMethod.COD
 
         const orderUpdate = {
           deliveredAt: new Date(),

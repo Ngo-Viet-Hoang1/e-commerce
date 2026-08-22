@@ -9,6 +9,7 @@ import redis from '../../shared/config/database/redis'
 import type { PrismaTransaction } from '../../shared/interfaces/prisma.interface'
 import { invoiceService } from '../invoice/invoice.service'
 import { productVariantService } from '../product-variant'
+import { CacheUtil } from '../../shared/utils/cache.util'
 import {
   isOnlinePaymentMethod,
   OrderStatus,
@@ -182,10 +183,12 @@ class OrderService {
     const order = await this.findById(id)
 
     if (!data.status || data.status === order.status) {
-      return orderRepository.update(id, data)
+      const res = await orderRepository.update(id, data)
+      CacheUtil.delPattern('admin:dashboard:*').catch(() => {})
+      return res
     }
 
-    return prisma.$transaction(async (tx) => {
+    const updated = await prisma.$transaction(async (tx) => {
       const updatedOrder = await executeOrderTransition(
         data.status as OrderStatus,
         { order, triggeredBy: 'admin' },
@@ -201,12 +204,15 @@ class OrderService {
 
       return updatedOrder
     })
+
+    CacheUtil.delPattern('admin:dashboard:*').catch(() => {})
+    return updated
   }
 
   cancelUserOrder = async (userId: number, orderId: number) => {
     const order = await this.findUserOrderById(userId, orderId)
 
-    return prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx) => {
       const cancelledOrder = await executeOrderTransition(
         OrderStatus.CANCELLED,
         { order, triggeredBy: 'user' },
@@ -222,32 +228,46 @@ class OrderService {
 
       return cancelledOrder
     })
+
+    CacheUtil.delPattern('admin:dashboard:*').catch(() => {})
+    return result
   }
 
   returnUserOrder = async (userId: number, orderId: number) => {
     const order = await this.findUserOrderById(userId, orderId)
 
-    return prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx) => {
       return executeOrderTransition(
         OrderStatus.RETURNED,
         { order, triggeredBy: 'user' },
         tx,
       )
     })
+
+    CacheUtil.delPattern('admin:dashboard:*').catch(() => {})
+    return result
   }
 
   confirmPayment = async (orderId: number) => {
     const order = await this.findById(orderId)
 
-    return prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx) => {
       const { newStatus } = paymentStateMachine.transition(PaymentStatus.PAID, {
         order,
         triggeredBy: 'webhook',
       })
 
+      const updateData: { paymentStatus: string; status?: string } = {
+        paymentStatus: newStatus,
+      }
+
+      if (order.status === OrderStatus.PENDING) {
+        updateData.status = OrderStatus.PROCESSING
+      }
+
       const updated = await tx.order.updateMany({
         where: { orderId: order.orderId, paymentStatus: PaymentStatus.PENDING },
-        data: { paymentStatus: newStatus },
+        data: updateData,
       })
 
       if (updated.count === 0) return
@@ -256,12 +276,15 @@ class OrderService {
         await reservationService.commitByOrderId(orderId, tx)
       }
     })
+
+    CacheUtil.delPattern('admin:dashboard:*').catch(() => {})
+    return result
   }
 
   markPaymentFailed = async (orderId: number, reason = 'payment_failed') => {
     const order = await this.findById(orderId)
 
-    return prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx) => {
       const { newStatus } = paymentStateMachine.transition(
         PaymentStatus.FAILED,
         {
@@ -282,6 +305,9 @@ class OrderService {
         data: { paymentStatus: newStatus },
       })
     })
+
+    CacheUtil.delPattern('admin:dashboard:*').catch(() => {})
+    return result
   }
 
   deleteById = async (id: number) => {
