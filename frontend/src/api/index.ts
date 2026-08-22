@@ -36,9 +36,6 @@ const createAuthAxiosInstance = ({
     reject: (reason?: unknown) => void
   }
 
-  const MAX_RETRIES = 1
-  const RETRY_DELAY = 1500
-
   let isRefreshing = false
   let failedQueue: QueueItem[] = []
 
@@ -103,22 +100,6 @@ const createAuthAxiosInstance = ({
       }
 
       progress.stop()
-
-      if (!error.response && originalRequest && !originalRequest._retry) {
-        originalRequest.retryCount = originalRequest.retryCount ?? 0
-
-        if (originalRequest.retryCount < MAX_RETRIES) {
-          originalRequest.retryCount++
-          console.log(
-            `🔄 Retrying request (${originalRequest.retryCount}/${MAX_RETRIES})...`,
-          )
-
-          await new Promise((resolve) =>
-            setTimeout(resolve, RETRY_DELAY * originalRequest.retryCount),
-          )
-          return api(originalRequest)
-        }
-      }
 
       if (
         error.response?.status === 401 &&
@@ -205,7 +186,10 @@ const handleError = (axiosError: AxiosError<IErrorResponse>): ApiError => {
       'Something went wrong'
 
     const customConfig = axiosError.config as CustomAxiosRequestConfig
-    if (!customConfig?.skipToast) {
+    const isGetRequest = axiosError.config?.method?.toLowerCase() === 'get'
+
+    // Only display automatic toast for mutations (POST/PUT/DELETE/PATCH) or explicit requests, not background GET queries
+    if (!customConfig?.skipToast && !isGetRequest && statusCode !== 401) {
       toast.error(msg)
 
       if (error?.details) {
@@ -221,7 +205,11 @@ const handleError = (axiosError: AxiosError<IErrorResponse>): ApiError => {
       error?.details as Record<string, string[]> | undefined,
     )
   } else if (axiosError.request) {
-    if (!(axiosError.config as CustomAxiosRequestConfig)?.skipToast) {
+    const isGetRequest = axiosError.config?.method?.toLowerCase() === 'get'
+    if (
+      !(axiosError.config as CustomAxiosRequestConfig)?.skipToast &&
+      !isGetRequest
+    ) {
       toast.error('Network Error - Please check your connection')
     }
     return new ApiError(

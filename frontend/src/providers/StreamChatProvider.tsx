@@ -6,7 +6,6 @@ import type { ChatTokenResponse } from '@/interfaces/stream-chat.interface'
 import { useAdminAuthStore, useAuthStore } from '@/store/zustand/useAuthStore'
 import { useQuery } from '@tanstack/react-query'
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
-import { toast } from 'sonner'
 import { StreamChat } from 'stream-chat'
 
 interface ChatProviderProps {
@@ -57,8 +56,7 @@ const StreamChatProvider = ({ children, role }: ChatProviderProps) => {
 
         setClient(chatClient)
       } catch (error) {
-        console.error('Chat init error:', error)
-        toast.error('Failed to initialize chat')
+        console.warn('Chat service unavailable or unconfigured:', error)
       } finally {
         isInitializingRef.current = false
       }

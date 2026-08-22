@@ -35,7 +35,9 @@ const OrderItems = ({
   onViewDetail,
   onCancelOrder,
 }: OrderItemsProps) => {
-  const canCancel = ['pending', 'processing'].includes(order.status)
+  const canCancel = ['pending', 'processing'].includes(
+    order.status?.toLowerCase(),
+  )
 
   const calculatedTotal =
     order.orderItems?.reduce((sum, item) => sum + Number(item.totalPrice), 0) ??

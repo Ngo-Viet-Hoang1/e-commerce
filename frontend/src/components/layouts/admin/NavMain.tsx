@@ -35,7 +35,7 @@ const navMain: {
   }[]
 }[] = [
   {
-    title: 'Playground',
+    title: 'Quản trị hệ thống',
     url: '#',
     icon: SquareTerminal,
     isActive: true,
@@ -74,10 +74,6 @@ const navMain: {
       {
         title: 'Add Product',
         url: '/admin/products/create',
-      },
-      {
-        title: 'Edit Product',
-        url: '/admin/products/edit/:id',
       },
     ],
   },

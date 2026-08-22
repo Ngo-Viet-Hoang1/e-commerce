@@ -4,36 +4,34 @@ import { toast } from 'sonner'
 
 const queryConfig: DefaultOptions = {
   queries: {
-    // Retry configuration
+    // Retry configuration: Only retry once for 5xx/network errors, NEVER for 4xx errors
     retry: (failureCount, error) => {
-      // Don't retry on 4xx errors (client errors)
       if (error instanceof ApiError && error.status && error.status < 500) {
         return false
       }
-      // Retry up to 3 times for 5xx errors
-      return failureCount < 3
+      return failureCount < 1
     },
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    retryDelay: 1000,
 
     // Stale time - data considered fresh for 5 minutes
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000,
 
     // Cache time - unused data stays in cache for 10 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes (previously cacheTime)
+    gcTime: 10 * 60 * 1000,
 
-    // Refetch configuration
-    refetchOnWindowFocus: true, // Refetch when window regains focus
-    refetchOnMount: true, // Refetch on component mount if data is stale
-    refetchOnReconnect: true, // Refetch when network reconnects
+    // Refetch configuration: Disable aggressive window focus refetch
+    refetchOnWindowFocus: false,
+    refetchOnMount: true,
+    refetchOnReconnect: true,
 
     // Disable automatic refetching in the background
     refetchInterval: false,
 
     // Error handling
-    throwOnError: false, // Handle errors in components, not globally
+    throwOnError: false,
 
     // Network mode
-    networkMode: 'online', // 'online' | 'always' | 'offlineFirst'
+    networkMode: 'online',
   },
 
   mutations: {

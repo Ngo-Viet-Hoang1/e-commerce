@@ -15,7 +15,9 @@ const ProtectedRoute = ({
   const authStore = type === 'admin' ? useAdminAuthStore : useAuthStore
   const isAuthenticated = authStore((s) => s.isAuthenticated)
   const me = authStore((s) => s.me)
-  const hasRole = me?.roles?.includes(type)
+  const hasRole = me?.roles?.some(
+    (role: string) => role.toUpperCase() === type.toUpperCase(),
+  )
 
   if (!isAuthenticated) {
     return <Navigate to={redirectPath} replace />

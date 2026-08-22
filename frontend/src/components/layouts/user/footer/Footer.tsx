@@ -53,7 +53,7 @@ export default function Footer() {
               {categories.map((category) => (
                 <li key={category.slug}>
                   <Link
-                    to={`/#`}
+                    to={`/product-catalog?category=${category.slug}`}
                     className="text-muted-foreground hover:text-foreground transition"
                   >
                     {category.name}
@@ -72,7 +72,7 @@ export default function Footer() {
             <ul className="mt-3 space-y-2 text-sm">
               <li>
                 <Link
-                  to="/#"
+                  to="/about"
                   className="text-muted-foreground hover:text-foreground transition"
                 >
                   Trung tâm hỗ trợ
@@ -80,7 +80,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  to="/#"
+                  to="/about"
                   className="text-muted-foreground hover:text-foreground transition"
                 >
                   Chính sách bảo hành
@@ -88,7 +88,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  to="/#"
+                  to="/about"
                   className="text-muted-foreground hover:text-foreground transition"
                 >
                   Vận chuyển & giao hàng
@@ -96,7 +96,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  to="/#"
+                  to="/about"
                   className="text-muted-foreground hover:text-foreground transition"
                 >
                   Liên hệ
