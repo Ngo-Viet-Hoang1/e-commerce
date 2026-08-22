@@ -1,16 +1,15 @@
-import { DataTable } from '@/components/common/table/DataTable'
-import type { OrderStatus, PaymentStatus } from '@/constants/order.constants'
+import { DataTable } from '@/shared/ui/table/DataTable'
+import type { OrderStatus, PaymentStatus } from '@/entities/order'
 import {
   createModalState,
   isViewMode,
   type ModalState,
-} from '@/interfaces/modal.interface'
-import type { Order } from '@/interfaces/order.interface'
-import type { PaginationParams } from '@/interfaces/pagination.interface'
+} from '@/shared/types'
+import type { Order } from '@/entities/order'
+import type { PaginationParams } from '@/shared/types'
 import { useState } from 'react'
 import createOrderColumns from './Columns'
-import { useOrders, useUpdateOrderStatus } from './order.queries'
-import { ViewOrderDialog } from './ViewOrderDialog'
+import { useOrders, useUpdateOrderStatus, ViewOrderDialog } from '@/features/manage-order'
 
 const OrderManagement = () => {
   const [modalState, setModalState] = useState<ModalState<Order>>(null)

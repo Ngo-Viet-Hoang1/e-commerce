@@ -1,18 +1,17 @@
-import { ConfirmDialog } from '@/components/common/ConfirmDialog'
-import { DataTable } from '@/components/common/table/DataTable'
+import { ConfirmDialog } from '@/shared/ui/ConfirmDialog'
+import { DataTable } from '@/shared/ui/table/DataTable'
 import {
   createModalState,
   isDeleteMode,
   isViewMode,
   type ModalState,
-} from '@/interfaces/modal.interface'
-import type { PaginationParams } from '@/interfaces/pagination.interface'
-import type { Product } from '@/interfaces/product.interface'
+} from '@/shared/types'
+import type { PaginationParams } from '@/shared/types'
+import type { Product } from '@/entities/product'
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import createProductColumns from './Columns'
-import { useDeleteProduct, useProducts } from './product.queries'
-import { ViewProductDialog } from './ViewProductDialog'
+import { useDeleteProduct, useProducts, ViewProductDialog } from '@/features/manage-product'
 
 const ProductManagement = () => {
   const navigate = useNavigate()

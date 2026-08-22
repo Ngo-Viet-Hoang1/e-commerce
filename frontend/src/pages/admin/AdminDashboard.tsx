@@ -1,18 +1,18 @@
 import { useQueries, useQuery } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
-import AdminOrderService from '@/api/services/admin/order.admin.service'
-import AdminProductService from '@/api/services/admin/product.admin.service'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { AdminOrderService } from '@/entities/order'
+import { AdminProductService } from '@/entities/product'
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/ui/avatar'
+import { Badge } from '@/shared/ui/badge'
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { Skeleton } from '@/components/ui/skeleton'
+} from '@/shared/ui/select'
+import { Skeleton } from '@/shared/ui/skeleton'
 import {
   Table,
   TableBody,
@@ -20,18 +20,18 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import type { Order } from '@/interfaces/order.interface'
+} from '@/shared/ui/table'
+import type { Order } from '@/entities/order'
 import {
   getOrderStatusColor,
   getOrderStatusLabel,
-} from '@/constants/order.constants'
+} from '@/entities/order'
 import {
   formatCurrency,
   formatDate,
   formatNumber,
   formatPercent,
-} from '@/lib/format'
+} from '@/shared/utils'
 
 const DASHBOARD_ORDERS_LIMIT = 500
 

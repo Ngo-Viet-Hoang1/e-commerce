@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button'
+import { Button } from '@/shared/ui/button'
 import { Plus } from 'lucide-react'
 
 const UserTableToolbar = ({ onCreate }: { onCreate: () => void }) => {

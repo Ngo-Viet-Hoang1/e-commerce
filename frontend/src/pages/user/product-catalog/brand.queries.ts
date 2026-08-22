@@ -1,5 +1,5 @@
-import BrandService from '@/api/services/user/brand.service'
-import type { PaginationParams } from '@/interfaces/pagination.interface'
+import { BrandService } from '@/entities/brand'
+import type { PaginationParams } from '@/shared/types'
 import { useQuery } from '@tanstack/react-query'
 
 export const queryKeys = {

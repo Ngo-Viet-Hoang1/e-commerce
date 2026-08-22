@@ -1,15 +1,15 @@
-import { Button } from '@/components/ui/button'
+import { Button } from '@/shared/ui/button'
 import { Pencil, Trash2 } from 'lucide-react'
-import { formatDate } from '@/lib/format'
+import { formatDate } from '@/shared/utils'
 import type { ColumnDef } from '@tanstack/react-table'
 
-import { DataTableColumnHeader } from '@/components/common/table/DataTableColumnHeader'
-import rowSelectionColumn from '@/components/common/table/RowSelectionColumn'
+import { DataTableColumnHeader } from '@/shared/ui/table/DataTableColumnHeader'
+import rowSelectionColumn from '@/shared/ui/table/RowSelectionColumn'
 import {
   TableCellAlign,
   TableTextCell,
-} from '@/components/common/table/TableCellWrapper'
-import type { Badge } from '@/interfaces/badge.interface'
+} from '@/shared/ui/table/TableCellWrapper'
+import type { Badge } from '@/entities/badge'
 
 interface CreateBadgeColumnsProps {
   onEdit?: (badge: Badge) => void

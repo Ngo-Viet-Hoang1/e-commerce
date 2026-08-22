@@ -1,16 +1,15 @@
 'use client'
 
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { Badge } from '@/shared/ui/badge'
+import { Button } from '@/shared/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+} from '@/shared/ui/dropdown-menu'
 import { ChevronDown, SlidersHorizontal, X } from 'lucide-react'
-import { useState } from 'react'
 
 export interface CategoryOption {
   id: number | 'all'
@@ -39,14 +38,18 @@ interface CategoryFilterProps {
   selectedPriceRange: string
   selectedBrand: number | 'all'
   selectedSort: string
+  searchQuery?: string
   showingCount: number
   onCategoryChange: (value: number | 'all') => void
   onPriceRangeChange: (value: string) => void
   onBrandChange: (value: number | 'all') => void
   onSortChange: (value: string) => void
+  onClearSearch?: () => void
+  onClearAll?: () => void
 }
 
 const sortOptions = [
+  { id: 'featured', label: 'Nổi bật nhất' },
   { id: 'price-low', label: 'Giá: Thấp đến Cao' },
   { id: 'price-high', label: 'Giá: Cao đến Thấp' },
 ]
@@ -59,22 +62,22 @@ export default function CategoryFilter({
   selectedPriceRange,
   selectedBrand,
   selectedSort,
+  searchQuery = '',
   showingCount,
   onCategoryChange,
   onPriceRangeChange,
   onBrandChange,
   onSortChange,
+  onClearSearch,
+  onClearAll,
 }: CategoryFilterProps) {
-  const [searchQuery, setSearchQuery] = useState('')
-
   const activeFilters = []
   if (selectedCategory !== 'all') {
     const category = categories.find((c) => c.id === selectedCategory)
     if (category)
       activeFilters.push({
         type: 'category',
-        label: category.name,
-        value: selectedCategory,
+        label: `Danh mục: ${category.name}`,
       })
   }
   if (selectedPriceRange !== 'all') {
@@ -82,8 +85,7 @@ export default function CategoryFilter({
     if (priceRange)
       activeFilters.push({
         type: 'price',
-        label: priceRange.label,
-        value: selectedPriceRange,
+        label: `Giá: ${priceRange.label}`,
       })
   }
   if (selectedBrand !== 'all') {
@@ -91,15 +93,13 @@ export default function CategoryFilter({
     if (brand)
       activeFilters.push({
         type: 'brand',
-        label: brand.name,
-        value: selectedBrand,
+        label: `Thương hiệu: ${brand.name}`,
       })
   }
-  if (searchQuery) {
+  if (searchQuery.trim()) {
     activeFilters.push({
       type: 'search',
-      label: `"${searchQuery}"`,
-      value: searchQuery,
+      label: `Tìm kiếm: "${searchQuery.trim()}"`,
     })
   }
 
@@ -107,28 +107,31 @@ export default function CategoryFilter({
     if (type === 'category') onCategoryChange('all')
     if (type === 'price') onPriceRangeChange('all')
     if (type === 'brand') onBrandChange('all')
-    if (type === 'search') setSearchQuery('')
+    if (type === 'search' && onClearSearch) onClearSearch()
   }
 
   const clearAllFilters = () => {
-    onCategoryChange('all')
-    onPriceRangeChange('all')
-    onBrandChange('all')
-    setSearchQuery('')
+    if (onClearAll) {
+      onClearAll()
+    } else {
+      onCategoryChange('all')
+      onPriceRangeChange('all')
+      onBrandChange('all')
+      if (onClearSearch) onClearSearch()
+    }
   }
 
   return (
     <section className="pb-8">
       <div className="mb-6 space-y-4">
-        {/* Search and Sort Row */}
-        {/* Category and Price Filter Row */}
+        {/* Category, Brand, and Price Filter Row */}
         <div className="flex flex-wrap gap-3">
           {/* Category Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm" className="cursor-pointer">
                 Danh mục:{' '}
-                {categories.find((c) => c.id === selectedCategory)?.name}
+                {categories.find((c) => c.id === selectedCategory)?.name ?? 'Tất cả'}
                 <ChevronDown className="ms-2 size-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -138,7 +141,7 @@ export default function CategoryFilter({
                   key={category.id}
                   onClick={() => onCategoryChange(category.id)}
                   className={
-                    selectedCategory === category.id ? 'bg-accent' : ''
+                    selectedCategory === category.id ? 'bg-accent font-medium' : ''
                   }
                 >
                   <div className="flex w-full items-center justify-between">
@@ -154,10 +157,12 @@ export default function CategoryFilter({
             </DropdownMenuContent>
           </DropdownMenu>
 
+          {/* Brand Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm" className="cursor-pointer">
-                Thương hiệu: {brands.find((b) => b.id === selectedBrand)?.name}
+                Thương hiệu:{' '}
+                {brands.find((b) => b.id === selectedBrand)?.name ?? 'Tất cả'}
                 <ChevronDown className="ms-2 size-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -166,7 +171,7 @@ export default function CategoryFilter({
                 <DropdownMenuItem
                   key={brand.id}
                   onClick={() => onBrandChange(brand.id)}
-                  className={selectedBrand === brand.id ? 'bg-accent' : ''}
+                  className={selectedBrand === brand.id ? 'bg-accent font-medium' : ''}
                 >
                   <div className="flex w-full items-center justify-between">
                     <span>{brand.name}</span>
@@ -185,8 +190,8 @@ export default function CategoryFilter({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm" className="cursor-pointer">
-                Giá:{' '}
-                {priceRanges.find((p) => p.id === selectedPriceRange)?.label}
+                Mức giá:{' '}
+                {priceRanges.find((p) => p.id === selectedPriceRange)?.label ?? 'Tất cả'}
                 <ChevronDown className="ms-2 size-4" />
               </Button>
             </DropdownMenuTrigger>
@@ -195,7 +200,7 @@ export default function CategoryFilter({
                 <DropdownMenuItem
                   key={range.id}
                   onClick={() => onPriceRangeChange(range.id)}
-                  className={selectedPriceRange === range.id ? 'bg-accent' : ''}
+                  className={selectedPriceRange === range.id ? 'bg-accent font-medium' : ''}
                 >
                   {range.label}
                 </DropdownMenuItem>
@@ -204,23 +209,23 @@ export default function CategoryFilter({
           </DropdownMenu>
         </div>
 
-        {/* Active Filters */}
+        {/* Active Filters Bar */}
         {activeFilters.length > 0 && (
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2 pt-1">
             <span className="text-muted-foreground text-sm font-medium">
-              Bộ lọc đang áp dụng:
+              Đang lọc theo:
             </span>
             {activeFilters.map((filter, index) => (
-              <Badge key={index} variant="secondary">
+              <Badge key={index} variant="secondary" className="gap-1 px-2.5 py-1">
                 {filter.label}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto cursor-pointer p-1! text-inherit"
+                <button
+                  type="button"
+                  className="hover:bg-muted-foreground/20 rounded-full p-0.5 transition-colors cursor-pointer"
                   onClick={() => clearFilter(filter.type)}
+                  aria-label={`Xóa bộ lọc ${filter.label}`}
                 >
                   <X className="size-3" />
-                </Button>
+                </button>
               </Badge>
             ))}
             <DropdownMenuSeparator className="mx-2" />
@@ -228,38 +233,38 @@ export default function CategoryFilter({
               variant="ghost"
               size="sm"
               onClick={clearAllFilters}
-              className="text-muted-foreground h-auto cursor-pointer p-1.5 text-xs"
+              className="text-muted-foreground h-auto cursor-pointer p-1.5 text-xs hover:text-foreground"
             >
-              Xóa tất cả
+              Xóa tất cả bộ lọc
             </Button>
           </div>
         )}
       </div>
 
-      {/* Results Summary */}
-      <div className="bg-muted/50 rounded-lg border p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <span className="text-sm font-medium">
-              Hiển thị {showingCount} kết quả
+      {/* Results Summary & Sorting Bar */}
+      <div className="bg-muted/40 rounded-xl border p-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-foreground">
+              Hiển thị {showingCount} sản phẩm
             </span>
-            {searchQuery && (
+            {searchQuery.trim() && (
               <span className="text-muted-foreground text-sm">
-                cho "{searchQuery}"
+                cho từ khóa &ldquo;<strong className="text-foreground">{searchQuery.trim()}</strong>&rdquo;
               </span>
             )}
           </div>
-          <div className="text-muted-foreground text-xs">
-            {/* Sort Dropdown */}
+          <div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
-                  className="ml-auto w-full cursor-pointer sm:w-auto"
+                  size="sm"
+                  className="cursor-pointer"
                 >
                   <SlidersHorizontal className="me-2 size-4" />
                   Sắp xếp:{' '}
-                  {sortOptions.find((s) => s.id === selectedSort)?.label}
+                  {sortOptions.find((s) => s.id === selectedSort)?.label ?? 'Nổi bật nhất'}
                   <ChevronDown className="ms-2 size-4" />
                 </Button>
               </DropdownMenuTrigger>
@@ -268,7 +273,7 @@ export default function CategoryFilter({
                   <DropdownMenuItem
                     key={option.id}
                     onClick={() => onSortChange(option.id)}
-                    className={selectedSort === option.id ? 'bg-accent' : ''}
+                    className={selectedSort === option.id ? 'bg-accent font-medium' : ''}
                   >
                     {option.label}
                   </DropdownMenuItem>

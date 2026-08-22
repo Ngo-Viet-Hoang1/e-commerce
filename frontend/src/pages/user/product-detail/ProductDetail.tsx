@@ -1,28 +1,27 @@
 import ImageCarousel_Basic, {
   type CarouselImage,
-} from '@/components/commerce-ui/image-carousel-basic'
-import ProductCard from '@/components/common/product-card/ProductCard'
+} from '@/shared/ui/commerce-ui/image-carousel-basic'
+import ProductCard from '@/entities/product'
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from '@/components/ui/carousel'
-import { Skeleton } from '@/components/ui/skeleton'
-import { DEFAULT_IMAGE_URL } from '@/constants'
-import { useProductVariants } from '@/hooks/useProductVariants'
-import { useAddToCart } from '@/hooks/useCart'
-import type { Product, ProductVariant } from '@/interfaces/product.interface'
+} from '@/shared/ui/carousel'
+import { Skeleton } from '@/shared/ui/skeleton'
+import { DEFAULT_IMAGE_URL } from '@/shared/constants'
+import { useProductVariants } from '@/entities/product'
+import { useAddToCart } from '@/features/cart'
+import type { Product, ProductVariant } from '@/entities/product'
 import {
   useProductBySlug,
   useProductsByBrand,
-} from '@/pages/admin/ProductManagement/product.queries'
-import { useParams, useNavigate } from 'react-router-dom'
+} from '@/features/manage-product'
+import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useMemo } from 'react'
-import { ProductInfo } from './ProductInfo'
-import { ProductTabs } from './ProductTabs'
-import { useAuthStore } from '@/store/zustand/useAuthStore'
+import { ProductInfo, ProductTabs } from '@/widgets/product-detail'
+import { useAuthStore } from '@/features/auth'
 import { toast } from 'sonner'
 
 const getProductImageUrl = (product: Product) => {
@@ -223,12 +222,12 @@ function ProductNotFound() {
       <p className="text-muted-foreground mt-2">
         Sản phẩm bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.
       </p>
-      <a
-        href="/products"
-        className="text-primary mt-4 inline-block hover:underline"
+      <Link
+        to="/product-catalog"
+        className="text-primary mt-4 inline-block font-medium hover:underline"
       >
         Quay lại danh sách sản phẩm
-      </a>
+      </Link>
     </div>
   )
 }

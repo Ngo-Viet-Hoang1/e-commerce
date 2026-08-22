@@ -1,0 +1,5 @@
+export { default as Hero } from './Hero'
+export { default as BestSeller } from './BestSeller'
+export { default as TodayBestDeal } from './TodayBestDeal'
+export { default as Brand } from './Brand'
+export { default as Banner } from './Banner'

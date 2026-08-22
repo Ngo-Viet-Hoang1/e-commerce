@@ -1,21 +1,21 @@
-import { OrderDetail } from '@/components/common/OrderDetail'
-import { Button } from '@/components/ui/button'
+import { OrderDetail } from '@/entities/order/ui/OrderDetail'
+import { Button } from '@/shared/ui/button'
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
-import { Skeleton } from '@/components/ui/skeleton'
-import type { Order } from '@/interfaces/order.interface'
-import type { PaginationParams } from '@/interfaces/pagination.interface'
+} from '@/shared/ui/dialog'
+import { Skeleton } from '@/shared/ui/skeleton'
+import type { Order } from '@/entities/order'
+import type { PaginationParams } from '@/shared/types'
 import { useState } from 'react'
-import { useCancelUserOrder, useUserOrders } from '@/hooks/useOrder'
+import { useCancelUserOrder, useUserOrders } from '@/entities/order'
 import OrderItems from './OrderItems'
 import { Package } from 'lucide-react'
-import { ConfirmDialog } from '@/components/common/ConfirmDialog'
-import UserOrderService from '@/api/services/user/order.user.service'
-import { downloadBlob, generateOrderPDFFilename } from '@/utils/download'
+import { ConfirmDialog } from '@/shared/ui/ConfirmDialog'
+import { UserOrderService } from '@/entities/order'
+import { downloadBlob, generateOrderPDFFilename } from '@/shared/utils/download'
 import { toast } from 'sonner'
 
 const OrdersPage = () => {

@@ -1,29 +1,29 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { Badge } from '@/components/ui/badge'
+import { Badge } from '@/shared/ui/badge'
 import {
   DropdownMenuItem,
   DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu'
+} from '@/shared/ui/dropdown-menu'
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip'
-import { formatDate, formatDateTime } from '@/lib/format'
+} from '@/shared/ui/tooltip'
+import { formatDate, formatDateTime } from '@/shared/utils'
 import type { ColumnDef } from '@tanstack/react-table'
 import { Check, Lock, LockOpen, ShieldCheck, X } from 'lucide-react'
 
-import { DataTableColumnHeader } from '@/components/common/table/DataTableColumnHeader'
-import rowSelectionColumn from '@/components/common/table/RowSelectionColumn'
-import { StatusBadge } from '@/components/common/table/StatusBadge'
-import TableActions from '@/components/common/table/TableActions'
+import { DataTableColumnHeader } from '@/shared/ui/table/DataTableColumnHeader'
+import rowSelectionColumn from '@/shared/ui/table/RowSelectionColumn'
+import { StatusBadge } from '@/shared/ui/table/StatusBadge'
+import TableActions from '@/shared/ui/table/TableActions'
 import {
   TableCellAlign,
   TableIconCell,
   TableTextCell,
-} from '@/components/common/table/TableCellWrapper'
-import type { User } from '@/interfaces/user.interface'
+} from '@/shared/ui/table/TableCellWrapper'
+import type { User } from '@/entities/user'
 
 interface CreateUserColumnsProps {
   onView?: (user: User) => void

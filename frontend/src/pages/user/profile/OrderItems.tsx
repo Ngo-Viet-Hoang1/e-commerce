@@ -4,8 +4,8 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
+} from '@/shared/ui/card'
+import { Button } from '@/shared/ui/button'
 import {
   Table,
   TableBody,
@@ -14,15 +14,15 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { Badge } from '@/components/ui/badge'
+} from '@/shared/ui/table'
+import { Badge } from '@/shared/ui/badge'
 import { Package } from 'lucide-react'
-import type { Order } from '@/interfaces/order.interface'
-import { formatCurrency, formatDate } from '@/lib/format'
+import type { Order } from '@/entities/order'
+import { formatCurrency, formatDate } from '@/shared/utils'
 import {
   getOrderStatusColor,
   getOrderStatusLabel,
-} from '@/constants/order.constants'
+} from '@/entities/order'
 
 interface OrderItemsProps {
   order: Order

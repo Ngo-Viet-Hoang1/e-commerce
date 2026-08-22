@@ -1,18 +1,18 @@
 import {
   DropdownMenuItem,
   DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu'
-import { formatDate } from '@/lib/format'
+} from '@/shared/ui/dropdown-menu'
+import { formatDate } from '@/shared/utils'
 import type { ColumnDef } from '@tanstack/react-table'
 
-import { DataTableColumnHeader } from '@/components/common/table/DataTableColumnHeader'
-import rowSelectionColumn from '@/components/common/table/RowSelectionColumn'
-import TableActions from '@/components/common/table/TableActions'
+import { DataTableColumnHeader } from '@/shared/ui/table/DataTableColumnHeader'
+import rowSelectionColumn from '@/shared/ui/table/RowSelectionColumn'
+import TableActions from '@/shared/ui/table/TableActions'
 import {
   TableCellAlign,
   TableTextCell,
-} from '@/components/common/table/TableCellWrapper'
-import type { Category } from '@/interfaces/category.interface'
+} from '@/shared/ui/table/TableCellWrapper'
+import type { Category } from '@/entities/category'
 
 interface CreateCategoryColumnsProps {
   onView?: (category: Category) => void

@@ -1,19 +1,17 @@
-import { ConfirmDialog } from '@/components/common/ConfirmDialog'
-import { DataTable } from '@/components/common/table/DataTable'
+import { ConfirmDialog } from '@/shared/ui/ConfirmDialog'
+import { DataTable } from '@/shared/ui/table/DataTable'
 import {
   createModalState,
   isCreateMode,
   isDeleteMode,
   isEditMode,
   type ModalState,
-} from '@/interfaces/modal.interface'
-import type { PaginationParams } from '@/interfaces/pagination.interface'
-import type { User } from '@/interfaces/user.interface'
+} from '@/shared/types'
+import type { PaginationParams } from '@/shared/types'
+import type { User } from '@/entities/user'
 import { useState } from 'react'
 import createUserColumns from './Columns'
-import { CreateUserForm } from './CreateUserForm'
-import { EditUserForm } from './EditUserForm'
-import { useDeleteUser, useUsers } from './user.queries'
+import { CreateUserForm, EditUserForm, useDeleteUser, useUsers } from '@/features/manage-user'
 import UserTableToolbar from './UserTableToolbar'
 
 const UserManagement = () => {

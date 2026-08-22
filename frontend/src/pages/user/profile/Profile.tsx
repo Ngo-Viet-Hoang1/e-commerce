@@ -1,4 +1,4 @@
-import { useAuthStore } from '@/store/zustand/useAuthStore'
+import { useAuthStore } from '@/features/auth'
 import { Heart, LogOut, Mail, Package, User } from 'lucide-react'
 import { NavLink, Outlet } from 'react-router-dom'
 

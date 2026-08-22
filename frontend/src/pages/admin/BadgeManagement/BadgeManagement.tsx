@@ -1,12 +1,10 @@
-import { ConfirmDialog } from '@/components/common/ConfirmDialog'
-import { DataTable } from '@/components/common/table/DataTable'
-import type { PaginationParams } from '@/interfaces/pagination.interface'
-import type { Badge } from '@/interfaces/badge.interface'
+import { ConfirmDialog } from '@/shared/ui/ConfirmDialog'
+import { DataTable } from '@/shared/ui/table/DataTable'
+import type { PaginationParams } from '@/shared/types'
+import type { Badge } from '@/entities/badge'
 import { useState } from 'react'
 import createBadgeColumns from './Columns'
-import { CreateBadgeForm } from './CreateBadgeForm'
-import { EditBadgeForm } from './EditBadgeForm'
-import { useDeleteBadge, useBadges } from './badge.queries'
+import { CreateBadgeForm, EditBadgeForm, useDeleteBadge, useBadges } from '@/features/manage-badge'
 import BadgeTableToolbar from './BadgeTableToolbar'
 
 type ModalMode = 'create' | 'edit' | 'delete' | null

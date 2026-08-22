@@ -1,20 +1,20 @@
-import { DropdownMenuItem } from '@/components/ui/dropdown-menu'
-import { formatCurrency, formatDate } from '@/lib/format'
+import { DropdownMenuItem } from '@/shared/ui/dropdown-menu'
+import { formatCurrency, formatDate } from '@/shared/utils'
 import type { ColumnDef } from '@tanstack/react-table'
 import { Package } from 'lucide-react'
 
-import { DataTableColumnHeader } from '@/components/common/table/DataTableColumnHeader'
-import rowSelectionColumn from '@/components/common/table/RowSelectionColumn'
-import TableActions from '@/components/common/table/TableActions'
+import { DataTableColumnHeader } from '@/shared/ui/table/DataTableColumnHeader'
+import rowSelectionColumn from '@/shared/ui/table/RowSelectionColumn'
+import TableActions from '@/shared/ui/table/TableActions'
 import {
   TableCellAlign,
   TableIconCell,
   TableTextCell,
-} from '@/components/common/table/TableCellWrapper'
+} from '@/shared/ui/table/TableCellWrapper'
 import {
   StatusDropdown,
   type StatusOption,
-} from '@/components/common/StatusDropdown'
+} from '@/shared/ui/StatusDropdown'
 import {
   getAvailableOrderStatuses,
   getAvailablePaymentStatuses,
@@ -24,8 +24,8 @@ import {
   getPaymentStatusLabel,
   type OrderStatus,
   type PaymentStatus,
-} from '@/constants/order.constants'
-import type { Order } from '@/interfaces/order.interface'
+} from '@/entities/order'
+import type { Order } from '@/entities/order'
 
 interface CreateOrderColumnsProps {
   onView?: (order: Order) => void

@@ -1,19 +1,17 @@
-import { ConfirmDialog } from '@/components/common/ConfirmDialog'
-import { DataTable } from '@/components/common/table/DataTable'
+import { ConfirmDialog } from '@/shared/ui/ConfirmDialog'
+import { DataTable } from '@/shared/ui/table/DataTable'
 import {
   createModalState,
   isCreateMode,
   isDeleteMode,
   isEditMode,
   type ModalState,
-} from '@/interfaces/modal.interface'
-import type { PaginationParams } from '@/interfaces/pagination.interface'
-import type { Category } from '@/interfaces/category.interface'
+} from '@/shared/types'
+import type { PaginationParams } from '@/shared/types'
+import type { Category } from '@/entities/category'
 import { useState } from 'react'
 import createCategoryColumns from './Columns'
-import { CreateCategoryForm } from './CreateCategoryForm'
-import { EditCategoryForm } from './EditCategoryForm'
-import { useDeleteCategory, useCategories } from './category.queries'
+import { CreateCategoryForm, EditCategoryForm, useDeleteCategory, useCategories } from '@/features/manage-category'
 import CategoryTableToolbar from './CategoryTableToolbar'
 
 const CategoryManagement = () => {

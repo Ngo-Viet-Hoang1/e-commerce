@@ -1,15 +1,15 @@
-import { Button } from '@/components/ui/button'
-import { Skeleton } from '@/components/ui/skeleton'
-import { DEFAULT_IMAGE_URL, SORT_ORDER } from '@/constants'
-import ProductCard from '@/components/common/product-card/ProductCard'
-import type { Brand } from '@/interfaces/brand.interface'
-import type { Category } from '@/interfaces/category.interface'
-import type { Product } from '@/interfaces/product.interface'
+import { Button } from '@/shared/ui/button'
+import { Skeleton } from '@/shared/ui/skeleton'
+import { DEFAULT_IMAGE_URL, SORT_ORDER } from '@/shared/constants'
+import ProductCard from '@/entities/product'
+import type { Brand } from '@/entities/brand'
+import type { Category } from '@/entities/category'
+import type { Product } from '@/entities/product'
 import {
   useAddFavorite,
   useFavoriteProducts,
   useRemoveFavorite,
-} from '@/pages/user/profile/Favorite/favoriteProducts.queries'
+} from '@/features/wishlist'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import CategoryFilter, {
@@ -21,18 +21,26 @@ import { useBrands } from './brand.queries'
 import { useCategories } from './category.queries'
 import { useAllCatalogProducts } from './product.queries'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { useAuthStore } from '@/store/zustand/useAuthStore'
+import { useAuthStore } from '@/features/auth'
+import { PackageSearch, RotateCcw } from 'lucide-react'
 
 export default function ProductCatalog() {
   const navigate = useNavigate()
   const { isAuthenticated } = useAuthStore()
-  const [searchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
+  
+  const searchQuery = searchParams.get('search') ?? ''
   const initialBrand = Number(searchParams.get('brandId'))
   const initialBrandFilter =
     Number.isFinite(initialBrand) && initialBrand > 0 ? initialBrand : 'all'
+
   const [page, setPage] = useState(1)
   const [limit] = useState(12)
   const [selectedSort, setSelectedSort] = useState('featured')
+  const [selectedCategory, setSelectedCategory] = useState<number | 'all'>('all')
+  const [selectedPriceRange, setSelectedPriceRange] = useState('all')
+  const [selectedBrand, setSelectedBrand] = useState<number | 'all'>(initialBrandFilter)
+
   const allProductsParams = useMemo(
     () => ({ page: 1, limit: 100, sort: 'createdAt', order: SORT_ORDER.DEST }),
     [],
@@ -42,29 +50,24 @@ export default function ProductCatalog() {
     isPending,
     error,
   } = useAllCatalogProducts(allProductsParams)
+
   const categoryParams = useMemo(
     () => ({ page: 1, limit: 100, sort: 'name', order: SORT_ORDER.ASC }),
     [],
   )
   const { data: categoryData } = useCategories(categoryParams)
+
   const brandParams = useMemo(
     () => ({ page: 1, limit: 100, sort: 'name', order: SORT_ORDER.ASC }),
     [],
   )
   const { data: brandData } = useBrands(brandParams)
+
   const { data: favoritesData } = useFavoriteProducts()
   const addFavorite = useAddFavorite()
   const removeFavorite = useRemoveFavorite()
-  const [pendingFavoriteId, setPendingFavoriteId] = useState<number | null>(
-    null,
-  )
-  const [selectedCategory, setSelectedCategory] = useState<number | 'all'>(
-    'all',
-  )
-  const [selectedPriceRange, setSelectedPriceRange] = useState('all')
-  const [selectedBrand, setSelectedBrand] = useState<number | 'all'>(
-    initialBrandFilter,
-  )
+  const [pendingFavoriteId, setPendingFavoriteId] = useState<number | null>(null)
+
   const allProducts = useMemo<Product[]>(
     () => allProductsData ?? [],
     [allProductsData],
@@ -74,13 +77,14 @@ export default function ProductCatalog() {
     [categoryData?.data],
   )
   const brands = useMemo(() => brandData?.data ?? [], [brandData?.data])
+  
   const favoriteIds = useMemo(() => {
-    return new Set((favoritesData?.data ?? []).map((product) => product.id))
+    return new Set((favoritesData?.data ?? []).map((product: Product) => product.id))
   }, [favoritesData?.data])
 
   const handleToggleFavorite = (productId: number, isFavorite: boolean) => {
     if (!isAuthenticated) {
-      toast.error('Vui lòng đăng nhập để thêm vào yêu thích')
+      toast.error('Vui lòng đăng nhập để thêm vào danh sách yêu thích')
       navigate('/auth/login', { state: { from: window.location.pathname } })
       return
     }
@@ -138,7 +142,7 @@ export default function ProductCatalog() {
       count: categoryCounts.get(category.id),
     }))
     return [
-      { id: 'all', name: 'Tất cả sản phẩm', count: totalProducts },
+      { id: 'all', name: 'Tất cả danh mục', count: totalProducts },
       ...dbCategories,
     ]
   }, [categories, categoryCounts, totalProducts])
@@ -157,16 +161,36 @@ export default function ProductCatalog() {
     [priceRanges, selectedPriceRange],
   )
 
+  // Filter products by Search, Category, Brand, Price
   const filteredProducts = useMemo(() => {
+    const normalizedSearch = searchQuery.trim().toLowerCase()
+
     return allProducts.filter((product) => {
+      // 1. Search Query Matching (Name, SKU, Description)
+      if (normalizedSearch) {
+        const nameMatch = product.name?.toLowerCase().includes(normalizedSearch)
+        const skuMatch = product.sku?.toLowerCase().includes(normalizedSearch)
+        const descMatch = product.description?.toLowerCase().includes(normalizedSearch)
+        const shortDescMatch = product.shortDescription?.toLowerCase().includes(normalizedSearch)
+        if (!nameMatch && !skuMatch && !descMatch && !shortDescMatch) {
+          return false
+        }
+      }
+
+      // 2. Category Filter
       const categoryId = product.categoryId ?? product.category?.id
       const matchesCategory =
         selectedCategory === 'all' || categoryId === selectedCategory
+      if (!matchesCategory) return false
+
+      // 3. Brand Filter
       const brandId = product.brandId ?? product.brand?.id
       const matchesBrand = selectedBrand === 'all' || brandId === selectedBrand
+      if (!matchesBrand) return false
 
+      // 4. Price Filter
       if (!selectedPrice || selectedPrice.id === 'all') {
-        return matchesCategory && matchesBrand
+        return true
       }
 
       const variantPrices =
@@ -184,9 +208,9 @@ export default function ProductCatalog() {
           ? priceValue >= selectedPrice.min
           : priceValue >= selectedPrice.min && priceValue < selectedPrice.max
 
-      return matchesCategory && matchesBrand && matchesPrice
+      return matchesPrice
     })
-  }, [allProducts, selectedCategory, selectedBrand, selectedPrice])
+  }, [allProducts, searchQuery, selectedCategory, selectedBrand, selectedPrice])
 
   const sortedProducts = useMemo(() => {
     const items = [...filteredProducts]
@@ -242,9 +266,24 @@ export default function ProductCatalog() {
     setPage(1)
   }
 
+  const handleClearSearch = () => {
+    const nextParams = new URLSearchParams(searchParams)
+    nextParams.delete('search')
+    setSearchParams(nextParams)
+    setPage(1)
+  }
+
+  const handleClearAll = () => {
+    setSelectedCategory('all')
+    setSelectedPriceRange('all')
+    setSelectedBrand('all')
+    navigate('/product-catalog')
+    setPage(1)
+  }
+
   return (
-    <div className="bg-white">
-      <h2 className="sr-only">Sản phẩm</h2>
+    <div className="bg-white dark:bg-gray-950 py-4">
+      <h1 className="sr-only">Danh mục sản phẩm</h1>
 
       <CategoryFilter
         categories={categoryOptions}
@@ -254,26 +293,56 @@ export default function ProductCatalog() {
         selectedPriceRange={selectedPriceRange}
         selectedBrand={selectedBrand}
         selectedSort={selectedSort}
-        showingCount={pagedProducts.length}
+        searchQuery={searchQuery}
+        showingCount={sortedProducts.length}
         onCategoryChange={handleCategoryChange}
         onPriceRangeChange={handlePriceRangeChange}
         onBrandChange={handleBrandChange}
         onSortChange={handleSortChange}
+        onClearSearch={handleClearSearch}
+        onClearAll={handleClearAll}
       />
 
-      <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
+      {/* Product Grid */}
+      <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8 min-h-[300px]">
         {isPending &&
           Array.from({ length: 8 }).map((_, index) => (
             <div key={index} className="group">
-              <Skeleton className="aspect-square w-full rounded-lg xl:aspect-7/8" />
+              <Skeleton className="aspect-square w-full rounded-xl" />
               <Skeleton className="mt-4 h-4 w-2/3" />
               <Skeleton className="mt-2 h-5 w-1/3" />
             </div>
           ))}
 
         {!isPending && error && (
-          <div className="text-sm text-red-600">
-            Không thể tải danh sách sản phẩm
+          <div className="col-span-full py-12 text-center text-sm text-red-500">
+            Không thể tải danh sách sản phẩm. Vui lòng thử lại sau.
+          </div>
+        )}
+
+        {!isPending && !error && pagedProducts.length === 0 && (
+          <div className="col-span-full py-16 text-center space-y-4">
+            <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-muted">
+              <PackageSearch className="size-8 text-muted-foreground" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-lg font-semibold text-foreground">
+                Không tìm thấy sản phẩm nào
+              </h3>
+              <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                {searchQuery
+                  ? `Không có kết quả phù hợp với từ khóa "${searchQuery}". Vui lòng thử từ khóa khác hoặc xóa bộ lọc.`
+                  : 'Không có sản phẩm nào phù hợp với các tiêu chí bộ lọc bạn đã chọn.'}
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              onClick={handleClearAll}
+              className="gap-2 cursor-pointer"
+            >
+              <RotateCcw className="size-4" />
+              Xóa bộ lọc & Xem tất cả sản phẩm
+            </Button>
           </div>
         )}
 
@@ -317,18 +386,20 @@ export default function ProductCatalog() {
           })}
       </div>
 
+      {/* Pagination */}
       {!isPending && !error && totalPages > 1 && (
-        <div className="mt-10 flex items-center justify-center gap-2">
+        <div className="mt-12 flex items-center justify-center gap-2">
           <Button
             type="button"
             variant="outline"
             size="sm"
             onClick={() => setPage((prev) => Math.max(1, prev - 1))}
             disabled={currentPage <= 1}
+            className="cursor-pointer"
           >
-            Trước
+            Trang trước
           </Button>
-          <span className="text-muted-foreground text-sm">
+          <span className="text-muted-foreground text-sm font-medium px-2">
             Trang {currentPage} / {totalPages}
           </span>
           <Button
@@ -337,8 +408,9 @@ export default function ProductCatalog() {
             size="sm"
             onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
             disabled={currentPage >= totalPages}
+            className="cursor-pointer"
           >
-            Sau
+            Trang sau
           </Button>
         </div>
       )}

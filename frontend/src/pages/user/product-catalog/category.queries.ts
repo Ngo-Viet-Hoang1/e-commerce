@@ -1,5 +1,5 @@
-import CategoryService from '@/api/services/user/category.service'
-import type { PaginationParams } from '@/interfaces/pagination.interface'
+import { CategoryService } from '@/entities/category'
+import type { PaginationParams } from '@/shared/types'
 import { useQuery } from '@tanstack/react-query'
 
 export const queryKeys = {

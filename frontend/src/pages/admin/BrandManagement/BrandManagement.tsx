@@ -1,19 +1,17 @@
-import { ConfirmDialog } from '@/components/common/ConfirmDialog'
-import { DataTable } from '@/components/common/table/DataTable'
+import { ConfirmDialog } from '@/shared/ui/ConfirmDialog'
+import { DataTable } from '@/shared/ui/table/DataTable'
 import {
   createModalState,
   isCreateMode,
   isDeleteMode,
   isEditMode,
   type ModalState,
-} from '@/interfaces/modal.interface'
-import type { PaginationParams } from '@/interfaces/pagination.interface'
-import type { Brand } from '@/interfaces/brand.interface'
+} from '@/shared/types'
+import type { PaginationParams } from '@/shared/types'
+import type { Brand } from '@/entities/brand'
 import { useState } from 'react'
 import createBrandColumns from './Columns'
-import { CreateBrandForm } from './CreateBrandForm'
-import { EditBrandForm } from './EditBrandForm'
-import { useDeleteBrand, useBrands } from './brand.queries'
+import { CreateBrandForm, EditBrandForm, useDeleteBrand, useBrands } from '@/features/manage-brand'
 import BrandTableToolbar from './BrandTableToolbar'
 
 const BrandManagement = () => {

@@ -1,27 +1,27 @@
-import { Button } from '@/components/ui/button'
+import { Button } from '@/shared/ui/button'
 import pLimit from 'p-limit'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Progress } from '@/components/ui/progress'
-import { Spinner } from '@/components/ui/spinner'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { useCloudinaryUpload } from '@/hooks/useCloudinaryUpload'
-import type { CreateProduct } from '@/interfaces/product.interface'
-import { ProductBasicInfo } from '@/pages/admin/ProductManagement/components/ProductBasicInfo'
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
+import { Progress } from '@/shared/ui/progress'
+import { Spinner } from '@/shared/ui/spinner'
+import { Checkbox } from '@/shared/ui/checkbox'
+import { Label } from '@/shared/ui/label'
+import { RHFCombobox } from '@/shared/ui/RHFCombobox'
+import { useCloudinaryUpload } from '@/shared/hooks'
+import type { CreateProduct } from '@/entities/product'
 import {
+  ProductBasicInfo,
   ProductImagesUpload,
   type ProductImageForm,
-} from '@/pages/admin/ProductManagement/components/ProductImagesUpload'
-import {
   ProductVariantForm,
   type VariantFormData,
-} from '@/pages/admin/ProductManagement/components/ProductVariantForm'
-import { Plus } from 'lucide-react'
+  useCreateProduct,
+} from '@/features/manage-product'
+import { ArrowLeft, CheckCircle2, Layers, Plus, Sparkles, UploadCloud } from 'lucide-react'
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
-import { useBrands } from '../BrandManagement/brand.queries'
-import { useCategories } from '../CategoryMangement/category.queries'
-import { useCreateProduct } from './product.queries'
+import { useBrands } from '@/features/manage-brand'
+import { useCategories } from '@/features/manage-category'
 
 export default function CreateProductPage() {
   const navigate = useNavigate()
@@ -46,11 +46,11 @@ export default function CreateProductPage() {
     {
       id: crypto.randomUUID(),
       sku: '',
-      title: '',
+      title: 'Mặc định',
       price: '',
       costPrice: '',
       msrp: '',
-      stockQuantity: '0',
+      stockQuantity: '10',
       isDefault: true,
       attributes: [],
       images: [],
@@ -81,7 +81,7 @@ export default function CreateProductPage() {
     const uploadedVariants = await Promise.all(
       variants.map(async (variant) => {
         const uploadedImages = await Promise.all(
-          variant.images.map((img) =>
+          variant.images.map((img: ProductImageForm) =>
             img.file
               ? limit(async () => {
                   const url = await uploadImage(img.file!, 'products')
@@ -92,20 +92,20 @@ export default function CreateProductPage() {
                         isPrimary: img.isPrimary,
                       }
                     : null
-                })
+                  })
               : Promise.resolve(null),
           ),
         )
 
         return {
           ...variant,
-          images: uploadedImages.filter((img) => img !== null),
+          images: uploadedImages.filter((img): img is NonNullable<typeof img> => img !== null),
         }
       }),
     )
 
     return {
-      productImages: uploadedProductImages.filter((img) => img !== null),
+      productImages: uploadedProductImages.filter((img): img is NonNullable<typeof img> => img !== null),
       variants: uploadedVariants,
     }
   }
@@ -113,40 +113,60 @@ export default function CreateProductPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
+    if (!formData.name.trim()) {
+      toast.error('Vui lòng nhập tên sản phẩm')
+      return
+    }
+
+    if (!formData.sku.trim()) {
+      toast.error('Vui lòng nhập mã sản phẩm (SKU)')
+      return
+    }
+
     if (!formData.brandId || !formData.categoryId) {
-      toast.error('Please select brand and category')
+      toast.error('Vui lòng chọn Thương hiệu và Danh mục cho sản phẩm')
       return
     }
 
     if (variants.length === 0) {
-      toast.error('Please add at least one variant')
+      toast.error('Cần ít nhất một phiên bản sản phẩm')
       return
+    }
+
+    for (const [idx, v] of variants.entries()) {
+      if (!v.sku.trim()) {
+        toast.error(`Phiên bản #${idx + 1} chưa có mã SKU`)
+        return
+      }
+      if (!v.price || Number(v.price) <= 0) {
+        toast.error(`Phiên bản #${idx + 1} cần có giá bán lớn hơn 0`)
+        return
+      }
     }
 
     setIsSubmitting(true)
 
     try {
-      // Upload all images first
       const {
         productImages: uploadedProductImages,
         variants: uploadedVariants,
       } = await uploadAllImages()
 
       const productData: CreateProduct = {
-        name: formData.name,
-        sku: formData.sku,
+        name: formData.name.trim(),
+        sku: formData.sku.trim().toUpperCase(),
         description: formData.description || undefined,
         status: formData.status,
         brandId: Number(formData.brandId),
         categoryId: Number(formData.categoryId),
         isFeatured: formData.isFeatured,
         variants: uploadedVariants.map((v) => ({
-          sku: v.sku,
+          sku: v.sku.trim().toUpperCase(),
           title: v.title || undefined,
           price: Number(v.price),
           costPrice: v.costPrice ? Number(v.costPrice) : undefined,
           msrp: v.msrp ? Number(v.msrp) : undefined,
-          stockQuantity: Number(v.stockQuantity),
+          stockQuantity: Number(v.stockQuantity) || 0,
           isDefault: v.isDefault,
           attributes: v.attributes.length > 0 ? v.attributes : undefined,
           images: v.images.length > 0 ? v.images : undefined,
@@ -156,9 +176,10 @@ export default function CreateProductPage() {
       }
 
       await createProduct.mutateAsync(productData)
+      toast.success('Tạo mới sản phẩm thành công!')
       navigate('/admin/products')
     } catch {
-      toast.error('Failed to create product')
+      toast.error('Đã xảy ra lỗi khi tạo sản phẩm')
     } finally {
       setIsSubmitting(false)
     }
@@ -169,12 +190,12 @@ export default function CreateProductPage() {
       ...prev,
       {
         id: crypto.randomUUID(),
-        sku: '',
-        title: '',
-        price: '',
-        costPrice: '',
-        msrp: '',
-        stockQuantity: '0',
+        sku: `${formData.sku || 'SKU'}-VAR-${prev.length + 1}`,
+        title: `Phiên bản ${prev.length + 1}`,
+        price: prev[0]?.price || '',
+        costPrice: prev[0]?.costPrice || '',
+        msrp: prev[0]?.msrp || '',
+        stockQuantity: '10',
         isDefault: false,
         attributes: [],
         images: [],
@@ -184,19 +205,19 @@ export default function CreateProductPage() {
 
   const removeVariant = (id: string) => {
     if (variants.length === 1) {
-      toast.error('At least one variant is required')
+      toast.error('Bắt buộc phải có ít nhất một phiên bản sản phẩm')
       return
     }
     setVariants((prev) => prev.filter((v) => v.id !== id))
   }
 
-  const addAttribute = (variantId: string) => {
+  const addAttribute = (variantId: string, defaultName = '') => {
     setVariants((prev) =>
       prev.map((v) =>
         v.id === variantId
           ? {
               ...v,
-              attributes: [...v.attributes, { attributeName: '', value: '' }],
+              attributes: [...v.attributes, { attributeName: defaultName, value: '' }],
             }
           : v,
       ),
@@ -207,121 +228,266 @@ export default function CreateProductPage() {
     setVariants((prev) =>
       prev.map((v) =>
         v.id === variantId
-          ? { ...v, attributes: v.attributes.filter((_, i) => i !== index) }
+          ? { ...v, attributes: v.attributes.filter((_: unknown, i: number) => i !== index) }
           : v,
       ),
     )
   }
 
   return (
-    <div className="container mx-auto">
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <Tabs defaultValue="basic-info">
-          <div className="flex items-center justify-between">
-            <TabsList>
-              <TabsTrigger value="basic-info">Basic Information</TabsTrigger>
-              <TabsTrigger value="product-images">Product Images</TabsTrigger>
-              <TabsTrigger value="variants">Variants</TabsTrigger>
-            </TabsList>
-
-            <Button
-              variant="outline"
-              type="submit"
-              disabled={isSubmitting || uploading}
-            >
-              {isSubmitting && <Spinner />}
-              Create Product
-            </Button>
+    <div className="container mx-auto pb-12 space-y-4">
+      {/* Top Header */}
+      <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b">
+        <div className="flex items-center gap-3">
+          <Link
+            to="/admin/products"
+            className="size-8 rounded-lg border flex items-center justify-center hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+            title="Quay lại danh sách"
+          >
+            <ArrowLeft className="size-4" />
+          </Link>
+          <div>
+            <h1 className="text-xl font-bold tracking-tight">Thêm sản phẩm mới</h1>
+            <p className="text-[11px] text-muted-foreground">
+              Thông tin chi tiết, hình ảnh và phân loại phiên bản
+            </p>
           </div>
+        </div>
 
-          <TabsContent value="basic-info">
-            <Card>
-              <CardHeader>
-                <CardTitle>Basic Information</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ProductBasicInfo
-                  formData={formData}
-                  brands={brandsQuery.data?.data}
-                  categories={categoriesQuery.data?.data}
-                  onChange={(data) =>
-                    setFormData((prev) => ({ ...prev, ...data }))
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => navigate('/admin/products')}
+            disabled={isSubmitting || uploading}
+          >
+            Hủy bỏ
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            onClick={handleSubmit}
+            disabled={isSubmitting || uploading}
+            className="cursor-pointer font-semibold shadow-xs"
+          >
+            {isSubmitting ? (
+              <>
+                <Spinner className="mr-1.5 size-3.5" />
+                Đang lưu...
+              </>
+            ) : (
+              <>
+                <CheckCircle2 className="mr-1.5 size-3.5" />
+                Lưu & Xuất bản
+              </>
+            )}
+          </Button>
+        </div>
+      </div>
+
+      {/* Upload Progress Notification */}
+      {uploading && (
+        <Card className="border-primary/50 bg-primary/5">
+          <CardContent className="py-3">
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between text-xs font-medium">
+                <span className="flex items-center gap-1.5">
+                  <UploadCloud className="size-3.5 animate-bounce text-primary" />
+                  Đang tải hình ảnh lên Cloudinary...
+                </span>
+                <span className="font-bold text-primary">{progress}%</span>
+              </div>
+              <Progress value={progress} className="h-1.5" />
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Main 2-Column Layout */}
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+        {/* Left Column (8 cols): Main Content */}
+        <div className="lg:col-span-8 space-y-4">
+          {/* Card 1: Basic Information */}
+          <Card className="shadow-xs">
+            <CardHeader className="py-3 px-4 border-b bg-muted/10">
+              <CardTitle className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                1. Thông tin chung
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4">
+              <ProductBasicInfo
+                formData={formData}
+                onChange={(data) => setFormData((prev) => ({ ...prev, ...data }))}
+                disabled={isSubmitting || uploading}
+              />
+            </CardContent>
+          </Card>
+
+          {/* Card 2: Product Images */}
+          <Card className="shadow-xs">
+            <CardHeader className="py-3 px-4 border-b bg-muted/10">
+              <CardTitle className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                2. Bộ sưu tập hình ảnh
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4">
+              <ProductImagesUpload
+                images={productImages}
+                onChange={setProductImages}
+                disabled={isSubmitting || uploading}
+              />
+            </CardContent>
+          </Card>
+
+          {/* Card 3: Variants */}
+          <Card className="shadow-xs">
+            <CardHeader className="py-3 px-4 border-b bg-muted/10 flex flex-row items-center justify-between">
+              <CardTitle className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                <Layers className="size-3.5 text-primary" />
+                3. Phiên bản & Phân loại hàng <span className="text-destructive">*</span>
+              </CardTitle>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={addVariant}
+                disabled={isSubmitting || uploading}
+                className="h-6 text-[11px] px-2 cursor-pointer"
+              >
+                <Plus className="mr-1 size-3" />
+                Thêm phiên bản
+              </Button>
+            </CardHeader>
+            <CardContent className="p-4 space-y-3">
+              {variants.map((variant, variantIndex) => (
+                <ProductVariantForm
+                  key={variant.id}
+                  variant={variant}
+                  variantIndex={variantIndex}
+                  canRemove={variants.length > 1}
+                  onRemove={() => removeVariant(variant.id.toString())}
+                  onUpdate={(updated) =>
+                    setVariants((prev) =>
+                      prev.map((v) =>
+                        v.id === variant.id ? { ...v, ...updated } : v,
+                      ),
+                    )
                   }
+                  onAddAttribute={(defaultName) =>
+                    addAttribute(variant.id.toString(), defaultName)
+                  }
+                  onRemoveAttribute={(attrIndex) =>
+                    removeAttribute(variant.id.toString(), attrIndex)
+                  }
+                  disabled={isSubmitting || uploading}
                 />
-              </CardContent>
-            </Card>
-          </TabsContent>
+              ))}
+            </CardContent>
+          </Card>
+        </div>
 
-          <TabsContent value="product-images">
-            <Card>
-              <CardHeader>
-                <CardTitle>Product Images</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ProductImagesUpload
-                  images={productImages}
-                  onChange={setProductImages}
+        {/* Right Column (4 cols): Sticky Sidebar */}
+        <div className="lg:col-span-4 space-y-4 lg:sticky lg:top-4">
+          {/* Card: Status & Visibility */}
+          <Card className="shadow-xs">
+            <CardHeader className="py-3 px-4 border-b bg-muted/10">
+              <CardTitle className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                Trạng thái & Hiển thị
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 space-y-3">
+              <div className="space-y-1">
+                <Label className="text-xs font-semibold">Trạng thái xuất bản</Label>
+                <RHFCombobox
+                  value={formData.status}
+                  onChange={(value) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      status: value as
+                        | 'active'
+                        | 'inactive'
+                        | 'draft'
+                        | 'out_of_stock',
+                    }))
+                  }
+                  options={[
+                    { label: 'Đang bán (Hiển thị công khai)', value: 'active' },
+                    { label: 'Bản nháp (Chưa công khai)', value: 'draft' },
+                    { label: 'Tạm ẩn (Không hiển thị)', value: 'inactive' },
+                    { label: 'Hết hàng', value: 'out_of_stock' },
+                  ]}
+                  placeholder="Chọn trạng thái"
                 />
-              </CardContent>
-            </Card>
-          </TabsContent>
+              </div>
 
-          <TabsContent value="variants">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>
-                  Variants <span className="text-destructive">*</span>
-                </CardTitle>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={addVariant}
-                >
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Variant
-                </Button>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {variants.map((variant, variantIndex) => (
-                  <ProductVariantForm
-                    key={variant.id}
-                    variant={variant}
-                    variantIndex={variantIndex}
-                    canRemove={variants.length > 1}
-                    onRemove={() => removeVariant(variant.id.toString())}
-                    onUpdate={(updated) =>
-                      setVariants((prev) =>
-                        prev.map((v) =>
-                          v.id === variant.id ? { ...v, ...updated } : v,
-                        ),
-                      )
-                    }
-                    onAddAttribute={() => addAttribute(variant.id.toString())}
-                    onRemoveAttribute={(attrIndex) =>
-                      removeAttribute(variant.id.toString(), attrIndex)
-                    }
-                  />
-                ))}
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-
-        {/* Upload Progress */}
-        {uploading && (
-          <Card>
-            <CardContent className="pt-6">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span>Uploading images...</span>
-                  <span>{progress}%</span>
+              <div className="bg-muted/20 flex items-start space-x-2.5 rounded-lg border p-3">
+                <Checkbox
+                  id="isFeatured"
+                  checked={formData.isFeatured}
+                  onCheckedChange={(checked) =>
+                    setFormData((prev) => ({ ...prev, isFeatured: !!checked }))
+                  }
+                  disabled={isSubmitting || uploading}
+                  className="mt-0.5"
+                />
+                <div className="space-y-0.5">
+                  <Label htmlFor="isFeatured" className="cursor-pointer text-xs font-semibold flex items-center gap-1">
+                    <Sparkles className="size-3 text-amber-500" />
+                    Sản phẩm nổi bật
+                  </Label>
+                  <p className="text-[11px] text-muted-foreground leading-tight">
+                    Ưu tiên tại Banner và Carousel trang chủ
+                  </p>
                 </div>
-                <Progress value={progress} />
               </div>
             </CardContent>
           </Card>
-        )}
+
+          {/* Card: Category & Brand */}
+          <Card className="shadow-xs">
+            <CardHeader className="py-3 px-4 border-b bg-muted/10">
+              <CardTitle className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                Phân loại danh mục
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 space-y-3">
+              <div className="space-y-1">
+                <Label className="text-xs font-semibold">
+                  Thương hiệu <span className="text-destructive">*</span>
+                </Label>
+                <RHFCombobox
+                  value={formData.brandId}
+                  onChange={(value) => setFormData((prev) => ({ ...prev, brandId: value }))}
+                  options={
+                    brandsQuery.data?.data?.map((brand) => ({
+                      label: brand.name,
+                      value: brand.id.toString(),
+                    })) ?? []
+                  }
+                  placeholder="Chọn thương hiệu..."
+                />
+              </div>
+
+              <div className="space-y-1">
+                <Label className="text-xs font-semibold">
+                  Danh mục sản phẩm <span className="text-destructive">*</span>
+                </Label>
+                <RHFCombobox
+                  value={formData.categoryId}
+                  onChange={(value) => setFormData((prev) => ({ ...prev, categoryId: value }))}
+                  options={
+                    categoriesQuery.data?.data?.map((category) => ({
+                      label: category.name,
+                      value: category.id.toString(),
+                    })) ?? []
+                  }
+                  placeholder="Chọn danh mục..."
+                />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </form>
     </div>
   )

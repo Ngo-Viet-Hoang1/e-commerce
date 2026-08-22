@@ -1,9 +1,11 @@
-import { TrustStrip } from '@/components/common/TrustStrip'
-import Banner from './Banner'
-import BestSeller from './BestSeller'
-import Brand from './Brand'
-import Hero from './Hero'
-import TodayBestDeal from './TodayBestDeal'
+import { TrustStrip } from '@/shared/ui/TrustStrip'
+import {
+  Hero,
+  BestSeller,
+  Brand,
+  TodayBestDeal,
+  Banner,
+} from '@/widgets/home'
 
 const Home = () => {
   return (

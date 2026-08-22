@@ -1,25 +1,28 @@
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Progress } from '@/components/ui/progress'
-import { Skeleton } from '@/components/ui/skeleton'
-import { ProductBasicInfo } from '@/pages/admin/ProductManagement/components/ProductBasicInfo'
+import { Button } from '@/shared/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
+import { Progress } from '@/shared/ui/progress'
+import { Skeleton } from '@/shared/ui/skeleton'
+import { Spinner } from '@/shared/ui/spinner'
+import { Checkbox } from '@/shared/ui/checkbox'
+import { Label } from '@/shared/ui/label'
+import { RHFCombobox } from '@/shared/ui/RHFCombobox'
 import {
+  ProductBasicInfo,
   ProductImagesUpload,
   type ProductImageForm,
-} from '@/pages/admin/ProductManagement/components/ProductImagesUpload'
-import {
   ProductVariantForm,
   type VariantFormData,
-} from '@/pages/admin/ProductManagement/components/ProductVariantForm'
-import { useCloudinaryUpload } from '@/hooks/useCloudinaryUpload'
-import type { UpdateProduct } from '@/interfaces/product.interface'
-import { Loader2, Plus } from 'lucide-react'
+  useProduct,
+  useUpdateProduct,
+} from '@/features/manage-product'
+import { useCloudinaryUpload } from '@/shared/hooks'
+import type { UpdateProduct } from '@/entities/product'
+import { ArrowLeft, CheckCircle2, Layers, Plus, Sparkles, UploadCloud } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'sonner'
-import { useBrands } from '../BrandManagement/brand.queries'
-import { useCategories } from '../CategoryMangement/category.queries'
-import { useProduct, useUpdateProduct } from './product.queries'
+import { useBrands } from '@/features/manage-brand'
+import { useCategories } from '@/features/manage-category'
 
 export default function EditProductPage() {
   const { id } = useParams<{ id: string }>()
@@ -47,27 +50,27 @@ export default function EditProductPage() {
 
   // Load existing product data
   useEffect(() => {
-    if (productQuery.data) {
-      const product = productQuery.data
+    if (productQuery.data?.data) {
+      const product = productQuery.data.data
       setFormData({
-        name: product.data?.name ?? '',
-        sku: product.data?.sku ?? '',
-        description: product.data?.description ?? '',
-        status: (product.data?.status === 'out_of_stock'
+        name: product.name ?? '',
+        sku: product.sku ?? '',
+        description: product.description ?? '',
+        status: (product.status === 'out_of_stock'
           ? 'inactive'
-          : (product.data?.status ?? 'draft')) as
+          : (product.status ?? 'draft')) as
           | 'active'
           | 'inactive'
           | 'draft',
-        brandId: product.data?.brand?.id.toString() ?? '',
-        categoryId: product.data?.category?.id.toString() ?? '',
-        isFeatured: product.data?.isFeatured ?? false,
+        brandId: product.brand?.id.toString() ?? '',
+        categoryId: product.category?.id.toString() ?? '',
+        isFeatured: product.isFeatured ?? false,
       })
 
       // Load product images
-      if (product?.data?.productImages) {
+      if (product.productImages) {
         setProductImages(
-          product?.data?.productImages.map((img) => ({
+          product.productImages.map((img) => ({
             url: img.url,
             altText: img.altText ?? '',
             isPrimary: img.isPrimary,
@@ -76,9 +79,9 @@ export default function EditProductPage() {
       }
 
       // Load variants
-      if (product?.data?.variants) {
+      if (product.variants) {
         setVariants(
-          product?.data?.variants.map((variant) => ({
+          product.variants.map((variant) => ({
             id: variant.id,
             sku: variant.sku,
             title: variant.title ?? '',
@@ -105,7 +108,6 @@ export default function EditProductPage() {
   }, [productQuery.data])
 
   const uploadAllImages = async () => {
-    // Upload product images (only new ones with file property)
     const uploadedProductImages = await Promise.all(
       productImages.map(async (img) => {
         if (img.file) {
@@ -114,23 +116,20 @@ export default function EditProductPage() {
             ? { url, altText: img.altText, isPrimary: img.isPrimary }
             : null
         }
-        // Keep existing images
         return { url: img.url, altText: img.altText, isPrimary: img.isPrimary }
       }),
     )
 
-    // Upload variant images
     const uploadedVariants = await Promise.all(
       variants.map(async (variant) => {
         const uploadedImages = await Promise.all(
-          variant.images.map(async (img) => {
+          variant.images.map(async (img: ProductImageForm) => {
             if (img.file) {
               const url = await uploadImage(img.file, 'products')
               return url
                 ? { url, altText: img.altText, isPrimary: img.isPrimary }
                 : null
             }
-            // Keep existing images
             return {
               url: img.url,
               altText: img.altText,
@@ -141,13 +140,13 @@ export default function EditProductPage() {
 
         return {
           ...variant,
-          images: uploadedImages.filter((img) => img !== null),
+          images: uploadedImages.filter((img): img is NonNullable<typeof img> => img !== null),
         }
       }),
     )
 
     return {
-      productImages: uploadedProductImages.filter((img) => img !== null),
+      productImages: uploadedProductImages.filter((img): img is NonNullable<typeof img> => img !== null),
       variants: uploadedVariants,
     }
   }
@@ -155,40 +154,49 @@ export default function EditProductPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
+    if (!formData.name.trim()) {
+      toast.error('Vui lòng nhập tên sản phẩm')
+      return
+    }
+
+    if (!formData.sku.trim()) {
+      toast.error('Vui lòng nhập mã SKU')
+      return
+    }
+
     if (!formData.brandId || !formData.categoryId) {
-      toast.error('Please select brand and category')
+      toast.error('Vui lòng chọn Thương hiệu và Danh mục')
       return
     }
 
     if (variants.length === 0) {
-      toast.error('Please add at least one variant')
+      toast.error('Cần ít nhất một phiên bản sản phẩm')
       return
     }
 
     setIsSubmitting(true)
 
     try {
-      // Upload all images first
       const {
         productImages: uploadedProductImages,
         variants: uploadedVariants,
       } = await uploadAllImages()
 
       const productData: UpdateProduct = {
-        name: formData.name,
-        sku: formData.sku,
+        name: formData.name.trim(),
+        sku: formData.sku.trim().toUpperCase(),
         description: formData.description || undefined,
         status: formData.status,
         brandId: Number(formData.brandId),
         categoryId: Number(formData.categoryId),
         isFeatured: formData.isFeatured,
         variants: uploadedVariants.map((v) => ({
-          sku: v.sku,
+          sku: v.sku.trim().toUpperCase(),
           title: v.title || undefined,
           price: Number(v.price),
           costPrice: v.costPrice ? Number(v.costPrice) : undefined,
           msrp: v.msrp ? Number(v.msrp) : undefined,
-          stockQuantity: Number(v.stockQuantity),
+          stockQuantity: Number(v.stockQuantity) || 0,
           isDefault: v.isDefault,
           attributes: v.attributes.length > 0 ? v.attributes : undefined,
           images: v.images.length > 0 ? v.images : undefined,
@@ -198,9 +206,10 @@ export default function EditProductPage() {
       }
 
       await updateProduct.mutateAsync({ id: Number(id), data: productData })
+      toast.success('Cập nhật sản phẩm thành công!')
       navigate('/admin/products')
     } catch {
-      toast.error('Failed to update product')
+      toast.error('Cập nhật sản phẩm thất bại')
     } finally {
       setIsSubmitting(false)
     }
@@ -210,191 +219,322 @@ export default function EditProductPage() {
     setVariants((prev) => [
       ...prev,
       {
-        id: `new-${Date.now()}`,
-        sku: '',
-        title: '',
-        price: '',
-        costPrice: '',
-        msrp: '',
-        stockQuantity: '0',
+        id: crypto.randomUUID(),
+        sku: `${formData.sku || 'SKU'}-VAR-${prev.length + 1}`,
+        title: `Phiên bản ${prev.length + 1}`,
+        price: prev[0]?.price || '',
+        costPrice: prev[0]?.costPrice || '',
+        msrp: prev[0]?.msrp || '',
+        stockQuantity: '10',
         isDefault: false,
         attributes: [],
         images: [],
-        _isNew: true,
       },
     ])
   }
 
-  const removeVariant = (id: number | string) => {
+  const removeVariant = (variantId: string | number) => {
     if (variants.length === 1) {
-      toast.error('At least one variant is required')
+      toast.error('Bắt buộc phải có ít nhất một phiên bản sản phẩm')
       return
     }
-    setVariants((prev) => prev.filter((v) => v.id !== id))
+    setVariants((prev) => prev.filter((v) => v.id !== variantId))
   }
 
-  const addAttribute = (variantId: number | string) => {
+  const addAttribute = (variantId: string | number, defaultName = '') => {
     setVariants((prev) =>
       prev.map((v) =>
         v.id === variantId
           ? {
               ...v,
-              attributes: [...v.attributes, { attributeName: '', value: '' }],
+              attributes: [...v.attributes, { attributeName: defaultName, value: '' }],
             }
           : v,
       ),
     )
   }
 
-  const removeAttribute = (variantId: number | string, index: number) => {
+  const removeAttribute = (variantId: string | number, index: number) => {
     setVariants((prev) =>
       prev.map((v) =>
         v.id === variantId
-          ? { ...v, attributes: v.attributes.filter((_, i) => i !== index) }
+          ? { ...v, attributes: v.attributes.filter((_: unknown, i: number) => i !== index) }
           : v,
       ),
     )
   }
 
-  if (productQuery.isLoading) {
+  if (productQuery.isPending) {
     return (
-      <div className="container mx-auto max-w-5xl py-6">
-        <Skeleton className="mb-6 h-10 w-40" />
-        <Skeleton className="mb-6 h-12 w-80" />
-        <div className="space-y-6">
-          <Skeleton className="h-64" />
-          <Skeleton className="h-48" />
-          <Skeleton className="h-96" />
-        </div>
-      </div>
-    )
-  }
-
-  if (productQuery.isError || !productQuery.data) {
-    return (
-      <div className="container mx-auto max-w-5xl py-6">
-        <div className="text-center">
-          <h1 className="text-destructive mb-2 text-2xl font-bold">
-            Product Not Found
-          </h1>
-          <p className="text-muted-foreground mb-4">
-            The product you're looking for doesn't exist
-          </p>
-          <Link to="/admin/products">
-            <Button>Back to Products</Button>
-          </Link>
+      <div className="container mx-auto space-y-4">
+        <Skeleton className="h-9 w-40" />
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+          <div className="lg:col-span-8 space-y-4">
+            <Skeleton className="h-64 w-full rounded-xl" />
+            <Skeleton className="h-40 w-full rounded-xl" />
+          </div>
+          <div className="lg:col-span-4 space-y-4">
+            <Skeleton className="h-40 w-full rounded-xl" />
+            <Skeleton className="h-40 w-full rounded-xl" />
+          </div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="container mx-auto max-w-5xl py-6">
-      <div className="mb-6 text-center">
-        <h1 className="text-3xl font-bold">Edit Product</h1>
+    <div className="container mx-auto pb-12 space-y-4">
+      {/* Top Header */}
+      <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b">
+        <div className="flex items-center gap-3">
+          <Link
+            to="/admin/products"
+            className="size-8 rounded-lg border flex items-center justify-center hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+            title="Quay lại danh sách"
+          >
+            <ArrowLeft className="size-4" />
+          </Link>
+          <div>
+            <h1 className="text-xl font-bold tracking-tight">Chỉnh sửa sản phẩm #{id}</h1>
+            <p className="text-[11px] text-muted-foreground">
+              Cập nhật thông tin chi tiết, hình ảnh và danh sách phiên bản
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => navigate('/admin/products')}
+            disabled={isSubmitting || uploading}
+          >
+            Hủy bỏ
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            onClick={handleSubmit}
+            disabled={isSubmitting || uploading}
+            className="cursor-pointer font-semibold shadow-xs"
+          >
+            {isSubmitting ? (
+              <>
+                <Spinner className="mr-1.5 size-3.5" />
+                Đang lưu...
+              </>
+            ) : (
+              <>
+                <CheckCircle2 className="mr-1.5 size-3.5" />
+                Lưu thay đổi
+              </>
+            )}
+          </Button>
+        </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Basic Information */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Basic Information</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ProductBasicInfo
-              formData={formData}
-              brands={brandsQuery.data?.data}
-              categories={categoriesQuery.data?.data}
-              onChange={(data) => setFormData((prev) => ({ ...prev, ...data }))}
-            />
+      {/* Upload Progress */}
+      {uploading && (
+        <Card className="border-primary/50 bg-primary/5">
+          <CardContent className="py-3">
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between text-xs font-medium">
+                <span className="flex items-center gap-1.5">
+                  <UploadCloud className="size-3.5 animate-bounce text-primary" />
+                  Đang tải hình ảnh lên Cloudinary...
+                </span>
+                <span className="font-bold text-primary">{progress}%</span>
+              </div>
+              <Progress value={progress} className="h-1.5" />
+            </div>
           </CardContent>
         </Card>
+      )}
 
-        {/* Product Images */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Product Images</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ProductImagesUpload
-              images={productImages}
-              onChange={setProductImages}
-            />
-          </CardContent>
-        </Card>
-
-        {/* Variants */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>
-              Variants <span className="text-destructive">*</span>
-            </CardTitle>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={addVariant}
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              Add Variant
-            </Button>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {variants.map((variant, variantIndex) => (
-              <ProductVariantForm
-                key={variant.id}
-                variant={variant}
-                variantIndex={variantIndex}
-                canRemove={variants.length > 1}
-                onRemove={() => removeVariant(variant.id)}
-                onUpdate={(updated) =>
-                  setVariants((prev) =>
-                    prev.map((v) =>
-                      v.id === variant.id ? { ...v, ...updated } : v,
-                    ),
-                  )
-                }
-                onAddAttribute={() => addAttribute(variant.id)}
-                onRemoveAttribute={(attrIndex) =>
-                  removeAttribute(variant.id, attrIndex)
-                }
+      {/* Main 2-Column Responsive Layout */}
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+        {/* Left Column (8 cols): Content & Media */}
+        <div className="lg:col-span-8 space-y-4">
+          {/* Card 1: Basic Info */}
+          <Card className="shadow-xs">
+            <CardHeader className="py-3 px-4 border-b bg-muted/10">
+              <CardTitle className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                1. Thông tin chung
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4">
+              <ProductBasicInfo
+                formData={formData}
+                onChange={(data) => setFormData((prev) => ({ ...prev, ...data }))}
+                disabled={isSubmitting || uploading}
               />
-            ))}
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
 
-        {/* Upload Progress */}
-        {uploading && (
-          <Card>
-            <CardContent className="pt-6">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span>Uploading images...</span>
-                  <span>{progress}%</span>
+          {/* Card 2: Product Images */}
+          <Card className="shadow-xs">
+            <CardHeader className="py-3 px-4 border-b bg-muted/10">
+              <CardTitle className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                2. Bộ sưu tập hình ảnh
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4">
+              <ProductImagesUpload
+                images={productImages}
+                onChange={setProductImages}
+                disabled={isSubmitting || uploading}
+              />
+            </CardContent>
+          </Card>
+
+          {/* Card 3: Variants */}
+          <Card className="shadow-xs">
+            <CardHeader className="py-3 px-4 border-b bg-muted/10 flex flex-row items-center justify-between">
+              <CardTitle className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                <Layers className="size-3.5 text-primary" />
+                3. Phiên bản & Phân loại hàng <span className="text-destructive">*</span>
+              </CardTitle>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={addVariant}
+                disabled={isSubmitting || uploading}
+                className="h-6 text-[11px] px-2 cursor-pointer"
+              >
+                <Plus className="mr-1 size-3" />
+                Thêm phiên bản
+              </Button>
+            </CardHeader>
+            <CardContent className="p-4 space-y-3">
+              {variants.map((variant, variantIndex) => (
+                <ProductVariantForm
+                  key={variant.id}
+                  variant={variant}
+                  variantIndex={variantIndex}
+                  canRemove={variants.length > 1}
+                  onRemove={() => removeVariant(variant.id)}
+                  onUpdate={(updated) =>
+                    setVariants((prev) =>
+                      prev.map((v) =>
+                        v.id === variant.id ? { ...v, ...updated } : v,
+                      ),
+                    )
+                  }
+                  onAddAttribute={(defaultName) =>
+                    addAttribute(variant.id, defaultName)
+                  }
+                  onRemoveAttribute={(attrIndex) =>
+                    removeAttribute(variant.id, attrIndex)
+                  }
+                  disabled={isSubmitting || uploading}
+                />
+              ))}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Right Column (4 cols): Sticky Sidebar */}
+        <div className="lg:col-span-4 space-y-4 lg:sticky lg:top-4">
+          {/* Card: Status & Visibility */}
+          <Card className="shadow-xs">
+            <CardHeader className="py-3 px-4 border-b bg-muted/10">
+              <CardTitle className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                Trạng thái & Hiển thị
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 space-y-3">
+              <div className="space-y-1">
+                <Label className="text-xs font-semibold">Trạng thái xuất bản</Label>
+                <RHFCombobox
+                  value={formData.status}
+                  onChange={(value) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      status: value as
+                        | 'active'
+                        | 'inactive'
+                        | 'draft'
+                        | 'out_of_stock',
+                    }))
+                  }
+                  options={[
+                    { label: 'Đang bán (Hiển thị công khai)', value: 'active' },
+                    { label: 'Bản nháp (Chưa công khai)', value: 'draft' },
+                    { label: 'Tạm ẩn (Không hiển thị)', value: 'inactive' },
+                    { label: 'Hết hàng', value: 'out_of_stock' },
+                  ]}
+                  placeholder="Chọn trạng thái"
+                />
+              </div>
+
+              <div className="bg-muted/20 flex items-start space-x-2.5 rounded-lg border p-3">
+                <Checkbox
+                  id="isFeatured"
+                  checked={formData.isFeatured}
+                  onCheckedChange={(checked) =>
+                    setFormData((prev) => ({ ...prev, isFeatured: !!checked }))
+                  }
+                  disabled={isSubmitting || uploading}
+                  className="mt-0.5"
+                />
+                <div className="space-y-0.5">
+                  <Label htmlFor="isFeatured" className="cursor-pointer text-xs font-semibold flex items-center gap-1">
+                    <Sparkles className="size-3 text-amber-500" />
+                    Sản phẩm nổi bật
+                  </Label>
+                  <p className="text-[11px] text-muted-foreground leading-tight">
+                    Ưu tiên tại Banner và Carousel trang chủ
+                  </p>
                 </div>
-                <Progress value={progress} />
               </div>
             </CardContent>
           </Card>
-        )}
 
-        {/* Actions */}
-        <div className="flex justify-end gap-4">
-          <Link to="/admin/products">
-            <Button type="button" variant="outline" disabled={isSubmitting}>
-              Cancel
-            </Button>
-          </Link>
-          <Button type="submit" disabled={isSubmitting || uploading}>
-            {isSubmitting ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Updating...
-              </>
-            ) : (
-              'Update Product'
-            )}
-          </Button>
+          {/* Card: Category & Brand */}
+          <Card className="shadow-xs">
+            <CardHeader className="py-3 px-4 border-b bg-muted/10">
+              <CardTitle className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                Phân loại danh mục
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 space-y-3">
+              <div className="space-y-1">
+                <Label className="text-xs font-semibold">
+                  Thương hiệu <span className="text-destructive">*</span>
+                </Label>
+                <RHFCombobox
+                  value={formData.brandId}
+                  onChange={(value) => setFormData((prev) => ({ ...prev, brandId: value }))}
+                  options={
+                    brandsQuery.data?.data?.map((brand) => ({
+                      label: brand.name,
+                      value: brand.id.toString(),
+                    })) ?? []
+                  }
+                  placeholder="Chọn thương hiệu..."
+                />
+              </div>
+
+              <div className="space-y-1">
+                <Label className="text-xs font-semibold">
+                  Danh mục sản phẩm <span className="text-destructive">*</span>
+                </Label>
+                <RHFCombobox
+                  value={formData.categoryId}
+                  onChange={(value) => setFormData((prev) => ({ ...prev, categoryId: value }))}
+                  options={
+                    categoriesQuery.data?.data?.map((category) => ({
+                      label: category.name,
+                      value: category.id.toString(),
+                    })) ?? []
+                  }
+                  placeholder="Chọn danh mục..."
+                />
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </form>
     </div>
