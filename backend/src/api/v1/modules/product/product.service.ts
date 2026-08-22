@@ -27,7 +27,24 @@ class ProductService {
       await productRepository.findBestSellerProductIds(limit)
 
     if (orderedProductIds.length === 0) {
-      return []
+      const fallbackProducts = await productRepository.findMany({
+        where: {
+          deletedAt: null,
+          status: 'active',
+        },
+        orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }],
+        take: limit,
+      })
+
+      return Promise.all(
+        fallbackProducts.map(async (product) => {
+          const minPrice = await productRepository.getMinPrice(product.id)
+          return {
+            ...product,
+            minPrice,
+          }
+        }),
+      )
     }
 
     const products = await productRepository.findMany({
@@ -169,26 +186,107 @@ class ProductService {
   }
 
   updateById = async (id: number, data: UpdateProductBody) => {
-    await this.findById(id)
+    const existing = await this.findById(id)
+    if (!existing) throw new NotFoundException(`Product with ID ${id} not found`)
 
-    const updateData: Prisma.ProductUpdateInput = {
-      name: data.name!,
-      sku: data.sku!,
-      status: data.status!,
-      brand: { connect: { id: data.brandId! } },
-      category: { connect: { id: data.categoryId! } },
-      shortDescription: data.shortDescription,
-      description: data.description,
-      isFeatured: data.isFeatured,
-      metaData: data.metaData,
-      weightGrams: data.weightGrams,
-      dimensions: data.dimensions,
-      publishedAt: data.publishedAt,
+    // Check SKU uniqueness if SKU is changing
+    if (data.sku && data.sku !== existing.sku) {
+      const skuExists = await prisma.product.findUnique({
+        where: { sku: data.sku },
+      })
+      if (skuExists && skuExists.id !== id) {
+        throw new ConflictException(`Product SKU "${data.sku}" is already in use`)
+      }
     }
 
-    const product = await productRepository.update(id, updateData)
+    const updated = await prisma.$transaction(async (tx) => {
+      // 1. Update basic product fields
+      const updateData: Prisma.ProductUpdateInput = {}
+      if (data.name !== undefined) updateData.name = data.name
+      if (data.sku !== undefined) updateData.sku = data.sku
+      if (data.status !== undefined) updateData.status = data.status
+      if (data.brandId !== undefined) {
+        updateData.brand = { connect: { id: data.brandId } }
+      }
+      if (data.categoryId !== undefined) {
+        updateData.category = { connect: { id: data.categoryId } }
+      }
+      if (data.description !== undefined) {
+        updateData.description = sanitizeHtml(data.description || '')
+      }
+      if (data.shortDescription !== undefined) {
+        updateData.shortDescription = data.shortDescription
+      }
+      if (data.isFeatured !== undefined) updateData.isFeatured = data.isFeatured
+      if (data.weightGrams !== undefined) updateData.weightGrams = data.weightGrams
+      if (data.dimensions !== undefined) updateData.dimensions = data.dimensions
+      if (data.metaData !== undefined) updateData.metaData = data.metaData
+      if (data.publishedAt !== undefined) updateData.publishedAt = data.publishedAt
 
-    return product
+      await tx.product.update({
+        where: { id },
+        data: updateData,
+      })
+
+      // 2. If variants are provided, update variants & variant attributes
+      if (data.variants && data.variants.length > 0) {
+        // Resolve attribute values for all variants
+        const { attributeValueMap } = await AttributeResolver.resolveAttributes(
+          tx,
+          data.variants,
+        )
+
+        // Delete old product images and old variants
+        await tx.productImage.deleteMany({
+          where: { productId: id },
+        })
+
+        await tx.productVariant.deleteMany({
+          where: { productId: id },
+        })
+
+        // Re-create variants with new attributes
+        const createdVariants = await VariantBuilder.createVariants(
+          tx,
+          id,
+          data.variants,
+          attributeValueMap,
+        )
+
+        // Re-create all images (product images + variant images)
+        await ImageHandler.createAllImages(
+          tx,
+          id,
+          {
+            name: data.name ?? existing.name,
+            sku: data.sku ?? existing.sku,
+            brandId: data.brandId ?? existing.brand.id,
+            categoryId: data.categoryId ?? existing.category.id,
+            isFeatured: data.isFeatured ?? existing.isFeatured,
+            status:
+              data.status === 'out_of_stock'
+                ? 'inactive'
+                : ((data.status ?? existing.status) as
+                    | 'active'
+                    | 'inactive'
+                    | 'draft'),
+            variants: data.variants,
+            images: data.images,
+          },
+          createdVariants,
+        )
+      } else if (data.images) {
+        // If only product images changed
+        await tx.productImage.deleteMany({
+          where: { productId: id, variantId: null },
+        })
+        await ImageHandler.createProductImages(tx, id, data.images)
+      }
+
+      return id
+    })
+
+    return await productRepository.findById(updated)
   }
 
   deleteById = async (id: number) => {

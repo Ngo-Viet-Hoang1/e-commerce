@@ -162,7 +162,9 @@ class ProductRepository {
 
   findMany = async (params: {
     where?: Prisma.ProductWhereInput
-    orderBy?: Prisma.ProductOrderByWithRelationInput
+    orderBy?:
+      | Prisma.ProductOrderByWithRelationInput
+      | Prisma.ProductOrderByWithRelationInput[]
     skip?: number
     take?: number
   }) => {

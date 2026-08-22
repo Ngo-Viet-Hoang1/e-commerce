@@ -84,10 +84,41 @@ export const createProductBodySchema = z.object({
   publishedAt: z.date().nullable().optional(),
 })
 
+export const productStatusParamSchema = z.object({
+  status: z.enum(['active', 'inactive', 'out_of_stock', 'draft']),
+})
+
+export const createSimpleVariantSchema = z.object({
+  sku: z.string().min(1, 'Variant SKU is required'),
+  title: z.string().optional(),
+  price: z.number().positive('Price must be positive'),
+  costPrice: z.number().positive().optional(),
+  msrp: z.number().positive().optional(),
+  stockQuantity: z.number().int().min(0).default(0),
+  isDefault: z.boolean().default(false),
+  attributes: z
+    .array(
+      z.object({
+        attributeName: z.string().min(1, 'Attribute name is required'),
+        value: z.string().min(1, 'Attribute value is required'),
+      }),
+    )
+    .optional(),
+  images: z
+    .array(
+      z.object({
+        url: z.string().url('Invalid image URL'),
+        altText: z.string().optional(),
+        isPrimary: z.boolean().default(false),
+      }),
+    )
+    .optional(),
+})
+
 export const updateProductBodySchema = z.object({
   name: z
     .string()
-    .min(6, 'Name must be at least 6 characters')
+    .min(3, 'Name must be at least 3 characters')
     .trim()
     .optional(),
   sku: z.string().min(1, 'SKU must be at least 1 character').trim().optional(),
@@ -110,28 +141,7 @@ export const updateProductBodySchema = z.object({
     .optional()
     .transform((v) => v ?? undefined),
   publishedAt: z.date().nullable().optional(),
-})
-
-export const productStatusParamSchema = z.object({
-  status: z.enum(['active', 'inactive', 'out_of_stock', 'draft']),
-})
-
-export const createSimpleVariantSchema = z.object({
-  sku: z.string().min(1, 'Variant SKU is required'),
-  title: z.string().optional(),
-  price: z.number().positive('Price must be positive'),
-  costPrice: z.number().positive().optional(),
-  msrp: z.number().positive().optional(),
-  stockQuantity: z.number().int().min(0).default(0),
-  isDefault: z.boolean().default(false),
-  attributes: z
-    .array(
-      z.object({
-        attributeName: z.string().min(1, 'Attribute name is required'),
-        value: z.string().min(1, 'Attribute value is required'),
-      }),
-    )
-    .optional(),
+  variants: z.array(createSimpleVariantSchema).optional(),
   images: z
     .array(
       z.object({

@@ -25,15 +25,15 @@ router.get(
 )
 
 router.get(
-  '/:id',
-  validate(categoryIdParamSchema, 'params'),
-  categoryController.findById,
-)
-
-router.get(
   '/slug/:slug',
   validate(categorySlugParamSchema, 'params'),
   categoryController.findBySlug,
+)
+
+router.get(
+  '/:id',
+  validate(categoryIdParamSchema, 'params'),
+  categoryController.findById,
 )
 
 router.post(

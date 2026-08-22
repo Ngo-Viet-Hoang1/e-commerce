@@ -33,15 +33,15 @@ router.get(
 )
 
 router.get(
-  '/:id',
-  validate(productIdParamSchema, 'params'),
-  productController.findById,
-)
-
-router.get(
   '/slug/:slug',
   validate(productSlugParamSchema, 'params'),
   productController.findBySlug,
+)
+
+router.get(
+  '/:id',
+  validate(productIdParamSchema, 'params'),
+  productController.findById,
 )
 
 router.post(
