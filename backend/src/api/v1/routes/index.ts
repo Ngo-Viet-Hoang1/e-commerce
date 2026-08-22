@@ -21,7 +21,7 @@ import { productVideoRouter } from '../modules/product-video/product-video.route
 import productRoute from '../modules/product/product.route.js'
 import provinceRoute from '../modules/province/province.route.js'
 import userRoute from '../modules/user/user.route.js'
-import warrantyPoliciesRoute from '../modules/warrantyPolicies/warrantyPolicies.route.js'
+import warrantyPoliciesRoute from '../modules/warranty-policies/warranty-policies.route.js'
 import adminRoute from './admin.route.js'
 import chatRoute from './chat.route.js'
 import errorRoute from './error.route.js'
@@ -39,7 +39,9 @@ router.use('/categories', categoryRoute)
 router.use('/badges', badgeRoute)
 router.use('/products', productRoute)
 router.use('/productFaqs', productFaqRoute)
-router.use('/errors', errorRoute)
+if (process.env.NODE_ENV === 'development') {
+  router.use('/errors', errorRoute)
+}
 router.use('/product-badges', productBadgeRoute)
 router.use('/orders', orderAdminRouter)
 router.use('/me/orders', orderUserRouter)

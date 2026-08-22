@@ -1,31 +1,30 @@
 import type { Prisma } from '@generated/prisma/client'
 import { NotFoundException } from '../../shared/models/app-error.model'
-import { productRepository } from '../product/product.repository'
-import warrantyPoliciesRepository from './warrantyPolicies.repository'
+import warrantyPoliciesRepository from './warranty-policies.repository'
 import type {
   CreateWarrantyPolicyBody,
   ListWarrantyPoliciesQuery,
   UpdateWarrantyPolicyBody,
-} from './warrantyPolicies.shema'
+} from './warranty-policies.schema'
 
 class WarrantyPoliciesService {
   findAll = async (query: ListWarrantyPoliciesQuery) => {
-    const { page, limit, sort, order, search } = query
+    const { page, limit, search, sort, order } = query
 
     const where: Prisma.WarrantyPolicyWhereInput = {
-      deletedAt: null,
       ...(search && {
         OR: [
           { title: { contains: search, mode: 'insensitive' } },
           { description: { contains: search, mode: 'insensitive' } },
         ],
       }),
+      deletedAt: null,
     }
 
     const [warrantyPolicies, total] = await Promise.all([
       warrantyPoliciesRepository.findMany({
         where,
-        orderBy: { [sort]: order },
+        orderBy: sort ? { [sort]: order } : { createdAt: 'desc' },
         skip: (page - 1) * limit,
         take: limit,
       }),
@@ -35,66 +34,59 @@ class WarrantyPoliciesService {
     return { warrantyPolicies, total, page, limit }
   }
 
-  async findById(id: number, _includeDeleted = false) {
+  findById = async (id: number) => {
     const warrantyPolicy = await warrantyPoliciesRepository.findById(id)
-
-    if (!warrantyPolicy) {
-      throw new NotFoundException('Warranty Policy', id.toString())
+    if (!warrantyPolicy || warrantyPolicy.deletedAt) {
+      throw new NotFoundException(`Warranty policy with ID ${id} not found`)
     }
-
     return warrantyPolicy
   }
 
-  create = async (productId: number, data: CreateWarrantyPolicyBody) => {
-    const product = await productRepository.findById(productId)
-
-    if (!product) {
-      throw new NotFoundException('Product', productId.toString())
-    }
-
+  create = async (data: CreateWarrantyPolicyBody) => {
     const warrantyPolicy = await warrantyPoliciesRepository.create({
-      product: { connect: { id: product.id } },
-      brand: { connect: { id: product.brand.id } },
+      product: { connect: { id: data.productId } },
+      brand: { connect: { id: data.brandId } },
       title: data.title,
       description: data.description,
       durationDays: data.durationDays,
       termsUrl: data.termsUrl,
     })
-
     return warrantyPolicy
   }
 
-  updateById = async (id: number, data: UpdateWarrantyPolicyBody) => {
+  update = async (id: number, data: UpdateWarrantyPolicyBody) => {
     await this.findById(id)
 
-    const updatedWarrantyPolicy = await warrantyPoliciesRepository.update(id, {
-      title: data.title,
-      description: data.description,
-      durationDays: data.durationDays,
-      termsUrl: data.termsUrl,
-    })
+    const updateData: Prisma.WarrantyPolicyUpdateInput = {
+      ...(data.productId && { product: { connect: { id: data.productId } } }),
+      ...(data.brandId && { brand: { connect: { id: data.brandId } } }),
+      ...(data.title && { title: data.title }),
+      ...(data.description !== undefined && { description: data.description }),
+      ...(data.durationDays !== undefined && { durationDays: data.durationDays }),
+      ...(data.termsUrl !== undefined && { termsUrl: data.termsUrl }),
+    }
+
+    const updatedWarrantyPolicy = await warrantyPoliciesRepository.update(
+      id,
+      updateData,
+    )
+
     return updatedWarrantyPolicy
   }
 
   deleteById = async (id: number) => {
     await this.findById(id)
-
-    const deletedWarrantyPolicy =
-      await warrantyPoliciesRepository.deleteById(id)
-    return deletedWarrantyPolicy
+    const deleted = await warrantyPoliciesRepository.deleteById(id)
+    return deleted
   }
 
-  softDeleteById = async (id: number) => {
+  softDelete = async (id: number) => {
     await this.findById(id)
-
-    const deletedWarrantyPolicy =
-      await warrantyPoliciesRepository.softDelete(id)
-    return deletedWarrantyPolicy
+    const softDeleted = await warrantyPoliciesRepository.softDelete(id)
+    return softDeleted
   }
 
-  restoreById = async (id: number) => {
-    await this.findById(id)
-
+  restore = async (id: number) => {
     const restoredWarrantyPolicy = await warrantyPoliciesRepository.restore(id)
     return restoredWarrantyPolicy
   }

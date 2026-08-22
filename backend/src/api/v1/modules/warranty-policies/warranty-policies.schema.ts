@@ -27,6 +27,8 @@ export const listWarrantyPoliciesQuerySchema = createPaginationSchema(
 export const warrantyPolicyIdParamSchema = numericIdParamSchema
 
 export const createWarrantyPolicyBodySchema = z.object({
+  productId: z.number().int().positive('Product ID must be a positive integer'),
+  brandId: z.number().int().positive('Brand ID must be a positive integer'),
   title: z
     .string()
     .min(2, 'Title must be at least 2 characters')
@@ -38,6 +40,8 @@ export const createWarrantyPolicyBodySchema = z.object({
 })
 
 export const updateWarrantyPolicyBodySchema = z.object({
+  productId: z.number().int().positive().optional(),
+  brandId: z.number().int().positive().optional(),
   title: z
     .string()
     .min(2, 'Title must be at least 2 characters')
@@ -54,7 +58,7 @@ export type WarrantyPolicy = z.infer<typeof warrantyPolicySchema>
 export type ListWarrantyPoliciesQuery = z.infer<
   typeof listWarrantyPoliciesQuerySchema
 >
-export type warrantyPolicyIdParamSchema = z.infer<
+export type WarrantyPolicyIdParam = z.infer<
   typeof warrantyPolicyIdParamSchema
 >
 export type CreateWarrantyPolicyBody = z.infer<

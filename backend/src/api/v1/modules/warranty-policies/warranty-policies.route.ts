@@ -1,61 +1,75 @@
 import { Router } from 'express'
 import {
+  authenticate,
+  requireAdmin,
+} from '../../shared/middlewares/auth.middleware'
+import {
   validate,
   validateMultiple,
 } from '../../shared/middlewares/validate.middleware'
-import WarrantyPoliciesController from './warranty-policies.controller'
+import warrantyPoliciesController from './warranty-policies.controller'
 import {
   createWarrantyPolicyBodySchema,
   listWarrantyPoliciesQuerySchema,
   updateWarrantyPolicyBodySchema,
   warrantyPolicyIdParamSchema,
-} from './warranty-policiesshema'
+} from './warranty-policies.schema'
 
 const router = Router()
 
 router.get(
-  '/:productId/warranty-policies',
+  '/',
   validate(listWarrantyPoliciesQuerySchema, 'query'),
-  WarrantyPoliciesController.findAll,
+  warrantyPoliciesController.findAll,
 )
 
 router.get(
-  '/:productId/warranty-policies/:id',
+  '/:id',
   validate(warrantyPolicyIdParamSchema, 'params'),
-  WarrantyPoliciesController.findById,
+  warrantyPoliciesController.findById,
 )
 
 router.post(
-  '/:productId/warranty-policies',
+  '/',
+  authenticate,
+  requireAdmin,
   validate(createWarrantyPolicyBodySchema, 'body'),
-  WarrantyPoliciesController.create,
+  warrantyPoliciesController.create,
 )
 
 router.put(
-  '/:productId/warranty-policies/:id',
+  '/:id',
+  authenticate,
+  requireAdmin,
   validateMultiple({
-    params: createWarrantyPolicyBodySchema,
+    params: warrantyPolicyIdParamSchema,
     body: updateWarrantyPolicyBodySchema,
   }),
-  WarrantyPoliciesController.updateById,
+  warrantyPoliciesController.updateById,
 )
 
 router.delete(
-  '/:productId/warranty-policies/:id',
+  '/:id',
+  authenticate,
+  requireAdmin,
   validate(warrantyPolicyIdParamSchema, 'params'),
-  WarrantyPoliciesController.deleteById,
+  warrantyPoliciesController.deleteById,
 )
 
 router.delete(
-  '/:productId/warranty-policies/:id/soft',
+  '/:id/soft',
+  authenticate,
+  requireAdmin,
   validate(warrantyPolicyIdParamSchema, 'params'),
-  WarrantyPoliciesController.softDeleteById,
+  warrantyPoliciesController.softDeleteById,
 )
 
 router.post(
-  '/:productId/warranty-policies/:id/restore',
+  '/:id/restore',
+  authenticate,
+  requireAdmin,
   validate(warrantyPolicyIdParamSchema, 'params'),
-  WarrantyPoliciesController.restoreById,
+  warrantyPoliciesController.restoreById,
 )
 
 export default router

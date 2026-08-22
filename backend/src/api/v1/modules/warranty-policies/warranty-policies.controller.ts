@@ -1,11 +1,11 @@
 import type { Request, Response } from 'express'
 import { SuccessResponse } from '../../shared/models/success-response.model'
 import type {
-  warrantyPolicyIdParamSchema,
   CreateWarrantyPolicyBody,
   ListWarrantyPoliciesQuery,
   UpdateWarrantyPolicyBody,
-} from './warranty-policiesshema'
+  WarrantyPolicyIdParam,
+} from './warranty-policies.schema'
 import warrantyPoliciesService from './warranty-policies.service'
 
 class WarrantyPoliciesController {
@@ -19,88 +19,79 @@ class WarrantyPoliciesController {
       res,
       warrantyPolicies,
       { page, limit, total },
-      'Warranty Policies retrieved successfully',
+      'Warranty policies retrieved successfully',
     )
   }
 
   findById = async (req: Request, res: Response) => {
-    const { id } = req.validatedData?.params as warrantyPolicyIdParamSchema
+    const { id } = req.validatedData?.params as WarrantyPolicyIdParam
 
     const warrantyPolicy = await warrantyPoliciesService.findById(id)
 
     SuccessResponse.send(
       res,
       warrantyPolicy,
-      'Warranty Policy retrieved successfully',
+      'Warranty policy retrieved successfully',
     )
   }
 
   create = async (req: Request, res: Response) => {
-    const productId = Number(req.params.productId)
-
     const data = req.validatedData?.body as CreateWarrantyPolicyBody
-    const warrantyPolicy = await warrantyPoliciesService.create(productId, data)
+
+    const warrantyPolicy = await warrantyPoliciesService.create(data)
 
     SuccessResponse.created(
       res,
       warrantyPolicy,
-      'Warranty Policy created successfully',
+      'Warranty policy created successfully',
     )
   }
 
   updateById = async (req: Request, res: Response) => {
-    const { id } = req.validatedData?.params as warrantyPolicyIdParamSchema
-
+    const { id } = req.validatedData?.params as WarrantyPolicyIdParam
     const data = req.validatedData?.body as UpdateWarrantyPolicyBody
-    const updatedWarrantyPolicy = await warrantyPoliciesService.updateById(
-      id,
-      data,
-    )
+
+    const updatedWarrantyPolicy = await warrantyPoliciesService.update(id, data)
 
     SuccessResponse.send(
       res,
       updatedWarrantyPolicy,
-      'Warranty Policy updated successfully',
+      'Warranty policy updated successfully',
     )
   }
 
   deleteById = async (req: Request, res: Response) => {
-    const { id } = req.validatedData?.params as warrantyPolicyIdParamSchema
+    const { id } = req.validatedData?.params as WarrantyPolicyIdParam
 
-    const deletedWarrantyPolicy = await warrantyPoliciesService.deleteById(id)
+    const deleted = await warrantyPoliciesService.deleteById(id)
 
-    SuccessResponse.send(
-      res,
-      deletedWarrantyPolicy,
-      'Warranty Policy deleted permanently',
-    )
+    SuccessResponse.send(res, deleted, 'Warranty policy deleted permanently')
   }
 
   softDeleteById = async (req: Request, res: Response) => {
-    const { id } = req.validatedData?.params as warrantyPolicyIdParamSchema
+    const { id } = req.validatedData?.params as WarrantyPolicyIdParam
 
-    const softDeletedWarrantyPolicy =
-      await warrantyPoliciesService.softDeleteById(id)
+    const softDeleted = await warrantyPoliciesService.softDelete(id)
 
     SuccessResponse.send(
       res,
-      softDeletedWarrantyPolicy,
-      'Warranty Policy soft deleted successfully',
+      softDeleted,
+      'Warranty policy soft deleted successfully',
     )
   }
 
   restoreById = async (req: Request, res: Response) => {
-    const { id } = req.validatedData?.params as warrantyPolicyIdParamSchema
+    const { id } = req.validatedData?.params as WarrantyPolicyIdParam
 
-    const restoredWarrantyPolicy = await warrantyPoliciesService.restoreById(id)
+    const restoredWarrantyPolicy = await warrantyPoliciesService.restore(id)
 
     SuccessResponse.send(
       res,
       restoredWarrantyPolicy,
-      'Warranty Policy restored successfully',
+      'Warranty policy restored successfully',
     )
   }
 }
 
 export const warrantyPoliciesController = new WarrantyPoliciesController()
-export default new WarrantyPoliciesController()
+export default warrantyPoliciesController

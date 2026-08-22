@@ -2,7 +2,7 @@ import type { Prisma } from '@generated/prisma/client'
 import { prisma } from '../../shared/config/database/postgres'
 import { executePrismaQuery } from '../../shared/utils/prisma-error.util'
 
-export const WARRANTYPOLICIES_SELECT_FIELDS = {
+export const WARRANTY_POLICIES_SELECT_FIELDS = {
   id: true,
   title: true,
   description: true,
@@ -18,7 +18,7 @@ class WarrantyPoliciesRepository {
     return executePrismaQuery(() =>
       prisma.warrantyPolicy.findUniqueOrThrow({
         where: { id },
-        select: WARRANTYPOLICIES_SELECT_FIELDS,
+        select: WARRANTY_POLICIES_SELECT_FIELDS,
       }),
     )
   }
@@ -32,7 +32,7 @@ class WarrantyPoliciesRepository {
     return executePrismaQuery(() =>
       prisma.warrantyPolicy.findMany({
         ...params,
-        select: WARRANTYPOLICIES_SELECT_FIELDS,
+        select: WARRANTY_POLICIES_SELECT_FIELDS,
       }),
     )
   }
@@ -45,7 +45,7 @@ class WarrantyPoliciesRepository {
     return executePrismaQuery(() =>
       prisma.warrantyPolicy.create({
         data,
-        select: WARRANTYPOLICIES_SELECT_FIELDS,
+        select: WARRANTY_POLICIES_SELECT_FIELDS,
       }),
     )
   }
@@ -55,7 +55,7 @@ class WarrantyPoliciesRepository {
       prisma.warrantyPolicy.update({
         where: { id },
         data,
-        select: WARRANTYPOLICIES_SELECT_FIELDS,
+        select: WARRANTY_POLICIES_SELECT_FIELDS,
       }),
     )
   }
@@ -64,7 +64,7 @@ class WarrantyPoliciesRepository {
     return executePrismaQuery(() =>
       prisma.warrantyPolicy.delete({
         where: { id },
-        select: WARRANTYPOLICIES_SELECT_FIELDS,
+        select: WARRANTY_POLICIES_SELECT_FIELDS,
       }),
     )
   }
@@ -74,7 +74,7 @@ class WarrantyPoliciesRepository {
       prisma.warrantyPolicy.update({
         where: { id },
         data: { deletedAt: new Date() },
-        select: WARRANTYPOLICIES_SELECT_FIELDS,
+        select: WARRANTY_POLICIES_SELECT_FIELDS,
       }),
     )
   }
