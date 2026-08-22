@@ -51,10 +51,15 @@ const AdminLoginForm = ({
           toast.success(message ?? 'Đăng nhập trang quản trị thành công!')
           navigate('/admin/dashboard', { replace: true })
         } else {
+          useAdminAuthStore.getState().reset()
           toast.error('Không thể tải thông tin tài khoản quản trị.')
         }
+      } else {
+        useAdminAuthStore.getState().reset()
+        toast.error('Đăng nhập quản trị thất bại. Vui lòng kiểm tra lại.')
       }
     } catch {
+      useAdminAuthStore.getState().reset()
       toast.error(
         'Đăng nhập quản trị thất bại. Vui lòng kiểm tra lại email và mật khẩu.',
       )
