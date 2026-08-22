@@ -36,15 +36,13 @@ class ProductService {
         take: limit,
       })
 
-      return Promise.all(
-        fallbackProducts.map(async (product) => {
-          const minPrice = await productRepository.getMinPrice(product.id)
-          return {
-            ...product,
-            minPrice,
-          }
-        }),
-      )
+      const productIds = fallbackProducts.map((p) => p.id)
+      const minPriceMap = await productRepository.getMinPricesBatch(productIds)
+
+      return fallbackProducts.map((product) => ({
+        ...product,
+        minPrice: (minPriceMap.get(product.id) as any) ?? null,
+      }))
     }
 
     const products = await productRepository.findMany({
@@ -58,21 +56,17 @@ class ProductService {
     })
 
     const productMap = new Map(products.map((product) => [product.id, product]))
+    const minPriceMap = await productRepository.getMinPricesBatch(orderedProductIds)
 
-    const orderedProducts = await Promise.all(
-      orderedProductIds
-        .map((id) => productMap.get(id))
-        .filter((product): product is NonNullable<typeof product> =>
-          Boolean(product),
-        )
-        .map(async (product) => {
-          const minPrice = await productRepository.getMinPrice(product.id)
-          return {
-            ...product,
-            minPrice,
-          }
-        }),
-    )
+    const orderedProducts = orderedProductIds
+      .map((id) => productMap.get(id))
+      .filter((product): product is NonNullable<typeof product> =>
+        Boolean(product),
+      )
+      .map((product) => ({
+        ...product,
+        minPrice: (minPriceMap.get(product.id) as any) ?? null,
+      }))
 
     return orderedProducts
   }
@@ -118,15 +112,13 @@ class ProductService {
       productRepository.count(where),
     ])
 
-    const productsWithMinPrice = await Promise.all(
-      products.map(async (product) => {
-        const minPrice = await productRepository.getMinPrice(product.id)
-        return {
-          ...product,
-          minPrice,
-        }
-      }),
-    )
+    const productIds = products.map((p) => p.id)
+    const minPriceMap = await productRepository.getMinPricesBatch(productIds)
+
+    const productsWithMinPrice = products.map((product) => ({
+      ...product,
+      minPrice: (minPriceMap.get(product.id) as any) ?? null,
+    }))
 
     return { products: productsWithMinPrice, total, page, limit }
   }

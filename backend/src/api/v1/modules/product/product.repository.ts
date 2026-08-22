@@ -237,6 +237,28 @@ class ProductRepository {
     return result._min.price
   }
 
+  getMinPricesBatch = async (productIds: number[]) => {
+    if (productIds.length === 0) return new Map<number, unknown>()
+    const results = await executePrismaQuery(() =>
+      prisma.productVariant.groupBy({
+        by: ['productId'],
+        where: {
+          productId: { in: productIds },
+          deletedAt: null,
+        },
+        _min: {
+          price: true,
+        },
+      }),
+    )
+
+    const map = new Map<number, unknown>()
+    results.forEach((r) => {
+      map.set(r.productId, r._min.price)
+    })
+    return map
+  }
+
   findManyWithPrimaryImage = async (productIds: number[]) => {
     return executePrismaQuery(() =>
       prisma.product.findMany({
