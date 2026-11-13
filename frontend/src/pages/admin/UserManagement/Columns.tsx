@@ -66,24 +66,6 @@ const createUserColumns = ({
     },
 
     {
-      accessorKey: 'googleId',
-      header: () => <TableCellAlign align="center">Auth</TableCellAlign>,
-      cell: ({ row }) => {
-        const value = row.getValue<string | null>('googleId')
-
-        return (
-          <TableIconCell>
-            {value ? (
-              <Badge variant="secondary">Google</Badge>
-            ) : (
-              <Badge variant="outline">Password</Badge>
-            )}
-          </TableIconCell>
-        )
-      },
-    },
-
-    {
       id: 'security',
       header: () => (
         <div className="flex items-center justify-center gap-1">
