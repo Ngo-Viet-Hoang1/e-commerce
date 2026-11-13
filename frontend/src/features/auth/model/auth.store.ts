@@ -39,7 +39,7 @@ const createAuthStore = ({
   }
 
   const tryRefreshToken = async (): Promise<string | null> => {
-    const refreshApi = axios.create({ baseURL, withCredentials: true })
+    const refreshApi = axios.create({ baseURL, withCredentials: true, timeout: 60000 })
     const res = await refreshApi.post(refreshTokenEndpoint)
     return res.data?.data?.accessToken ?? null
   }

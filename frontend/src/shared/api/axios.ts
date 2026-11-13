@@ -52,7 +52,7 @@ const createAuthAxiosInstance = ({
 
   const config: CreateAxiosDefaults = {
     baseURL,
-    timeout: 30000,
+    timeout: 60000,
     headers: {
       'Content-Type': 'application/json',
     },
@@ -124,6 +124,7 @@ const createAuthAxiosInstance = ({
           const refreshApi = axios.create({
             baseURL: config.baseURL,
             withCredentials: true,
+            timeout: 60000,
           })
 
           const res = await refreshApi.post(refreshTokenEndpoint)
